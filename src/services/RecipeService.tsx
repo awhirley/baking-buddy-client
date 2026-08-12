@@ -16,7 +16,7 @@ export type Recipe = {
   createdAt: string | null;
 };
 
-export type CreateRecipeArgs = {
+export type CreateRecipePayload = {
   name: string;
   description: string;
 };
@@ -27,7 +27,7 @@ export const recipeService = {
       return response.data;
     },
 
-    async createRecipe(args: CreateRecipeArgs): Promise<Recipe[]> {
+    async createRecipe(args: CreateRecipePayload): Promise<Recipe[]> {
       const response = await api.post<Recipe[]>('/recipes', args);
       return response.data;
     },

@@ -20,6 +20,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
+import { recipeService, type CreateRecipePayload } from "../../services/RecipeService";
+import { useMutation } from "@tanstack/react-query";
 
 interface Ingredient {
   id: string;
@@ -35,7 +37,7 @@ interface InstructionStep {
 let idCounter = 0;
 const nextId = () => `id-${idCounter++}`;
 
-export default function RecipeForm() {
+export function RecipeForm() {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [sourceType, setSourceType] = useState<"cookbook" | "url"| "other">("cookbook");
@@ -85,18 +87,30 @@ export default function RecipeForm() {
     );
   };
 
+
+  const { mutate: createRecipe, isPending: isCreating } = useMutation({
+    mutationFn: (newRecipe: CreateRecipePayload) =>
+      recipeService.createRecipe(newRecipe),
+    onSuccess: (data) => {
+      console.log("Recipe created successfully:", data);
+    },
+    onError: (error) => {
+      console.error("Error creating recipe:", error);
+    },
+  });
+
   const handleCreate = () => {
-    const payload = {
+    const payload: CreateRecipePayload = {
       name,
       description,
-      source: { type: sourceType, value: source },
-      ingredients: ingredients.map(({ amount, name }) => ({ amount, name })),
-      instructions: instructions.map((s) => s.text),
+      // source: { type: sourceType, value: source },
+      // ingredients: ingredients.map(({ amount, name }) => ({ amount, name })),
+      // instructions: instructions.map((s) => s.text),
     };
-    // Not wired up to an endpoint yet — log for now.
-    console.log("New recipe:", payload);
+    createRecipe(payload);
   };
 
+  
   return (
     <div className="mx-auto w-full max-w-2xl p-6">
       <Card>
