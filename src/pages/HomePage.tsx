@@ -1,5 +1,5 @@
-import { Body } from "../components/HomePage/Body";
-import { Header } from "../components/HomePage/Header";
+import { Body } from "#components/HomePage/Body";
+import { Header } from "#components/HomePage/Header";
 
 export function HomePage() {
   return (

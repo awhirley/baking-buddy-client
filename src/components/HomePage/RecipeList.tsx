@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { recipeService } from '../../services/RecipeService';
 import { type Recipe as RecipeType } from "../../types/Types"
 import { H3 } from './../ui/typography';
-import { Recipe } from './Recipe';
+import { Recipe } from './RecipeCard';
 
 export function RecipeList() {
   const { data, isLoading, error } = useQuery({

@@ -1,5 +1,5 @@
-import { RecipeForm } from "../components/CreateRecipeForm/CreateRecipeForm";
-import { Header } from "../components/HomePage/Header";
+import { RecipeForm } from "#components/CreateRecipeForm/CreateRecipeForm";
+import { Header } from "#components/HomePage/Header";
 
 export function CreateRecipe() {
   return (
