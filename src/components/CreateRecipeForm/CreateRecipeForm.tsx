@@ -1,5 +1,6 @@
 
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Plus, Trash2, ChefHat, BookOpen, Link as LinkIcon } from "lucide-react";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
@@ -22,7 +23,7 @@ import {
 } from "../ui/select";
 import { recipeService } from "../../services/RecipeService";
 import { useMutation } from "@tanstack/react-query";
-import type { CreateRecipePayload } from "../../types/Recipe";
+import type { CreateRecipePayload } from "../../types/Types";
 
 interface Ingredient {
   id: string;
@@ -39,6 +40,7 @@ let idCounter = 0;
 const nextId = () => `id-${idCounter++}`;
 
 export function RecipeForm() {
+  const navigate = useNavigate();
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [sourceType, setSourceType] = useState<"cookbook" | "url"| "other">("cookbook");
@@ -298,7 +300,10 @@ export function RecipeForm() {
 
           <Separator />
 
-          <div className="flex justify-end">
+          <div className="flex gap-x-4 justify-end">
+            <Button type="button" variant="secondary" onClick={() => navigate("/")} size="lg">
+              Cancel
+            </Button>
             <Button type="button" onClick={handleCreate} size="lg">
               Create recipe
             </Button>

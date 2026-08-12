@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { createRecipePayloadtoApiPayload, type CreateRecipePayload, type Recipe, type RecipeDetail } from '../types/Recipe';
+import { createRecipePayloadtoApiPayload, type CreateRecipePayload, type Recipe, type RecipeDetail } from '../types/Types';
 
 const recipeServiceApi = `${import.meta.env.VITE_API_URL}/api`;
 
@@ -20,4 +20,9 @@ export const recipeService = {
       const response = await api.post<RecipeDetail[]>('/recipes', createRecipePayloadtoApiPayload(args));
       return response.data;
     },
+
+    async getRecipeById(id: string): Promise<RecipeDetail> {
+      const response = await api.get<RecipeDetail>(`/recipes/${id}`);
+      return response.data;
+    }
 }

@@ -1,9 +1,12 @@
+import { useNavigate } from "react-router-dom";
 
-import { type Recipe } from '../../services/RecipeService';
+import { type Recipe } from '../../types/Types';
 import { Button } from '#components/ui/button';
 import { Card, CardAction, CardDescription, CardHeader, CardTitle } from '#components/ui/card';
 
 export function Recipe({ recipe }: { recipe: Recipe }) {
+  const navigate = useNavigate();
+
   return (
     <Card className="mb-4">
       <CardHeader>
@@ -13,7 +16,7 @@ export function Recipe({ recipe }: { recipe: Recipe }) {
           <Button variant="outline" size="sm" onClick={() => console.log("New!")}>
             New Bake
           </Button>
-          <Button size="sm" onClick={() => console.log("View!")}>
+          <Button size="sm" onClick={() => navigate(`/view/${recipe.id}`)}>
             View Recipe
           </Button>
         </CardAction>

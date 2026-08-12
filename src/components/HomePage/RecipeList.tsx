@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
-import { recipeService, type Recipe as RecipeType } from '../../services/RecipeService';
+import { recipeService } from '../../services/RecipeService';
+import { type Recipe as RecipeType } from "../../types/Types"
 import { H3 } from './../ui/typography';
 import { Recipe } from './Recipe';
 
