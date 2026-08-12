@@ -1,3 +1,13 @@
+export interface Recipe {
+  id: string;
+  name: string;
+  description: string;
+  recipeSource: string | null;
+  tags: string[];
+  tools: string[];
+  createdAt: string;
+}
+
 export interface Ingredient {
   id: string;
   amount: string;
@@ -7,16 +17,6 @@ export interface Ingredient {
 export interface Instruction {
   id: string;
   description: string;
-}
-
-export interface Recipe {
-  id: string;
-  name: string;
-  description: string;
-  recipeSource: string | null;
-  tags: string[];
-  tools: string[];
-  createdAt: string;
 }
 
 export interface RecipeDetail {
