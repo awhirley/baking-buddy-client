@@ -20,8 +20,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
-import { recipeService, type CreateRecipePayload } from "../../services/RecipeService";
+import { recipeService } from "../../services/RecipeService";
 import { useMutation } from "@tanstack/react-query";
+import type { CreateRecipePayload } from "../../types/Recipe";
 
 interface Ingredient {
   id: string;
@@ -103,9 +104,11 @@ export function RecipeForm() {
     const payload: CreateRecipePayload = {
       name,
       description,
-      // source: { type: sourceType, value: source },
-      // ingredients: ingredients.map(({ amount, name }) => ({ amount, name })),
-      // instructions: instructions.map((s) => s.text),
+      recipeSource: source,
+      tags: [],
+      tools: [],
+      ingredients: ingredients.map(({ amount, name }) => ({ amount, name })),
+      instructions: instructions.map((s) => s.text),
     };
     createRecipe(payload);
   };
