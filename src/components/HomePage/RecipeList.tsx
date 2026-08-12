@@ -1,5 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
-import { recipeService, type Recipe } from '../services/RecipeService';
+import { recipeService, type Recipe as RecipeType } from '../../services/RecipeService';
+import { H3 } from './../ui/typography';
+import { Recipe } from './Recipe';
 
 export function RecipeList() {
   const { data, isLoading, error } = useQuery({
@@ -10,17 +12,13 @@ export function RecipeList() {
     }
   });
 
-  console.log('isLoading', isLoading);
-  console.log('data', data);
+  // TODO: Handle loading and error states
 
   return (
     <div>
-      <h2>Recipes</h2>
-        {data?.map((recipe: Recipe) => (
-          <div key={recipe.id}>
-          <h2>{recipe.name}</h2>
-          <p>{recipe.description}</p>
-          </div>
+      <H3 className="mb-4">Recipes</H3>
+        {data?.map((recipe: RecipeType) => (
+          <Recipe recipe={recipe} />
         ))}
     </div>
   );
