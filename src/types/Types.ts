@@ -1,11 +1,8 @@
 export interface Recipe {
   id: string;
-  name: string;
-  description: string;
-  recipeSource: string | null;
-  tags: string[];
-  tools: string[];
-  createdAt: string;
+  details: RecipeDetail;
+  ingredients: Ingredient[];
+  instructions: Instruction[];
 }
 
 export interface Ingredient {
@@ -27,8 +24,6 @@ export interface RecipeDetail {
   tags: string[];
   tools: string[];
   createdAt: string;
-  ingredients: Ingredient[];
-  instructions: Instruction[];
 }
 
 export interface CreateIngredientPayload {

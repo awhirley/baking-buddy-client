@@ -1,10 +1,10 @@
 import { useNavigate } from "react-router-dom";
 
-import { type Recipe } from '../../types/Types';
+import { type RecipeDetail } from '../../types/Types';
 import { Button } from '#components/ui/button';
 import { Card, CardAction, CardDescription, CardHeader, CardTitle } from '#components/ui/card';
 
-export function Recipe({ recipe }: { recipe: Recipe }) {
+export function Recipe({ recipe }: { recipe: RecipeDetail }) {
   const navigate = useNavigate();
 
   return (

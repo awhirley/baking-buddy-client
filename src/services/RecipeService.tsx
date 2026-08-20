@@ -11,18 +11,18 @@ export const api = axios.create({
 });
 
 export const recipeService = {
-    async listRecipes(): Promise<Recipe[]> {
-      const response = await api.get<Recipe[]>('/recipes');
+    async listRecipes(): Promise<RecipeDetail[]> {
+      const response = await api.get<RecipeDetail[]>('/recipes');
       return response.data;
     },
 
-    async createRecipe(args: CreateRecipePayload): Promise<RecipeDetail[]> {
-      const response = await api.post<RecipeDetail[]>('/recipes', createRecipePayloadtoApiPayload(args));
+    async createRecipe(args: CreateRecipePayload): Promise<Recipe[]> {
+      const response = await api.post<Recipe[]>('/recipes', createRecipePayloadtoApiPayload(args));
       return response.data;
     },
 
-    async getRecipeById(id: string): Promise<RecipeDetail> {
-      const response = await api.get<RecipeDetail>(`/recipes/${id}`);
+    async getRecipeById(id: string): Promise<Recipe> {
+      const response = await api.get<Recipe>(`/recipes/${id}`);
       return response.data;
     }
 }

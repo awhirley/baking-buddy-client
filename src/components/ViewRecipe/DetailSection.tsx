@@ -32,7 +32,7 @@ export function RecipeDetailsCard({
       <CardContent className="flex flex-col gap-4">
         <p className="text-sm">{description}</p>
 
-        {(tags.length > 0 || tools.length > 0) && (
+        {(tags?.length > 0 || tools?.length > 0) && (
           <div className="flex flex-col gap-2">
             {tags.length > 0 && (
               <div className="flex flex-wrap gap-2">
