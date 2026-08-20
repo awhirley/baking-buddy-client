@@ -24,6 +24,8 @@ import {
 import { recipeService } from "../../services/RecipeService";
 import { useMutation } from "@tanstack/react-query";
 import type { CreateRecipePayload } from "../../types/Types";
+import { Spinner } from "#components/ui/spinner";
+import { useToast } from "../../contexts/ToastContext";
 
 interface Ingredient {
   id: string;
@@ -41,6 +43,7 @@ const nextId = () => `id-${idCounter++}`;
 
 export function RecipeForm() {
   const navigate = useNavigate();
+  const { addToast } = useToast();
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [sourceType, setSourceType] = useState<"cookbook" | "url"| "other">("cookbook");
@@ -95,10 +98,11 @@ export function RecipeForm() {
     mutationFn: (newRecipe: CreateRecipePayload) =>
       recipeService.createRecipe(newRecipe),
     onSuccess: (data) => {
-      console.log("Recipe created successfully:", data);
+      addToast('Saved successfully!', { type: 'default' });
+      navigate(`/view/${data.id}`)
     },
     onError: (error) => {
-      console.error("Error creating recipe:", error);
+      addToast('Failed to save.', { type: 'destructive', duration: 6000 });
     },
   });
 
@@ -304,8 +308,8 @@ export function RecipeForm() {
             <Button type="button" variant="secondary" onClick={() => navigate("/")} size="lg">
               Cancel
             </Button>
-            <Button type="button" onClick={handleCreate} size="lg">
-              Create recipe
+            <Button style={{ width: '150px'}}type="button" onClick={handleCreate} size="lg">
+              { isCreating ? <Spinner /> : "Create recipe" }
             </Button>
           </div>
         </CardContent>

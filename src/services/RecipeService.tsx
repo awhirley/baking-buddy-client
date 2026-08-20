@@ -16,8 +16,8 @@ export const recipeService = {
       return response.data;
     },
 
-    async createRecipe(args: CreateRecipePayload): Promise<Recipe[]> {
-      const response = await api.post<Recipe[]>('/recipes', createRecipePayloadtoApiPayload(args));
+    async createRecipe(args: CreateRecipePayload): Promise<Recipe> {
+      const response = await api.post<Recipe>('/recipes', createRecipePayloadtoApiPayload(args));
       return response.data;
     },
 
