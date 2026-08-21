@@ -1,6 +1,6 @@
 import { Alert, AlertAction, AlertDescription, AlertTitle } from '#components/ui/alert';
 import { Button } from '#components/ui/button';
-import { AlertCircleIcon } from 'lucide-react';
+import { AlertCircleIcon, Croissant } from 'lucide-react';
 import { createContext, useContext, useState, useCallback, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 
@@ -45,14 +45,16 @@ export function ToastProvider({ children }: { children: ReactNode }) {
     [removeToast]
   );
 
+  const getClassName = (type: ToastType): string => type === 'destructive' ? "max-w-md" : "max-w-md bg-green-100";
+
   return (
     <ToastContext.Provider value={{ addToast, removeToast }}>
       {children}
       {createPortal(
         <div className="fixed bottom-5 right-5 z-[1000] flex flex-col gap-2">
           {toasts.map((toast) => (
-            <Alert variant={toast.type} className="max-w-md">
-              <AlertCircleIcon />
+            <Alert variant={toast.type} className={getClassName(toast.type)}>
+              { toast.type === 'destructive' ? <AlertCircleIcon /> : <Croissant /> }
               <AlertTitle>{toast.message}</AlertTitle>
               <AlertDescription>
                 Here's an alert description!

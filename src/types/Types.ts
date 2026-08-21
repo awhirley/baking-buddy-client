@@ -33,7 +33,7 @@ export interface CreateIngredientPayload {
 
 export interface CreateRecipePayload {
   name: string;
-  description: string;
+  description: string | null;
   recipeSource: string | null;
   tags: string[] | null;
   tools: string[] | null;

@@ -109,8 +109,8 @@ export function RecipeForm() {
   const handleCreate = () => {
     const payload: CreateRecipePayload = {
       name,
-      description,
-      recipeSource: source,
+      description: description === "" ? null : description,
+      recipeSource: source === "" ? null : source,
       tags: [],
       tools: [],
       ingredients: ingredients.map(({ amount, name }) => ({ amount, name })),
