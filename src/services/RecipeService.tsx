@@ -24,5 +24,9 @@ export const recipeService = {
     async getRecipeById(id: string): Promise<Recipe> {
       const response = await api.get<Recipe>(`/recipes/${id}`);
       return response.data;
+    },
+
+    async deleteRecipe(id: string): Promise<void> {
+      await api.delete(`/recipes/${id}`);
     }
 }
