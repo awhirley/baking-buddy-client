@@ -1,6 +1,6 @@
 "use client";
 
-import { Tagline } from "#components/pro-blocks/landing-page/tagline";
+import { Tagline } from "#components/ui/tagline";
 
 export function HeaderSection1() {
   return (

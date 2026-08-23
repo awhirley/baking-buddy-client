@@ -39,13 +39,7 @@ export function Recipe() {
 
       {data && (
         <div className="flex flex-col gap-6">
-          <RecipeDetailsCard
-            name={data.details.name}
-            description={data.details.description}
-            recipeSource={data.details.recipeSource}
-            tags={data.details.tags}
-            tools={data.details.tools}
-          />
+          <RecipeDetailsCard {...data.details} />
 
           <IngredientsSection ingredients={data.ingredients} />
 

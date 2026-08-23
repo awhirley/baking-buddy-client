@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { createRecipePayloadtoApiPayload, type CreateRecipePayload, type Recipe, type RecipeDetail } from '../types/Types';
+import { toCamelCase } from './caseConversion';
 
 const recipeServiceApi = `${import.meta.env.VITE_API_URL}/api`;
 
@@ -8,6 +9,11 @@ export const api = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
+});
+
+api.interceptors.response.use((response) => {
+  response.data = toCamelCase(response.data);
+  return response;
 });
 
 export const recipeService = {

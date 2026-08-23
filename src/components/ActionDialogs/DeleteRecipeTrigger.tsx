@@ -20,22 +20,29 @@ import { Button } from "#components/ui/button"
 import { Trash2Icon } from "lucide-react"
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState, type Dispatch, type SetStateAction } from "react";
+import { useNavigate } from "react-router-dom";
+import { useToast } from "../../contexts/ToastContext";
 
 interface DeleteRecipeTriggerProps {
   isOpen: boolean;
   setIsOpen: Dispatch<SetStateAction<boolean>>;
   recipeId: string;
+  navigateToHome?: boolean;
 }
 
-export function DeleteRecipeTrigger({ isOpen, setIsOpen, recipeId }: DeleteRecipeTriggerProps) {
+export function DeleteRecipeTrigger({ isOpen, setIsOpen, recipeId, navigateToHome = false }: DeleteRecipeTriggerProps) {
   const queryClient = useQueryClient();
   const [showAlert, setShowAlert] = useState(false);
+  const navigate = useNavigate();
+  const { addToast } = useToast();
 
   const deleteRecipeMutation = useMutation({
     mutationFn: (id: string) => recipeService.deleteRecipe(id),
     onSuccess: () => {
+      addToast('Deleted successfully!', { type: 'default' });
       queryClient.invalidateQueries({ queryKey: ['recipesList'] });
       setIsOpen(false);
+      if (navigateToHome) navigate("/");
     },
     onError: () => {
       setShowAlert(true);

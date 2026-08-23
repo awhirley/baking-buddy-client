@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "#components/ui/button";
-import { Tagline } from "#components/pro-blocks/landing-page/tagline";
+import { Tagline } from "#components/ui/tagline";
 import { AspectRatio } from "#components/ui/aspect-ratio";
 import Image from "next/image";
 import { ArrowUpRight } from "lucide-react";

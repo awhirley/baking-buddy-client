@@ -1,7 +1,6 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Plus, Trash2, ChefHat, BookOpen, Link as LinkIcon } from "lucide-react";
+import { Plus, Trash2, ChefHat, BookOpen, Link as LinkIcon, Images as InstagramIcon, PenLine } from "lucide-react";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
@@ -29,13 +28,13 @@ import { useToast } from "../../contexts/ToastContext";
 
 interface Ingredient {
   id: string;
-  amount: string;
-  name: string;
+  amount: string | null;
+  name: string | null;
 }
 
 interface InstructionStep {
   id: string;
-  text: string;
+  text: string | null;
 }
 
 let idCounter = 0;
@@ -44,21 +43,21 @@ const nextId = () => `id-${idCounter++}`;
 export function RecipeForm() {
   const navigate = useNavigate();
   const { addToast } = useToast();
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
-  const [sourceType, setSourceType] = useState<"cookbook" | "url"| "other">("cookbook");
-  const [source, setSource] = useState("");
+  const [name, setName] = useState<string>("");
+  const [description, setDescription] = useState<string>("");
+  const [sourceType, setSourceType] = useState<"cookbook" | "url"| "instagram" | "other">("cookbook");
+  const [source, setSource] = useState<string>("");
 
   const [ingredients, setIngredients] = useState<Ingredient[]>([
-    { id: nextId(), amount: "", name: "" },
+    { id: nextId(), amount: null, name: null },
   ]);
 
   const [instructions, setInstructions] = useState<InstructionStep[]>([
-    { id: nextId(), text: "" },
+    { id: nextId(), text: null },
   ]);
 
   const addIngredient = () => {
-    setIngredients((prev) => [...prev, { id: nextId(), amount: "", name: "" }]);
+    setIngredients((prev) => [...prev, { id: nextId(), amount: null, name: null }]);
   };
 
   const removeIngredient = (id: string) => {
@@ -73,12 +72,14 @@ export function RecipeForm() {
     value: string
   ) => {
     setIngredients((prev) =>
-      prev.map((i) => (i.id === id ? { ...i, [field]: value } : i))
+      prev.map((i) =>
+        i.id === id ? { ...i, [field]: value === "" ? null : value } : i
+      )
     );
   };
 
   const addInstruction = () => {
-    setInstructions((prev) => [...prev, { id: nextId(), text: "" }]);
+    setInstructions((prev) => [...prev, { id: nextId(), text: null }]);
   };
 
   const removeInstruction = (id: string) => {
@@ -89,10 +90,18 @@ export function RecipeForm() {
 
   const updateInstruction = (id: string, value: string) => {
     setInstructions((prev) =>
-      prev.map((s) => (s.id === id ? { ...s, text: value } : s))
+      prev.map((s) =>
+        s.id === id ? { ...s, text: value === "" ? null : value } : s
+      )
     );
   };
 
+  const hasIncompleteIngredient = ingredients.some(
+    (i) => i.amount === null || i.name === null
+  );
+  const hasIncompleteInstruction = instructions.some((s) => s.text === null);
+  const disableCreateButton =
+    name === "" || hasIncompleteIngredient || hasIncompleteInstruction;
 
   const { mutate: createRecipe, isPending: isCreating } = useMutation({
     mutationFn: (newRecipe: CreateRecipePayload) =>
@@ -113,8 +122,13 @@ export function RecipeForm() {
       recipeSource: source === "" ? null : source,
       tags: [],
       tools: [],
-      ingredients: ingredients.map(({ amount, name }) => ({ amount, name })),
-      instructions: instructions.map((s) => s.text),
+      // Safe to assume non-null here: the create button is disabled
+      // whenever any ingredient/instruction field is still null.
+      ingredients: ingredients.map(({ amount, name }) => ({
+        amount: amount ?? "",
+        name: name ?? "",
+      })),
+      instructions: instructions.map((s) => s.text ?? ""),
     };
     createRecipe(payload);
   };
@@ -137,10 +151,13 @@ export function RecipeForm() {
           {/* Basic info */}
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="recipe-name">Recipe name</Label>
+              <Label htmlFor="recipe-name">
+                Recipe name <span className="text-destructive">*</span>
+              </Label>
               <Input
                 id="recipe-name"
-                placeholder="e.g. Grandma's Sunday Sauce"
+                required={true}
+                className={name === "" ? "border-destructive/40" : ""}
                 value={name}
                 onChange={(e) => setName(e.target.value)}
               />
@@ -162,7 +179,7 @@ export function RecipeForm() {
               <div className="flex gap-2">
                 <Select
                   value={sourceType}
-                  onValueChange={(value: "cookbook" | "url" | "other" | null) => {
+                  onValueChange={(value: "cookbook" | "url" | "instagram" | "other" | null) => {
                     if (value !== null) {
                       setSourceType(value);
                     } else {
@@ -186,6 +203,18 @@ export function RecipeForm() {
                         URL
                       </span>
                     </SelectItem>
+                    <SelectItem value="instagram">
+                      <span className="flex items-center gap-2">
+                        <InstagramIcon className="h-4 w-4" />
+                        Instagram
+                      </span>
+                    </SelectItem>
+                    <SelectItem value="other">
+                      <span className="flex items-center gap-2">
+                        <PenLine className="h-4 w-4" />
+                        Add your own
+                      </span>
+                    </SelectItem>
                   </SelectContent>
                 </Select>
                 <Input
@@ -193,6 +222,8 @@ export function RecipeForm() {
                   placeholder={
                     sourceType === "cookbook"
                       ? "e.g. Salt, Fat, Acid, Heat, p. 214"
+                      : sourceType === "other"
+                      ? "e.g. Grandma's recipe box"
                       : "https://example.com/recipe"
                   }
                   value={source}
@@ -207,7 +238,9 @@ export function RecipeForm() {
           {/* Ingredients */}
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <Label className="text-base">Ingredients</Label>
+              <Label className="text-base">
+                Ingredients <span className="text-destructive">*</span>
+              </Label>
               <Button
                 type="button"
                 variant="outline"
@@ -226,17 +259,21 @@ export function RecipeForm() {
                     {index + 1}.
                   </span>
                   <Input
-                    className="w-28 shrink-0"
+                    className={`w-28 shrink-0 ${
+                      ingredient.amount === null ? "border-destructive/40" : ""
+                    }`}
                     placeholder="Amount"
-                    value={ingredient.amount}
+                    value={ingredient.amount ?? ""}
                     onChange={(e) =>
                       updateIngredient(ingredient.id, "amount", e.target.value)
                     }
                   />
                   <Input
-                    className="flex-1"
+                    className={`flex-1 ${
+                      ingredient.name === null ? "border-destructive/40" : ""
+                    }`}
                     placeholder="Ingredient"
-                    value={ingredient.name}
+                    value={ingredient.name ?? ""}
                     onChange={(e) =>
                       updateIngredient(ingredient.id, "name", e.target.value)
                     }
@@ -261,7 +298,9 @@ export function RecipeForm() {
           {/* Instructions */}
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <Label className="text-base">Instructions</Label>
+              <Label className="text-base">
+                Instructions <span className="text-destructive">*</span>
+              </Label>
               <Button
                 type="button"
                 variant="outline"
@@ -280,9 +319,11 @@ export function RecipeForm() {
                     {index + 1}.
                   </span>
                   <Input
-                    className="flex-1"
+                    className={`flex-1 ${
+                      step.text === null ? "border-destructive/40" : ""
+                    }`}
                     placeholder={`Step ${index + 1}`}
-                    value={step.text}
+                    value={step.text ?? ""}
                     onChange={(e) =>
                       updateInstruction(step.id, e.target.value)
                     }
@@ -308,7 +349,7 @@ export function RecipeForm() {
             <Button type="button" variant="secondary" onClick={() => navigate("/")} size="lg">
               Cancel
             </Button>
-            <Button style={{ width: '150px'}}type="button" onClick={handleCreate} size="lg">
+            <Button style={{ width: '150px'}}type="button" onClick={handleCreate} size="lg" disabled={disableCreateButton}>
               { isCreating ? <Spinner /> : "Create recipe" }
             </Button>
           </div>

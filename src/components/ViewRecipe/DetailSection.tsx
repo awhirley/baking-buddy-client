@@ -1,21 +1,22 @@
+import { DeleteRecipeTrigger } from "#components/ActionDialogs/DeleteRecipeTrigger";
 import { Badge } from "#components/ui/badge";
 import { Button } from "#components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "#components/ui/card";
 import { Pencil } from "lucide-react";
+import { useState } from "react";
+import type { RecipeDetail } from "../../types/Types";
 
 export function RecipeDetailsCard({
+  id,
   name,
   description,
   recipeSource,
   tags,
   tools,
-}: {
-  name: string;
-  description: string;
-  recipeSource: string | null;
-  tags: string[];
-  tools: string[];
-}) {
+  createdAt,
+}: RecipeDetail) {
+  const [deleteDialogIsOpen, setDeleteDialogIsOpen] = useState(false);
+
   return (
     <Card>
       <CardHeader className="flex flex-row items-start justify-between gap-4">
@@ -25,9 +26,12 @@ export function RecipeDetailsCard({
             <p className="text-sm text-muted-foreground mt-1">Source: {recipeSource}</p>
           )}
         </div>
-        <Button variant="outline" size="icon" aria-label="Edit recipe details">
-          <Pencil className="h-4 w-4" />
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" size="icon" aria-label="Edit recipe details">
+            <Pencil className="h-4 w-4" />
+          </Button>
+          <DeleteRecipeTrigger recipeId={id} isOpen={deleteDialogIsOpen} setIsOpen={setDeleteDialogIsOpen} navigateToHome={true} />
+        </div>
       </CardHeader>
       <CardContent className="flex flex-col gap-4">
         <p className="text-sm">{description}</p>
