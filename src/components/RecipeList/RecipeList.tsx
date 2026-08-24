@@ -1,10 +1,10 @@
 import { useQuery } from '@tanstack/react-query';
 import { recipeService } from '../../services/RecipeService';
 import { type RecipeDetail } from "../../types/Types"
-import { H3 } from './../ui/typography';
+import { H3 } from '../SharedComponents/ui/typography';
 import { Recipe } from './RecipeCard';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '#components/ui/card';
-import { Skeleton } from '#components/ui/skeleton';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '#components/SharedComponents/ui/card';
+import { Skeleton } from '#components/SharedComponents/ui/skeleton';
 
 export function RecipeList() {
   const { data, isLoading, error } = useQuery({

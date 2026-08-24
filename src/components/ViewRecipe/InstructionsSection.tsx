@@ -1,7 +1,7 @@
-import { Button } from "#components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "#components/ui/card";
+import { Button } from "#components/SharedComponents/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "#components/SharedComponents/ui/card";
 import { Pencil, StickyNote } from "lucide-react";
-import { Separator } from "#components/ui/separator";
+import { Separator } from "#components/SharedComponents/ui/separator";
 import type { Instruction } from "../../types/Types";
 
 export function InstructionsSection({ instructions }: { instructions: Instruction[] }) {

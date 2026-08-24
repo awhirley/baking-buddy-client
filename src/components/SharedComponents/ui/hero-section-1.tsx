@@ -1,8 +1,8 @@
 "use client";
 
-import { Button } from "#components/ui/button";
-import { Tagline } from "#components/ui/tagline";
-import { AspectRatio } from "#components/ui/aspect-ratio";
+import { Button } from "#components/SharedComponents/ui/button";
+import { Tagline } from "#components/SharedComponents/ui/tagline";
+import { AspectRatio } from "#components/SharedComponents/ui/aspect-ratio";
 import { ArrowUpRight } from "lucide-react";
 import { H1, P } from "./typography";
 

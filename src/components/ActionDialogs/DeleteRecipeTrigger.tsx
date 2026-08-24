@@ -8,15 +8,15 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "#components/ui/alert-dialog"
+} from "#components/SharedComponents/ui/alert-dialog"
 import { AlertCircleIcon } from "lucide-react"
 import {
   Alert,
   AlertDescription,
   AlertTitle,
-} from "#components/ui/alert"
+} from "#components/SharedComponents/ui/alert"
 import { recipeService } from '../../services/RecipeService';
-import { Button } from "#components/ui/button"
+import { Button } from "#components/SharedComponents/ui/button"
 import { Trash2Icon } from "lucide-react"
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState, type Dispatch, type SetStateAction } from "react";

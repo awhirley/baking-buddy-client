@@ -4,7 +4,7 @@ import { AlertCircle } from "lucide-react";
 import { skipToken, useQuery } from "@tanstack/react-query";
 
 import { RecipeSkeleton } from "./RecipeSkeleton";
-import { Alert, AlertDescription, AlertTitle } from "#components/ui/alert";
+import { Alert, AlertDescription, AlertTitle } from "#components/SharedComponents/ui/alert";
 import { recipeService } from "../../services/RecipeService";
 import { RecipeDetailsCard } from "./DetailSection";
 import { IngredientsSection } from "./IngredientsSection";

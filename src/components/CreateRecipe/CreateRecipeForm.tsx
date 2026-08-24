@@ -1,29 +1,29 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Plus, Trash2, ChefHat, BookOpen, Link as LinkIcon, Images as InstagramIcon, PenLine } from "lucide-react";
-import { Button } from "../ui/button";
-import { Input } from "../ui/input";
-import { Label } from "../ui/label";
-import { Textarea } from "../ui/textarea";
+import { Button } from "../SharedComponents/ui/button";
+import { Input } from "../SharedComponents/ui/input";
+import { Label } from "../SharedComponents/ui/label";
+import { Textarea } from "../SharedComponents/ui/textarea";
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
   CardDescription,
-} from "../ui/card";
-import { Separator } from "../ui/separator";
+} from "../SharedComponents/ui/card";
+import { Separator } from "../SharedComponents/ui/separator";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../ui/select";
+} from "../SharedComponents/ui/select";
 import { recipeService } from "../../services/RecipeService";
 import { useMutation } from "@tanstack/react-query";
 import type { CreateRecipePayload } from "../../types/Types";
-import { Spinner } from "#components/ui/spinner";
+import { Spinner } from "#components/SharedComponents/ui/spinner";
 import { useToast } from "../../contexts/ToastContext";
 
 interface Ingredient {

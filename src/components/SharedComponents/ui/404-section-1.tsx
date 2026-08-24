@@ -1,7 +1,7 @@
 "use client";
 
-import { Button } from "#components/ui/button";
-import { Tagline } from "#components/ui/tagline";
+import { Button } from "#components/SharedComponents/ui/button";
+import { Tagline } from "#components/SharedComponents/ui/tagline";
 import { useNavigate } from "react-router-dom";
 import { H1, P } from "./typography";
 

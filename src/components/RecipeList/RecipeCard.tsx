@@ -1,10 +1,10 @@
 import { useNavigate } from "react-router-dom";
 
 import { type RecipeDetail } from '../../types/Types';
-import { Badge } from '#components/ui/badge';
-import { Button } from '#components/ui/button';
-import { ButtonGroup } from "#components/ui/button-group"
-import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from '#components/ui/card';
+import { Badge } from '#components/SharedComponents/ui/badge';
+import { Button } from '#components/SharedComponents/ui/button';
+import { ButtonGroup } from "#components/SharedComponents/ui/button-group"
+import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from '#components/SharedComponents/ui/card';
 import { DeleteRecipeTrigger } from "#components/ActionDialogs/DeleteRecipeTrigger";
 import { useState } from "react";
 

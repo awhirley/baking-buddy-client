@@ -1,5 +1,5 @@
-import { Card, CardContent, CardHeader } from "#components/ui/card";
-import { Skeleton } from "#components/ui/skeleton";
+import { Card, CardContent, CardHeader } from "#components/SharedComponents/ui/card";
+import { Skeleton } from "#components/SharedComponents/ui/skeleton";
 
 export function RecipeSkeleton() {
   return (

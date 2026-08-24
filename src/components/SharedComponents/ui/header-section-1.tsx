@@ -1,6 +1,6 @@
 "use client";
 
-import { Tagline } from "#components/ui/tagline";
+import { Tagline } from "#components/SharedComponents/ui/tagline";
 
 export function HeaderSection1() {
   return (

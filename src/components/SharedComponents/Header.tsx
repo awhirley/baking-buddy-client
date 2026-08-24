@@ -1,8 +1,8 @@
 import type { ReactNode } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
-import { Button } from "#components/ui/button";
-import { H1 } from "#components/ui/typography";
+import { Button } from "#components/SharedComponents/ui/button";
+import { H1 } from "#components/SharedComponents/ui/typography";
 
 export function BakingBuddyPage({ children }: { children: ReactNode }) {
   return (

@@ -1,6 +1,6 @@
 import { BakingBuddyPage } from "#components/SharedComponents/Header";
 import { RecipeList } from "#components/RecipeList/RecipeList";
-import { HeroSection1 } from "#components/ui/hero-section-1";
+import { HeroSection1 } from "#components/SharedComponents/ui/hero-section-1";
 
 export function HomePage() {
   return (
