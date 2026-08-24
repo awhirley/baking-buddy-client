@@ -39,7 +39,7 @@ export function DeleteRecipeTrigger({ isOpen, setIsOpen, recipeId, navigateToHom
   const deleteRecipeMutation = useMutation({
     mutationFn: (id: string) => recipeService.deleteRecipe(id),
     onSuccess: () => {
-      addToast('Deleted successfully!', { type: 'default' });
+      addToast('Recipe was deleted successfully!', null, { type: 'default' });
       queryClient.invalidateQueries({ queryKey: ['recipesList'] });
       setIsOpen(false);
       if (navigateToHome) navigate("/");

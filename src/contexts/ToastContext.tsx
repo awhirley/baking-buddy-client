@@ -1,6 +1,6 @@
 import { Alert, AlertAction, AlertDescription, AlertTitle } from '#components/ui/alert';
 import { Button } from '#components/ui/button';
-import { AlertCircleIcon, Croissant } from 'lucide-react';
+import { AlertCircleIcon, Croissant, XCircle } from 'lucide-react';
 import { createContext, useContext, useState, useCallback, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 
@@ -8,7 +8,8 @@ type ToastType ='default' | 'destructive';
 
 interface Toast {
   id: number;
-  message: string;
+  header: string;
+  message?: string | null;
   type: ToastType;
 }
 
@@ -18,7 +19,7 @@ interface ToastOptions {
 }
 
 interface ToastContextValue {
-  addToast: (message: string, options?: ToastOptions) => number;
+  addToast: (header: string, message: string | null, options?: ToastOptions) => number;
   removeToast: (id: number) => void;
 }
 
@@ -34,9 +35,9 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const addToast = useCallback(
-    (message: string, { type = 'default', duration = 4000 }: ToastOptions = {}) => {
+    (header: string, message: string | null = null, { type = 'default', duration = 4000 }: ToastOptions = {}) => {
       const id = ++idCounter;
-      setToasts((prev) => [...prev, { id, message, type }]);
+      setToasts((prev) => [...prev, { id, header, message, type }]);
       if (duration > 0) {
         setTimeout(() => removeToast(id), duration);
       }
@@ -45,7 +46,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
     [removeToast]
   );
 
-  const getClassName = (type: ToastType): string => type === 'destructive' ? "max-w-md" : "max-w-md bg-green-100";
+  const getClassName = (type: ToastType): string => type === 'destructive' ? "max-w-md min-w-sm" : "max-w-md min-w-sm bg-green-900";
 
   return (
     <ToastContext.Provider value={{ addToast, removeToast }}>
@@ -55,10 +56,10 @@ export function ToastProvider({ children }: { children: ReactNode }) {
           {toasts.map((toast) => (
             <Alert variant={toast.type} className={getClassName(toast.type)}>
               { toast.type === 'destructive' ? <AlertCircleIcon /> : <Croissant /> }
-              <AlertTitle>{toast.message}</AlertTitle>
-              <AlertDescription>
-                Here's an alert description!
-              </AlertDescription>
+              <AlertTitle>{toast.header}</AlertTitle>
+              {toast.message && <AlertDescription>
+                {toast.message}
+              </AlertDescription>}
               <AlertAction>
                 <Button size="xs" variant="secondary" onClick={() => removeToast(toast.id)}>
                   Dismiss

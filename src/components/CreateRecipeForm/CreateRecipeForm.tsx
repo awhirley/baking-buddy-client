@@ -107,11 +107,11 @@ export function RecipeForm() {
     mutationFn: (newRecipe: CreateRecipePayload) =>
       recipeService.createRecipe(newRecipe),
     onSuccess: (data) => {
-      addToast('Saved successfully!', { type: 'default' });
+      addToast('Recipe created successfully', null, { type: 'default' });
       navigate(`/view/${data.id}`)
     },
     onError: (error) => {
-      addToast('Failed to save.', { type: 'destructive', duration: 6000 });
+      addToast('Failed to create recipe', "Please try again.", { type: 'destructive', duration: 6000 });
     },
   });
 
