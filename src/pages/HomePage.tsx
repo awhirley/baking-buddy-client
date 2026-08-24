@@ -1,15 +1,14 @@
-import { Body } from "#components/HomePage/Body";
-import { Header } from "#components/HomePage/Header";
+import { BakingBuddyPage } from "#components/SharedComponents/Header";
+import { RecipeList } from "#components/RecipeList/RecipeList";
 import { HeroSection1 } from "#components/ui/hero-section-1";
 
 export function HomePage() {
   return (
-    <div className="px-30 py-20">
-      <div className="grid grid-cols-1 gap-4 justify-items-center">
-        <Header />
-        <HeroSection1 />
-        <Body />
+    <BakingBuddyPage>
+      <HeroSection1 />
+      <div className="w-300">
+        <RecipeList />
       </div>
-    </div>
+    </BakingBuddyPage>
   );
 }

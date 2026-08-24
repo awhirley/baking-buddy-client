@@ -1,9 +1,21 @@
+import type { ReactNode } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 import { Button } from "#components/ui/button";
 import { H1 } from "#components/ui/typography";
 
-export function Header() {
+export function BakingBuddyPage({ children }: { children: ReactNode }) {
+  return (
+    <div className="px-30 py-20">
+      <div className="grid grid-cols-1 gap-4 justify-items-center">
+        <Header />
+        {children}
+      </div>
+    </div>
+  );
+}
+
+function Header() {
   const navigate = useNavigate();
   const location = useLocation();
 

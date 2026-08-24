@@ -1,13 +1,10 @@
-import { RecipeForm } from "#components/CreateRecipeForm/CreateRecipeForm";
-import { Header } from "#components/HomePage/Header";
+import { RecipeForm } from "#components/CreateRecipe/CreateRecipeForm";
+import { BakingBuddyPage } from "#components/SharedComponents/Header";
 
 export function CreateRecipe() {
   return (
-    <div className="px-30 py-20">
-      <div className="grid grid-cols-1 gap-4 justify-items-center">
-        <Header />
-        <RecipeForm />
-      </div>
-    </div>
+    <BakingBuddyPage>
+      <RecipeForm />
+    </BakingBuddyPage>
   );
 }
