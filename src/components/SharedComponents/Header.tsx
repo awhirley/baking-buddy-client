@@ -2,7 +2,8 @@ import type { ReactNode } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 import { Button } from "#components/SharedComponents/ui/button";
-import { H1 } from "#components/SharedComponents/ui/typography";
+
+import headerImage from "../../assets/header_no_background.png";
 
 export function BakingBuddyPage({ children }: { children: ReactNode }) {
   return (
@@ -21,7 +22,7 @@ function Header() {
 
   return (
     <div className="flex flex-row gap-x-4 pb-10 flex flex-col justify-between w-200 items-center">
-      <H1>Baking Buddy</H1>
+      <img src={headerImage} alt="Banner" style={{ height: '80px', width: 'auto' }}  />
       {location.pathname === "/" && <Button onClick={() => navigate("/create")}>New Recipe</Button>}
       {location.pathname.includes("create")&& <Button onClick={() => navigate("/")}>Home</Button>}
       {location.pathname.includes("view") && <div className="flex gap-x-2">
