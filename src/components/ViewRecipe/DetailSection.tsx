@@ -21,9 +21,10 @@ export function RecipeDetailsCard({
   tags,
   tools,
   createdAt,
+  notes,
 }: RecipeDetail) {
   const [deleteDialogIsOpen, setDeleteDialogIsOpen] = useState(false);
-  const [note, setNote] = useState<string | null>(null);
+  const [note, setNote] = useState<string | null>(notes);
   const { addToast } = useToast();
 
   const { mutate: saveNote, isPending: isSaving } = useMutation({
@@ -37,8 +38,6 @@ export function RecipeDetailsCard({
     },
   });
 
-  const noteSaveButtonClassName = isSaving ? "self-end" : "hidden peer-focus:block self-end";
-
   return (
     <Card>
       <CardHeader className="flex flex-row items-start justify-between gap-4">
@@ -47,7 +46,6 @@ export function RecipeDetailsCard({
           <p className="text-sm text-muted-foreground mt-1">
             Added {formatAddedDate(createdAt)}
             { (recipeSourceType || recipeSource) && <span>, from {recipeSourceType} {recipeSource}</span>}
-            {/* { (recipeSourceType || recipeSource) && <span className='pl-4'>Source: {recipeSourceType} {recipeSource}</span>} */}
           </p>
         </div>
         <div className="flex gap-2">
@@ -86,7 +84,7 @@ export function RecipeDetailsCard({
         )}
 
         <div className="flex flex-col gap-2 group">
-          <Textarea onChange={(event) => { setNote(event.target.value) }} className="border p-2" placeholder="Recipe notes: enter anything you'd like to remember about your recipe"></Textarea>
+          <Textarea value={note ?? undefined} onChange={(event) => { setNote(event.target.value) }} className="border p-2" placeholder="Recipe notes: enter anything you'd like to remember about your recipe"></Textarea>
           <Button onClick={() => saveNote(note)} className="hidden group-focus-within:block self-end">
             <span className="flex items-center gap-2">
               { isSaving ? <Spinner /> : <PencilSparklesIcon /> }

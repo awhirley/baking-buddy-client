@@ -43,4 +43,20 @@ export const recipeService = {
         },
       });
     },
+
+    async addNotesToIngredient(id: string, note: string | null): Promise<void> {
+      await api.patch(`/ingredients/notes/${id}`, note, {
+        headers: {
+          'Content-Type': 'text/plain',
+        },
+      });
+    },
+
+    async addNotesToInstruction(id: string, note: string | null): Promise<void> {
+      await api.patch(`/instructions/notes/${id}`, note, {
+        headers: {
+          'Content-Type': 'text/plain',
+        },
+      });
+    },
 }
