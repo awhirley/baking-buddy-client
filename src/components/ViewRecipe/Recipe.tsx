@@ -9,9 +9,11 @@ import { recipeService } from "../../services/RecipeService";
 import { RecipeDetailsCard } from "./DetailSection";
 import { IngredientsSection } from "./IngredientsSection";
 import { InstructionsSection } from "./InstructionsSection";
+import { useState } from "react";
 
 export function Recipe() {
   const { id } = useParams();
+  const [editModeOn, setEditModeOn] = useState<boolean>(false);
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["recipe", id],
@@ -39,11 +41,11 @@ export function Recipe() {
 
       {data && (
         <div className="flex flex-col gap-6">
-          <RecipeDetailsCard {...data.details} />
+          <RecipeDetailsCard details={data.details} editModeOn={editModeOn} setEditModeOn={setEditModeOn} />
 
-          <IngredientsSection ingredients={data.ingredients} />
+          <IngredientsSection ingredients={data.ingredients} editModeOn={editModeOn} />
 
-          <InstructionsSection instructions={data.instructions} />
+          <InstructionsSection instructions={data.instructions} editModeOn={editModeOn} />
         </div>
       )}
     </div>

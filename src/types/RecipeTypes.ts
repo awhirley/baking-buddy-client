@@ -7,13 +7,23 @@ export interface Recipe {
 
 export interface Ingredient {
   id: string;
+  recipeId: string;
+  bestVersion: number;
+  notes: string | null;
   amount: string;
   name: string;
+  order: number;
+  createdAt: string;
 }
 
 export interface Instruction {
   id: string;
+  recipeId: string;
+  bestVersion: number;
+  notes: string | null;
   description: string;
+  order: number;
+  createdAt: string;
 }
 
 export interface RecipeDetail {
@@ -26,6 +36,7 @@ export interface RecipeDetail {
   tools: string[];
   createdAt: string;
   openBakeId: string | null;
+  notes: string | null;
 }
 
 export interface CreateIngredientPayload {
