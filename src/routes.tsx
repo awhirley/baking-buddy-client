@@ -19,7 +19,7 @@ const routes: RouteObject[] = [
     element: <ViewRecipe />,
   },
   {
-    path: '/bake/:recipeId',
+    path: '/bake/:bakeId',
     element: <ViewBake />,
   },
   {

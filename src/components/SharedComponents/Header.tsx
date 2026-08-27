@@ -25,11 +25,11 @@ function Header() {
     <div className="flex flex-row gap-x-4 pb-10 flex flex-col justify-between w-200 items-center">
       <img src={headerImage} alt="Banner" style={{ height: '80px', width: 'auto' }}  />
       {location.pathname === "/" && <Button onClick={() => navigate("/create")}>New Recipe</Button>}
-      {location.pathname.includes("create")&& <Button onClick={() => navigate("/")}>Home</Button>}
       {location.pathname.includes("view") && <div className="flex gap-x-2">
         <Button variant="outline" onClick={() => navigate(`/bake/${id}`)}>New Bake</Button>
         <Button onClick={() => navigate("/")}>Home</Button>
       </div>}
+      {location.pathname.includes("bake") && <Button onClick={() => navigate("/")}>Home</Button>}
     </div>
   );
 }

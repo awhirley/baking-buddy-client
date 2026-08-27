@@ -1,7 +1,5 @@
 import {
   AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
   AlertDialogFooter,
@@ -22,6 +20,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState, type Dispatch, type SetStateAction } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "../../contexts/ToastContext";
+import { LoadingButton } from "#components/SharedComponents/LoadingButton";
 
 interface DeleteRecipeTriggerProps {
   isOpen: boolean;
@@ -33,6 +32,7 @@ interface DeleteRecipeTriggerProps {
 export function DeleteRecipeTrigger({ isOpen, setIsOpen, recipeId, navigateToHome = false }: DeleteRecipeTriggerProps) {
   const queryClient = useQueryClient();
   const [showAlert, setShowAlert] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { addToast } = useToast();
 
@@ -49,6 +49,11 @@ export function DeleteRecipeTrigger({ isOpen, setIsOpen, recipeId, navigateToHom
     }
   });
 
+  const handleDelete = () => {
+    setIsLoading(true);
+    deleteRecipeMutation.mutate(recipeId);
+  }
+
   return (
     <AlertDialog open={isOpen}>
       <AlertDialogTrigger onClick={() => setIsOpen(true)} render={<Button variant="outline" size="icon"><Trash2Icon /></Button>} />
@@ -62,7 +67,7 @@ export function DeleteRecipeTrigger({ isOpen, setIsOpen, recipeId, navigateToHom
         </AlertDialogHeader>
         <AlertDialogFooter>
           <Button onClick={() => setIsOpen(false)} variant="outline">Cancel</Button>
-          <AlertDialogAction onClick={() => deleteRecipeMutation.mutate(recipeId)}>Delete recipe</AlertDialogAction>
+          <LoadingButton onClick={handleDelete} isLoading={isLoading} buttonVariant="default">Delete recipe</LoadingButton>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

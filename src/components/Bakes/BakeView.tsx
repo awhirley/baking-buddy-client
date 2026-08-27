@@ -11,13 +11,13 @@ import { BakeIngredientsSection } from "./BakeIngredientsSection";
 import { BakeInstructionsSection } from "./BakeInstructionsSection";
 
 export function BakeView() {
-  const { recipeId } = useParams();
+  const { bakeId } = useParams();
 
   const { data, isLoading, error } = useQuery({
-    queryKey: ["bake", "new", recipeId],
-    queryFn: recipeId
+    queryKey: ["bake", "new", bakeId],
+    queryFn: bakeId
       ? async () => {
-          const response = await bakeService.createBake(recipeId!);
+          const response = await bakeService.getBake(bakeId!);
           return response;
         }
       : skipToken,

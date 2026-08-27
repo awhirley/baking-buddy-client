@@ -25,6 +25,7 @@ export interface RecipeDetail {
   tags: string[];
   tools: string[];
   createdAt: string;
+  openBakeId: string | null;
 }
 
 export interface CreateIngredientPayload {
