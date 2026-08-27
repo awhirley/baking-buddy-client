@@ -59,7 +59,7 @@ function ActionMenu({ recipeId }: { recipeId: string }) {
         <DeleteRecipeTrigger isOpen={isOpen} setIsOpen={setIsOpen} recipeId={recipeId} />
       </ButtonGroup>
       <ButtonGroup>
-        <Button variant="outline" onClick={() => console.log("New!")}>New Bake</Button>
+        <Button variant="outline" onClick={() => navigate(`/bake/${recipeId}`)}>New Bake</Button>
         <Button variant="outline" onClick={() => navigate(`/view/${recipeId}`)}>View Recipe</Button>
       </ButtonGroup>
     </ButtonGroup>

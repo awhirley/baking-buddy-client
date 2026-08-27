@@ -3,6 +3,7 @@ import { HomePage } from './pages/HomePage';
 import { CreateRecipe } from './pages/CreateRecipe';
 import { ViewRecipe } from './pages/ViewRecipe';
 import { ErrorPage } from './pages/ErrorPage';
+import { ViewBake } from './pages/ViewBake';
 
 const routes: RouteObject[] = [
   {
@@ -16,6 +17,10 @@ const routes: RouteObject[] = [
   {
     path: '/view/:id',
     element: <ViewRecipe />,
+  },
+  {
+    path: '/bake/:recipeId',
+    element: <ViewBake />,
   },
   {
     path: '*',
