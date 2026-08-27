@@ -1,11 +1,16 @@
 import { DeleteRecipeTrigger } from "#components/ActionDialogs/DeleteRecipeTrigger";
 import { Badge } from "#components/SharedComponents/ui/badge";
 import { Button } from "#components/SharedComponents/ui/button";
+import { Textarea } from "#components/ui/textarea"
 import { Card, CardContent, CardHeader, CardTitle } from "#components/SharedComponents/ui/card";
-import { Pencil } from "lucide-react";
+import { Pencil, PencilSparklesIcon } from "lucide-react";
 import { useState } from "react";
 import type { RecipeDetail } from "../../types/RecipeTypes";
 import { formatAddedDate } from "#components/RecipeList/utils";
+import { useMutation } from "@tanstack/react-query";
+import { recipeService } from "../../services/RecipeService";
+import { useToast } from "../../contexts/ToastContext";
+import { Spinner } from "#components/SharedComponents/ui/spinner";
 
 export function RecipeDetailsCard({
   id,
@@ -18,6 +23,21 @@ export function RecipeDetailsCard({
   createdAt,
 }: RecipeDetail) {
   const [deleteDialogIsOpen, setDeleteDialogIsOpen] = useState(false);
+  const [note, setNote] = useState<string | null>(null);
+  const { addToast } = useToast();
+
+  const { mutate: saveNote, isPending: isSaving } = useMutation({
+    mutationFn: (note: string | null) =>
+      recipeService.addNotesToRecipe(id, note),
+    onSuccess: () => {
+      addToast('Note saved successfully', null, { type: 'default' });
+    },
+    onError: () => {
+      addToast('Failed to save note', "Please try again.", { type: 'destructive', duration: 6000 });
+    },
+  });
+
+  const noteSaveButtonClassName = isSaving ? "self-end" : "hidden peer-focus:block self-end";
 
   return (
     <Card>
@@ -37,13 +57,14 @@ export function RecipeDetailsCard({
           <DeleteRecipeTrigger recipeId={id} isOpen={deleteDialogIsOpen} setIsOpen={setDeleteDialogIsOpen} navigateToHome={true} />
         </div>
       </CardHeader>
-      <CardContent className="flex flex-col gap-4">
+      <CardContent className="flex flex-col gap-6">
         <p className="text-sm">{description}</p>
 
         {(tags?.length > 0 || tools?.length > 0) && (
           <div className="flex flex-col gap-2">
             {tags.length > 0 && (
               <div className="flex flex-wrap gap-2">
+                Tags:
                 {tags.map((tag) => (
                   <Badge key={tag} variant="secondary">
                     {tag}
@@ -53,6 +74,7 @@ export function RecipeDetailsCard({
             )}
             {tools.length > 0 && (
               <div className="flex flex-wrap gap-2">
+                Tools:
                 {tools.map((tool) => (
                   <Badge key={tool} variant="outline">
                     {tool}
@@ -62,6 +84,16 @@ export function RecipeDetailsCard({
             )}
           </div>
         )}
+
+        <div className="flex flex-col gap-2 group">
+          <Textarea onChange={(event) => { setNote(event.target.value) }} className="border p-2" placeholder="Recipe notes: enter anything you'd like to remember about your recipe"></Textarea>
+          <Button onClick={() => saveNote(note)} className="hidden group-focus-within:block self-end">
+            <span className="flex items-center gap-2">
+              { isSaving ? <Spinner /> : <PencilSparklesIcon /> }
+              Save note
+            </span>
+          </Button>
+        </div>
       </CardContent>
     </Card>
   );

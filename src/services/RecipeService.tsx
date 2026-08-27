@@ -34,5 +34,13 @@ export const recipeService = {
 
     async deleteRecipe(id: string): Promise<void> {
       await api.delete(`/recipes/${id}`);
-    }
+    },
+
+    async addNotesToRecipe(id: string, note: string | null): Promise<void> {
+      await api.patch(`/recipes/notes/${id}`, note, {
+        headers: {
+          'Content-Type': 'text/plain',
+        },
+      });
+    },
 }
