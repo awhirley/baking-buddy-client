@@ -20,10 +20,12 @@ export interface RecipeDetail {
   id: string;
   name: string;
   description: string;
+  recipeSourceType: string | null;
   recipeSource: string | null;
   tags: string[];
   tools: string[];
   createdAt: string;
+  openBakeId: string | null;
 }
 
 export interface CreateIngredientPayload {
@@ -34,6 +36,7 @@ export interface CreateIngredientPayload {
 export interface CreateRecipePayload {
   name: string;
   description: string | null;
+  recipeSourceType: string | null;
   recipeSource: string | null;
   tags: string[] | null;
   tools: string[] | null;
@@ -46,6 +49,7 @@ export function createRecipePayloadtoApiPayload(payload: CreateRecipePayload) {
   return {
     name: payload.name,
     description: payload.description,
+    recipe_source_type: payload.recipeSourceType,
     recipe_source: payload.recipeSource,
     tags: payload.tags,
     tools: payload.tools,

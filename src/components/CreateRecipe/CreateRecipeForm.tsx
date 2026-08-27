@@ -22,7 +22,7 @@ import {
 } from "../SharedComponents/ui/select";
 import { recipeService } from "../../services/RecipeService";
 import { useMutation } from "@tanstack/react-query";
-import type { CreateRecipePayload } from "../../types/Types";
+import type { CreateRecipePayload } from "../../types/RecipeTypes";
 import { Spinner } from "#components/SharedComponents/ui/spinner";
 import { useToast } from "../../contexts/ToastContext";
 
@@ -119,6 +119,7 @@ export function RecipeForm() {
     const payload: CreateRecipePayload = {
       name,
       description: description === "" ? null : description,
+      recipeSourceType: sourceType,
       recipeSource: source === "" ? null : source,
       tags: [],
       tools: [],
@@ -177,6 +178,7 @@ export function RecipeForm() {
             <div className="space-y-2">
               <Label htmlFor="recipe-source">Source</Label>
               <div className="flex gap-2">
+                {/* TODO: Make this a type to add your own dropdown */}
                 <Select
                   value={sourceType}
                   onValueChange={(value: "cookbook" | "url" | "instagram" | "other" | null) => {
@@ -186,7 +188,7 @@ export function RecipeForm() {
                       setSourceType("other");
                     }
                   }}
-                >
+                > 
                   <SelectTrigger className="w-[140px] shrink-0">
                     <SelectValue />
                   </SelectTrigger>

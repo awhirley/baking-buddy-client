@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { createRecipePayloadtoApiPayload, type CreateRecipePayload, type Recipe, type RecipeDetail } from '../types/Types';
+import { createRecipePayloadtoApiPayload, type CreateRecipePayload, type Recipe, type RecipeDetail } from '../types/RecipeTypes';
 import { toCamelCase } from './utils';
 
 const recipeServiceApi = `${import.meta.env.VITE_API_URL}/api`;

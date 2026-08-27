@@ -1,10 +1,16 @@
+// components/Bake/BakeIngredientsSection.tsx
+import { Badge } from "#components/SharedComponents/ui/badge";
 import { Button } from "#components/SharedComponents/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "#components/SharedComponents/ui/card";
 import { Pencil, StickyNote } from "lucide-react";
-import type { Ingredient } from "../../types/RecipeTypes";
 import { Separator } from "#components/SharedComponents/ui/separator";
+import type { BakeIngredient } from "../../types/BakeTypes";
 
-export function IngredientsSection({ ingredients }: { ingredients: Ingredient[] }) {
+function isModified({ version, ingredientDeltaId }: BakeIngredient) {
+  return version === null && ingredientDeltaId === null;
+}
+
+export function BakeIngredientsSection({ ingredients }: { ingredients: BakeIngredient[] }) {
   return (
     <Card>
       <CardHeader>
@@ -12,10 +18,17 @@ export function IngredientsSection({ ingredients }: { ingredients: Ingredient[] 
       </CardHeader>
       <CardContent className="flex flex-col gap-1">
         {ingredients.map((ingredient, index) => (
-          <div key={ingredient.id}>
+          <div key={ingredient.ingredientId}>
             <div className="flex items-center justify-between py-2 gap-4">
-              <span className="text-sm">
-                <span className="font-medium">{ingredient.amount}</span> {ingredient.name}
+              <span className="text-sm flex items-center gap-2">
+                <span>
+                  <span className="font-medium">{ingredient.amount}</span> {ingredient.name}
+                </span>
+                {isModified(ingredient) && (
+                  <Badge variant="outline" className="text-amber-600 border-amber-300">
+                    Modified this bake
+                  </Badge>
+                )}
               </span>
               <div className="flex gap-1 shrink-0">
                 <Button variant="ghost" size="icon" aria-label="Add note">

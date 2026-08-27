@@ -6,6 +6,9 @@ import { AspectRatio } from "#components/SharedComponents/ui/aspect-ratio";
 import { ArrowUpRight } from "lucide-react";
 import { H1, P } from "./typography";
 
+import kitchenImage from "../../../assets/kitchen.jpg";
+
+
 export function HeroSection1() {
   return (
     <section
@@ -39,7 +42,7 @@ export function HeroSection1() {
 
         <div className="w-full flex-1">
           <AspectRatio ratio={1 / 1}>
-            <img src="../../assets/oven.png" />
+            <img src={kitchenImage} alt="kitchen" className="rounded-xl" />
           </AspectRatio>
         </div>
       </div>
