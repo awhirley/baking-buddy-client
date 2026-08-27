@@ -4,12 +4,14 @@ import { Button } from "#components/SharedComponents/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "#components/SharedComponents/ui/card";
 import { Pencil } from "lucide-react";
 import { useState } from "react";
-import type { RecipeDetail } from "../../types/Types";
+import type { RecipeDetail } from "../../types/RecipeTypes";
+import { formatAddedDate } from "#components/RecipeList/utils";
 
 export function RecipeDetailsCard({
   id,
   name,
   description,
+  recipeSourceType,
   recipeSource,
   tags,
   tools,
@@ -22,9 +24,11 @@ export function RecipeDetailsCard({
       <CardHeader className="flex flex-row items-start justify-between gap-4">
         <div>
           <CardTitle className="text-2xl">{name}</CardTitle>
-          {recipeSource && (
-            <p className="text-sm text-muted-foreground mt-1">Source: {recipeSource}</p>
-          )}
+          <p className="text-sm text-muted-foreground mt-1">
+            Added {formatAddedDate(createdAt)}
+            { (recipeSourceType || recipeSource) && <span>, from {recipeSourceType} {recipeSource}</span>}
+            {/* { (recipeSourceType || recipeSource) && <span className='pl-4'>Source: {recipeSourceType} {recipeSource}</span>} */}
+          </p>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" size="icon" aria-label="Edit recipe details">

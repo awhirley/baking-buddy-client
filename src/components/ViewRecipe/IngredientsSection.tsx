@@ -1,7 +1,7 @@
 import { Button } from "#components/SharedComponents/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "#components/SharedComponents/ui/card";
 import { Pencil, StickyNote } from "lucide-react";
-import type { Ingredient } from "../../types/Types";
+import type { Ingredient } from "../../types/RecipeTypes";
 import { Separator } from "#components/SharedComponents/ui/separator";
 
 export function IngredientsSection({ ingredients }: { ingredients: Ingredient[] }) {

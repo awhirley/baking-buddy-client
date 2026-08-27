@@ -1,12 +1,13 @@
 import { useNavigate } from "react-router-dom";
 
-import { type RecipeDetail } from '../../types/Types';
+import { type RecipeDetail } from '../../types/RecipeTypes';
 import { Badge } from '#components/SharedComponents/ui/badge';
 import { Button } from '#components/SharedComponents/ui/button';
 import { ButtonGroup } from "#components/SharedComponents/ui/button-group"
 import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from '#components/SharedComponents/ui/card';
 import { DeleteRecipeTrigger } from "#components/ActionDialogs/DeleteRecipeTrigger";
 import { useState } from "react";
+import { formatAddedDate } from "./utils";
 
 export function Recipe({ recipe }: { recipe: RecipeDetail }) {
   return (
@@ -20,9 +21,9 @@ export function Recipe({ recipe }: { recipe: RecipeDetail }) {
       </CardHeader>
       <CardContent className="flex flex-col gap-3">
         <div className="flex flex-wrap items-center gap-x-2 text-xs text-muted-foreground">
-          {recipe.recipeSource && (
+          {(recipe.recipeSource || recipe.recipeSourceType) && (
             <>
-              <span>Source: {recipe.recipeSource}</span>
+              <span>Source: {recipe.recipeSourceType} {recipe.recipeSource}</span>
               <span aria-hidden="true">•</span>
             </>
           )}
@@ -63,19 +64,4 @@ function ActionMenu({ recipeId }: { recipeId: string }) {
       </ButtonGroup>
     </ButtonGroup>
   )
-}
-
-function formatAddedDate(iso: string): string {
-  const trimmed = iso.replace(/(\.\d{3})\d+/, "$1");
-  const date = new Date(trimmed);
-
-  if (isNaN(date.getTime())) return "recently";
-
-  const diffDays = Math.floor((Date.now() - date.getTime()) / (1000 * 60 * 60 * 24));
-
-  if (diffDays <= 0) return "today";
-  if (diffDays === 1) return "yesterday";
-  if (diffDays < 7) return `${diffDays} days ago`;
-  if (diffDays < 30) return `${Math.floor(diffDays / 7)}w ago`;
-  return date.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
 }

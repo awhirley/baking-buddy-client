@@ -2,7 +2,7 @@ import { Button } from "#components/SharedComponents/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "#components/SharedComponents/ui/card";
 import { Pencil, StickyNote } from "lucide-react";
 import { Separator } from "#components/SharedComponents/ui/separator";
-import type { Instruction } from "../../types/Types";
+import type { Instruction } from "../../types/RecipeTypes";
 
 export function InstructionsSection({ instructions }: { instructions: Instruction[] }) {
   return (

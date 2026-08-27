@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { recipeService } from '../../services/RecipeService';
-import { type RecipeDetail } from "../../types/Types"
+import { type RecipeDetail } from "../../types/RecipeTypes"
 import { H3 } from '../SharedComponents/ui/typography';
 import { Recipe } from './RecipeCard';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '#components/SharedComponents/ui/card';
