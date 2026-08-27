@@ -10,7 +10,7 @@ import { Textarea } from "#components/ui/textarea";
 import { useState } from "react";
 import { Spinner } from "#components/SharedComponents/ui/spinner";
 
-export function IngredientsSection({ ingredients }: { ingredients: Ingredient[] }) {
+export function IngredientsSection({ ingredients, editModeOn }: { ingredients: Ingredient[], editModeOn: boolean }) {
   return (
     <Card>
       <CardHeader>
@@ -19,7 +19,7 @@ export function IngredientsSection({ ingredients }: { ingredients: Ingredient[] 
       <CardContent className="flex flex-col gap-1">
         {ingredients.map((ingredient, index) => (
           <div key={ingredient.id}>
-            <IngredientRow ingredient={ingredient} />
+            <IngredientRow ingredient={ingredient} editModeOn={editModeOn} />
             {index < ingredients.length - 1 && <Separator />}
           </div>
         ))}
@@ -28,7 +28,7 @@ export function IngredientsSection({ ingredients }: { ingredients: Ingredient[] 
   );
 }
 
-function IngredientRow({ ingredient }: { ingredient: Ingredient }) {
+function IngredientRow({ ingredient, editModeOn }: { ingredient: Ingredient, editModeOn: boolean }) {
   const [isEditingNote, setIsEditingNote] = useState(false);
   const [noteDraft, setNoteDraft] = useState(ingredient.notes ?? "");
   const [savedNote, setSavedNote] = useState(ingredient.notes ?? "");
@@ -58,7 +58,7 @@ function IngredientRow({ ingredient }: { ingredient: Ingredient }) {
         <span className="text-sm">
           <span className="font-bold">{ingredient.amount}</span> {ingredient.name}
         </span>
-        <div className="flex gap-1 shrink-0">
+        { editModeOn && <div className="flex shrink-0">
           <Button
             variant={isEditingNote ? "secondary" : "ghost"}
             size="icon"
@@ -71,7 +71,7 @@ function IngredientRow({ ingredient }: { ingredient: Ingredient }) {
           <Button variant="ghost" size="icon" aria-label="Edit ingredient">
             <Pencil className="h-4 w-4" />
           </Button>
-        </div>
+        </div>}
       </div>
 
       {!isEditingNote && savedNote && (

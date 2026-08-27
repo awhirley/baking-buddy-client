@@ -10,7 +10,7 @@ import { Textarea } from "#components/ui/textarea";
 import { useState } from "react";
 import { Spinner } from "#components/SharedComponents/ui/spinner";
 
-export function InstructionsSection({ instructions }: { instructions: Instruction[] }) {
+export function InstructionsSection({ instructions, editModeOn }: { instructions: Instruction[], editModeOn: boolean }) {
   return (
     <Card>
       <CardHeader>
@@ -19,7 +19,7 @@ export function InstructionsSection({ instructions }: { instructions: Instructio
       <CardContent className="flex flex-col gap-1">
         {instructions.map((instruction, index) => (
           <div key={instruction.id}>
-            <InstructionRow instruction={instruction} stepNumber={index + 1} />
+            <InstructionRow instruction={instruction} stepNumber={index + 1} editModeOn={editModeOn} />
             {index < instructions.length - 1 && <Separator />}
           </div>
         ))}
@@ -28,7 +28,7 @@ export function InstructionsSection({ instructions }: { instructions: Instructio
   );
 }
 
-function InstructionRow({ instruction, stepNumber }: { instruction: Instruction; stepNumber: number }) {
+function InstructionRow({ instruction, stepNumber, editModeOn }: { instruction: Instruction; stepNumber: number, editModeOn: boolean }) {
   const [isEditingNote, setIsEditingNote] = useState(false);
   const [noteDraft, setNoteDraft] = useState(instruction.notes ?? "");
   const [savedNote, setSavedNote] = useState(instruction.notes ?? "");
@@ -59,7 +59,7 @@ function InstructionRow({ instruction, stepNumber }: { instruction: Instruction;
           <span className="font-medium text-muted-foreground">{stepNumber}.</span>{" "}
           {instruction.description}
         </span>
-        <div className="flex gap-1 shrink-0">
+        { editModeOn && <div className="flex shrink-0">
           <Button
             variant={isEditingNote ? "secondary" : "ghost"}
             size="icon"
@@ -72,7 +72,7 @@ function InstructionRow({ instruction, stepNumber }: { instruction: Instruction;
           <Button variant="ghost" size="icon" aria-label="Edit instruction">
             <Pencil className="h-4 w-4" />
           </Button>
-        </div>
+        </div>}
       </div>
 
       {!isEditingNote && savedNote && (
