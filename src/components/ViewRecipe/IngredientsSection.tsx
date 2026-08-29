@@ -1,19 +1,27 @@
-import { Button } from "#components/SharedComponents/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "#components/SharedComponents/ui/card";
-import { Pencil, PencilSparklesIcon, StickyNote } from "lucide-react";
-import type { Ingredient } from "../../types/RecipeTypes";
-import { Separator } from "#components/SharedComponents/ui/separator";
-import { recipeService } from "../../services/RecipeService";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useToast } from "../../contexts/ToastContext";
-import { Textarea } from "#components/ui/textarea";
+import { History as HistoryIcon, MoreVertical, Pencil, PencilSparklesIcon, StickyNote } from "lucide-react";
 import { useState } from "react";
-import { Spinner } from "#components/SharedComponents/ui/spinner";
-import { Input } from "#components/ui/input";
-import { LoadingButton } from "#components/SharedComponents/LoadingButton";
 import { useParams } from "react-router-dom";
 
-export function IngredientsSection({ ingredients, editModeOn }: { ingredients: Ingredient[], editModeOn: boolean }) {
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+
+import { LoadingButton } from "#components/SharedComponents/LoadingButton";
+import { formatAddedDate } from "#components/RecipeList/utils";
+import { Badge } from "#components/SharedComponents/ui/badge";
+import { Button } from "#components/SharedComponents/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "#components/SharedComponents/ui/card";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "#components/SharedComponents/ui/dialog";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "#components/SharedComponents/ui/dropdown-menu";
+import { Input } from "#components/SharedComponents/ui/input";
+import { Separator } from "#components/SharedComponents/ui/separator";
+import { Spinner } from "#components/SharedComponents/ui/spinner";
+import { Textarea } from "#components/SharedComponents/ui/textarea";
+
+import { useToast } from "../../contexts/ToastContext";
+import { recipeService } from "../../services/RecipeService";
+import type { IngredientDeltaEntry } from "../../types/BakeTypes";
+import type { Ingredient } from "../../types/RecipeTypes";
+
+export function IngredientsSection({ ingredients, editModeOn }: { ingredients: Ingredient[]; editModeOn: boolean }) {
   return (
     <Card>
       <CardHeader>
@@ -42,6 +50,8 @@ function IngredientRow({ ingredient, editModeOn }: { ingredient: Ingredient; edi
   const [isEditingIngredient, setIsEditingIngredient] = useState(false);
   const [nameDraft, setNameDraft] = useState(ingredient.name);
   const [amountDraft, setAmountDraft] = useState(ingredient.amount);
+
+  const [isViewingHistory, setIsViewingHistory] = useState(false);
 
   const { addToast } = useToast();
 
@@ -74,6 +84,7 @@ function IngredientRow({ ingredient, editModeOn }: { ingredient: Ingredient; edi
   function openNoteEditor() {
     setNoteDraft(ingredient.notes ?? "");
     setIsEditingIngredient(false);
+    setIsViewingHistory(false);
     setIsEditingNote(true);
   }
 
@@ -81,10 +92,17 @@ function IngredientRow({ ingredient, editModeOn }: { ingredient: Ingredient; edi
     setNameDraft(ingredient.name);
     setAmountDraft(ingredient.amount);
     setIsEditingNote(false);
+    setIsViewingHistory(false);
     setIsEditingIngredient(true);
   }
 
-  const isEditingSomething = isEditingNote || isEditingIngredient;
+  function openHistory() {
+    setIsEditingNote(false);
+    setIsEditingIngredient(false);
+    setIsViewingHistory(true);
+  }
+
+  const isEditingSomething = isEditingNote || isEditingIngredient || isViewingHistory;
 
   return (
     <div className="flex flex-col gap-1">
@@ -110,6 +128,19 @@ function IngredientRow({ ingredient, editModeOn }: { ingredient: Ingredient; edi
           </span>
         )}
 
+        { !editModeOn &&
+          <Button
+            variant={isViewingHistory ? "secondary" : "ghost"}
+            size="icon"
+            aria-label="View history"
+            aria-pressed={isViewingHistory}
+            disabled={isEditingSomething && !isViewingHistory}
+            onClick={() => (isViewingHistory ? setIsViewingHistory(false) : openHistory())}
+          >
+            <HistoryIcon className="h-4 w-4" />
+          </Button>
+        }
+
         {editModeOn && (
           <div className="flex shrink-0 gap-1">
             {isEditingIngredient ? (
@@ -128,7 +159,7 @@ function IngredientRow({ ingredient, editModeOn }: { ingredient: Ingredient; edi
                   onClick={() => editIngredient({ name: nameDraft, amount: amountDraft })}
                   disabled={isSavingIngredient || (nameDraft === ingredient.name && amountDraft === ingredient.amount)}
                 >
-                    Save
+                  Save
                 </LoadingButton>
               </>
             ) : (
@@ -138,7 +169,7 @@ function IngredientRow({ ingredient, editModeOn }: { ingredient: Ingredient; edi
                   size="icon"
                   aria-label="Add note"
                   aria-pressed={isEditingNote}
-                  disabled={isEditingSomething}
+                  disabled={isEditingSomething && !isEditingNote}
                   onClick={() => (isEditingNote ? setIsEditingNote(false) : openNoteEditor())}
                 >
                   <StickyNote className="h-4 w-4" />
@@ -151,6 +182,16 @@ function IngredientRow({ ingredient, editModeOn }: { ingredient: Ingredient; edi
                   onClick={openIngredientEditor}
                 >
                   <Pencil className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant={isViewingHistory ? "secondary" : "ghost"}
+                  size="icon"
+                  aria-label="View history"
+                  aria-pressed={isViewingHistory}
+                  disabled={isEditingSomething && !isViewingHistory}
+                  onClick={() => (isViewingHistory ? setIsViewingHistory(false) : openHistory())}
+                >
+                  <HistoryIcon className="h-4 w-4" />
                 </Button>
               </>
             )}
@@ -184,6 +225,109 @@ function IngredientRow({ ingredient, editModeOn }: { ingredient: Ingredient; edi
           </div>
         </div>
       )}
+
+      {isViewingHistory && <IngredientHistoryPreview ingredientId={ingredient.id} />}
     </div>
+  );
+}
+
+function IngredientHistoryPreview({ ingredientId }: { ingredientId: string }) {
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["ingredientHistory", ingredientId],
+    queryFn: () => recipeService.getIngredientHistory(ingredientId),
+  });
+
+  const sortedHistory = data?.history.slice().sort((a, b) => b.version - a.version) ?? [];
+  const recentEntries = sortedHistory.slice(0, 3);
+
+  return (
+    <div className="flex flex-col gap-1 pb-3 pl-4 border-l-2 border-muted ml-1">
+      {isLoading && <p className="text-xs text-muted-foreground">Loading history...</p>}
+      {error && <p className="text-xs text-destructive">Couldn't load history.</p>}
+
+      {recentEntries.map((entry) => (
+        <div key={entry.id} className="flex items-center justify-between text-xs text-muted-foreground gap-2 py-0.5">
+          <span>
+            <span className="font-medium">{entry.amount}</span> {entry.name}
+            {entry.version === data?.bestVersion && (
+              <Badge variant="secondary" className="ml-2 text-[10px] py-0">
+                Current
+              </Badge>
+            )}
+          </span>
+          <span className="shrink-0">{formatAddedDate(entry.createdAt)}</span>
+        </div>
+      ))}
+
+      {data && sortedHistory.length > 0 && (
+        <IngredientHistoryDialog
+          ingredientId={ingredientId}
+          bestVersion={data.bestVersion}
+          entries={sortedHistory}
+          trigger={
+            <Button variant="link" size="sm" className="self-start px-0 h-auto text-xs">
+              {sortedHistory.length > 3 ? `View full history (${sortedHistory.length})` : "View history"}
+            </Button>
+          }
+        />
+      )}
+    </div>
+  );
+}
+
+function IngredientHistoryDialog({
+  entries,
+  bestVersion,
+  trigger,
+}: {
+  ingredientId: string;
+  bestVersion: number;
+  entries: IngredientDeltaEntry[];
+  trigger: React.ReactNode;
+}) {
+  return (
+    <Dialog>
+      <DialogTrigger>{trigger}</DialogTrigger>
+      <DialogContent className="max-w-lg">
+        <DialogHeader>
+          <DialogTitle>Ingredient history</DialogTitle>
+        </DialogHeader>
+        <div className="flex flex-col gap-1 max-h-96 overflow-y-auto">
+          {entries.map((entry) => {
+            const isCurrent = entry.version === bestVersion;
+            return (
+              <div key={entry.id} className="flex items-center justify-between py-2 gap-4 border-b last:border-b-0">
+                <div className="text-sm">
+                  <span className="font-medium">{entry.amount}</span> {entry.name}
+                  {isCurrent && (
+                    <Badge variant="secondary" className="ml-2">
+                      Current
+                    </Badge>
+                  )}
+                  <p className="text-xs text-muted-foreground">
+                    v{entry.version} · {formatAddedDate(entry.createdAt)}
+                  </p>
+                </div>
+                <DropdownMenu>
+                  <DropdownMenuTrigger>
+                    <Button variant="ghost" size="icon" aria-label="Version actions">
+                      <MoreVertical className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem disabled={isCurrent} onClick={() => {}}>
+                      Revert to this version
+                    </DropdownMenuItem>
+                    <DropdownMenuItem className="text-destructive" disabled={isCurrent} onClick={() => {}}>
+                      Delete this version
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+            );
+          })}
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 }

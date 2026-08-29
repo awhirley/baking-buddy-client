@@ -1,7 +1,7 @@
 import { DeleteRecipeTrigger } from "#components/ActionDialogs/DeleteRecipeTrigger";
 import { Badge } from "#components/SharedComponents/ui/badge";
 import { Button } from "#components/SharedComponents/ui/button";
-import { Textarea } from "#components/ui/textarea"
+import { Textarea } from "#components/SharedComponents/ui/textarea"
 import { Card, CardContent, CardHeader, CardTitle } from "#components/SharedComponents/ui/card";
 import { NotepadText, Pencil, PencilSparklesIcon } from "lucide-react";
 import { useState, type Dispatch, type SetStateAction } from "react";
@@ -11,7 +11,8 @@ import { useMutation } from "@tanstack/react-query";
 import { recipeService } from "../../services/RecipeService";
 import { useToast } from "../../contexts/ToastContext";
 import { Spinner } from "#components/SharedComponents/ui/spinner";
-import { Toggle } from "#components/ui/toggle";
+import { Toggle } from "#components/SharedComponents/ui/toggle";
+import { Tooltip, TooltipContent, TooltipTrigger } from "#components/SharedComponents/ui/tooltip";
 
 interface RecipeDetailsCardProps {
   details: RecipeDetail,
@@ -46,10 +47,16 @@ export function RecipeDetailsCard({ details, editModeOn, setEditModeOn }: Recipe
           </p>
         </div>
         <div className="flex gap-2">
-          <Toggle aria-label="Toggle bookmark" variant="outline" pressed={editModeOn} onPressedChange={setEditModeOn} >
-            <Pencil className="group-aria-pressed/toggle:fill-foreground"/>
-            <span className="pl-1">Edit Mode</span>
-          </Toggle>
+          <Tooltip>
+            <TooltipTrigger render={
+              <Toggle aria-label="Toggle bookmark" variant="outline" pressed={editModeOn} onPressedChange={setEditModeOn} >
+                <Pencil className="group-aria-pressed/toggle:fill-foreground"/>
+              </Toggle> }
+            />
+            <TooltipContent>
+              <p>Turn edit mode { editModeOn ? "off" : "on" }</p>
+            </TooltipContent>
+          </Tooltip>
           <DeleteRecipeTrigger recipeId={details.id} isOpen={deleteDialogIsOpen} setIsOpen={setDeleteDialogIsOpen} navigateToHome={true} />
         </div>
       </CardHeader>

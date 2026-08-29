@@ -45,3 +45,19 @@ export interface UpdateBakeInstructionPayload {
 export interface CompleteBakePayload {
   setDeltasAsBest: boolean;
 }
+
+export interface IngredientHistory {
+  id: string;
+  recipeId: string;
+  bestVersion: number;
+  history: IngredientDeltaEntry[];
+}
+
+export interface IngredientDeltaEntry {
+  id: string;
+  ingredientId: string;
+  version: number;
+  amount: string;
+  name: string;
+  createdAt: string;
+}

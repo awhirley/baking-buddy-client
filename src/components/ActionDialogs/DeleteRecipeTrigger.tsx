@@ -67,7 +67,7 @@ export function DeleteRecipeTrigger({ isOpen, setIsOpen, recipeId, navigateToHom
         </AlertDialogHeader>
         <AlertDialogFooter>
           <Button onClick={() => setIsOpen(false)} variant="outline">Cancel</Button>
-          <LoadingButton onClick={handleDelete} isLoading={isLoading} buttonVariant="default">Delete recipe</LoadingButton>
+          <LoadingButton onClick={handleDelete} isLoading={isLoading} variant="default">Delete recipe</LoadingButton>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

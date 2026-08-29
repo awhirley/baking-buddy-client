@@ -6,7 +6,7 @@ import type { Instruction } from "../../types/RecipeTypes";
 import { recipeService } from "../../services/RecipeService";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "../../contexts/ToastContext";
-import { Textarea } from "#components/ui/textarea";
+import { Textarea } from "#components/SharedComponents/ui/textarea";
 import { useState } from "react";
 import { Spinner } from "#components/SharedComponents/ui/spinner";
 import { useParams } from "react-router-dom";
