@@ -315,8 +315,11 @@ function IngredientHistoryDialog({
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
-                    <DropdownMenuItem disabled={isCurrent} onClick={() => {}}>
+                    { !isCurrent && <DropdownMenuItem onClick={() => {}}>
                       Revert to this version
+                    </DropdownMenuItem>}
+                    <DropdownMenuItem onClick={() => {}}>
+                      See bakes associated with this version
                     </DropdownMenuItem>
                     <DropdownMenuItem className="text-destructive" disabled={isCurrent} onClick={() => {}}>
                       Delete this version
