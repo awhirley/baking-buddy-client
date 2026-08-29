@@ -61,3 +61,18 @@ export interface IngredientDeltaEntry {
   name: string;
   createdAt: string;
 }
+
+export interface InstructionHistory {
+  id: string;
+  recipeId: string;
+  bestVersion: number;
+  history: InstructionDeltaEntry[];
+}
+
+export interface InstructionDeltaEntry {
+  id: string;
+  instructionId: string;
+  version: number;
+  description: string;
+  createdAt: string;
+}
