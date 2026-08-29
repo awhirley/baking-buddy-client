@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { createRecipePayloadtoApiPayload, type CreateRecipePayload, type Recipe, type RecipeDetail } from '../types/RecipeTypes';
+import { createRecipePayloadtoApiPayload, type CreateRecipePayload, type EditIngredientPayload, type EditInstructionPayload, type Recipe, type RecipeDetail } from '../types/RecipeTypes';
 import { toCamelCase } from './utils';
 
 const recipeServiceApi = `${import.meta.env.VITE_API_URL}/api`;
@@ -58,5 +58,15 @@ export const recipeService = {
           'Content-Type': 'text/plain',
         },
       });
+    },
+
+    async editIngredient(id: string, args: EditIngredientPayload): Promise<Recipe> {
+      const response = await api.patch<Recipe>(`/ingredients/${id}`, args);
+      return response.data;
+    },
+
+    async editInstruction(id: string, args: EditInstructionPayload): Promise<Recipe> {
+      const response = await api.patch<Recipe>(`/instructions/${id}`, args);
+      return response.data;
     },
 }

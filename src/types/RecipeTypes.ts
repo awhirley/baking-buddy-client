@@ -44,6 +44,15 @@ export interface CreateIngredientPayload {
   name: string;
 }
 
+export interface EditIngredientPayload {
+  amount: string;
+  name: string;
+}
+
+export interface EditInstructionPayload {
+  description: string;
+}
+
 export interface CreateRecipePayload {
   name: string;
   description: string | null;
@@ -68,3 +77,4 @@ export function createRecipePayloadtoApiPayload(payload: CreateRecipePayload) {
     instructions: payload.instructions,
   };
 }
+
