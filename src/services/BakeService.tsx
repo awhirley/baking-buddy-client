@@ -13,7 +13,12 @@ export const bakeService = {
     return response.data;
   },
 
-  async listBakes(recipeId: string): Promise<BakeDetail[]> {
+  async listBakes(): Promise<BakeDetail[]> {
+    const response = await api.get<BakeDetail[]>(`/bakes/`);
+    return response.data;
+  },
+
+  async listBakesForRecipe(recipeId: string): Promise<BakeDetail[]> {
     const response = await api.get<BakeDetail[]>(`/bakes/recipe/${recipeId}`);
     return response.data;
   },

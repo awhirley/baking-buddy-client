@@ -4,6 +4,8 @@ import { CreateRecipe } from './pages/CreateRecipe';
 import { ViewRecipe } from './pages/ViewRecipe';
 import { ErrorPage } from './pages/ErrorPage';
 import { ViewBake } from './pages/ViewBake';
+import { RecipeListPage } from './pages/RecipeListPage';
+import { BakeListPage } from './pages/BakeListPage';
 
 const routes: RouteObject[] = [
   {
@@ -17,6 +19,18 @@ const routes: RouteObject[] = [
   {
     path: '/view/:id',
     element: <ViewRecipe />,
+  },
+  {
+    path: '/bakes',
+    element: <BakeListPage />,
+  },
+  {
+    path: '/bakes/:recipeId',
+    element: <BakeListPage />,
+  },
+  {
+    path: '/recipes',
+    element: <RecipeListPage />,
   },
   {
     path: '/bake/:bakeId',

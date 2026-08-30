@@ -12,7 +12,7 @@ export interface BakeDetail {
   elevation: number | null;
   notes: string | null;
   createdAt: string;
-  startDatetime: string; // TODO: should this be nullable?
+  startDatetime: string;
   endDatetime: string | null;
 }
 

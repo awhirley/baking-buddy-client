@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "#components/SharedComp
 import { formatAddedDate } from "#components/RecipeList/utils";
 import type { BakeDetail } from "../../types/BakeTypes";
 
-export function BakeDetailsCard({ createdAt, startDatetime, endDatetime, elevation, notes }: BakeDetail) {
+export function BakeDetailsCard({ startDatetime, endDatetime, elevation, notes }: BakeDetail) {
   return (
     <Card>
       <CardHeader className="flex flex-row items-start justify-between gap-4">
