@@ -32,7 +32,7 @@ export function BakeCard({ bake }: { bake: BakeDetail }) {
       <CardHeader>
         {/* TODO: swap for the real recipe name once BakeDetail includes it */}
         <CardTitle className="flex items-center gap-2">
-          Recipe
+          Bake Session: {bake.recipeName}
           {isInProgress && (
             <Badge variant="secondary" className="text-amber-600">
               In progress

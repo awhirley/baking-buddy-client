@@ -9,6 +9,7 @@ export interface Bake {
 export interface BakeDetail {
   id: string;
   recipeId: string;
+  recipeName: string;
   elevation: number | null;
   notes: string | null;
   createdAt: string;
