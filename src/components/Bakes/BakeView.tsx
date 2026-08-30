@@ -3,7 +3,6 @@ import { AlertCircle, Info } from "lucide-react";
 import { skipToken, useQuery } from "@tanstack/react-query";
 
 import { Alert, AlertDescription, AlertTitle } from "#components/SharedComponents/ui/alert";
-import { Button } from "#components/SharedComponents/ui/button";
 import { bakeService } from "../../services/BakeService";
 import { BakeSkeleton } from "./BakeSkeleton";
 import { BakeDetailsCard } from "./BakeDetailsCard";
@@ -53,10 +52,6 @@ export function BakeView() {
           <BakeIngredientsSection ingredients={data.ingredientVersions} />
 
           <BakeInstructionsSection instructions={data.instructionVersions} />
-
-          <Button size="lg" className="w-full" onClick={() => {}}>
-            Complete Bake
-          </Button>
         </div>
       )}
     </div>

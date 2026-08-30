@@ -76,3 +76,9 @@ export interface InstructionDeltaEntry {
   description: string;
   createdAt: string;
 }
+
+export function completeBakePayloadToJson(payload: CompleteBakePayload) {
+  return {
+    set_deltas_as_best: payload.setDeltasAsBest
+  };
+}

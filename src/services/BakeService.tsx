@@ -1,10 +1,11 @@
 import { api } from './RecipeService'; // adjust path/name to wherever `api` is exported from
-import type {
-  Bake,
-  BakeDetail,
-  UpdateBakeInstructionPayload,
-  UpdateBakeIngredientPayload,
-  CompleteBakePayload,
+import {
+  type Bake,
+  type BakeDetail,
+  type UpdateBakeInstructionPayload,
+  type UpdateBakeIngredientPayload,
+  type CompleteBakePayload,
+  completeBakePayloadToJson,
 } from '../types/BakeTypes';
 
 export const bakeService = {
@@ -46,6 +47,6 @@ export const bakeService = {
   },
 
   async completeBake(bakeId: string, args: CompleteBakePayload): Promise<void> {
-    await api.patch(`/bakes/${bakeId}/complete`, args);
+    await api.patch(`/bakes/${bakeId}/complete`, completeBakePayloadToJson(args));
   },
 };
