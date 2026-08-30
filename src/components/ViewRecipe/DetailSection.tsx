@@ -157,6 +157,7 @@ export function RecipeDetailsCard({ details, editModeOn, setEditModeOn }: Recipe
             isOpen={deleteDialogIsOpen}
             setIsOpen={setDeleteDialogIsOpen}
             navigateToHome={true}
+            renderButton={false}
           />
         </div>
       </CardHeader>

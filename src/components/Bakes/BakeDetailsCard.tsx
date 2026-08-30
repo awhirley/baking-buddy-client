@@ -3,7 +3,7 @@ import { Button } from "#components/SharedComponents/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "#components/SharedComponents/ui/card";
 import { formatAddedDate } from "#components/RecipeList/utils";
 import type { BakeDetail } from "../../types/BakeTypes";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "../../contexts/ToastContext";
 import { bakeService } from "../../services/BakeService";
 import { useState } from "react";
@@ -11,8 +11,18 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { LoadingButton } from "#components/SharedComponents/LoadingButton";
 import { Field, FieldContent, FieldDescription, FieldLabel } from "#components/SharedComponents/ui/field";
 import { Checkbox } from "#components/SharedComponents/ui/checkbox";
+import { useNavigate } from "react-router-dom";
+import { recipeService } from "../../services/RecipeService";
 
 export function BakeDetailsCard({ id, recipeId, recipeName, startDatetime, endDatetime, elevation, notes }: BakeDetail) {
+   const { data, isLoading, error } = useQuery({
+      queryKey: ["recipe", recipeId],
+      queryFn: async () => {
+            const response = await recipeService.getRecipeById(recipeId!);
+            return response;
+          }
+    });
+
   return (
     <Card>
       <CardHeader className="flex flex-row items-start justify-between gap-4">
@@ -36,6 +46,7 @@ export function BakeDetailsCard({ id, recipeId, recipeName, startDatetime, endDa
 }
 
 function CompleteBakeTrigger({ bakeId, recipeId }: { bakeId: string, recipeId: string }) {
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const queryClient = useQueryClient();
   const { addToast } = useToast();
@@ -48,6 +59,7 @@ function CompleteBakeTrigger({ bakeId, recipeId }: { bakeId: string, recipeId: s
       queryClient.invalidateQueries({ queryKey: ["bakes", "recipe", recipeId] });
       addToast("Bake completed!", null, { type: "default" });
       setIsOpen(false);
+       navigate(`/view/${recipeId}`);
     },
     onError: () => {
       addToast("Failed to complete bake", "Please try again.", { type: "destructive", duration: 6000 });

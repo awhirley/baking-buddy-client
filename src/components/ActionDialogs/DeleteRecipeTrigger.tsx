@@ -27,9 +27,10 @@ interface DeleteRecipeTriggerProps {
   setIsOpen: Dispatch<SetStateAction<boolean>>;
   recipeId: string;
   navigateToHome?: boolean;
+  renderButton?: boolean;
 }
 
-export function DeleteRecipeTrigger({ isOpen, setIsOpen, recipeId, navigateToHome = false }: DeleteRecipeTriggerProps) {
+export function DeleteRecipeTrigger({ isOpen, setIsOpen, recipeId, navigateToHome = false, renderButton = true }: DeleteRecipeTriggerProps) {
   const queryClient = useQueryClient();
   const [showAlert, setShowAlert] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -56,7 +57,7 @@ export function DeleteRecipeTrigger({ isOpen, setIsOpen, recipeId, navigateToHom
 
   return (
     <AlertDialog open={isOpen}>
-      <AlertDialogTrigger onClick={() => setIsOpen(true)} render={<Button variant="outline" size="icon"><Trash2Icon /></Button>} />
+      <AlertDialogTrigger onClick={() => setIsOpen(true)} render={renderButton ? <Button variant="outline" size="icon"><Trash2Icon /></Button> : <></>} />
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>Delete recipe?</AlertDialogTitle>
