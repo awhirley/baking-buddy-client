@@ -6,7 +6,7 @@ import { cva, type VariantProps } from 'class-variance-authority'
 import { Star } from 'lucide-react';
 import { cn } from '#lib/utils'
 
-type IconElementProps = {
+export type IconElementProps = {
   size?: number
   className?: string
   'aria-hidden'?: string | boolean
