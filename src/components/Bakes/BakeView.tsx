@@ -38,14 +38,14 @@ export function BakeView() {
 
       {data && (
         <div className="flex flex-col gap-6">
-          <Alert>
+          { !data.details.endDatetime && <Alert>
             <Info className="h-4 w-4" />
-            <AlertTitle>You're in a bake session</AlertTitle>
+            <AlertTitle>You're in an active bake session</AlertTitle>
             <AlertDescription>
               This is a working copy of the recipe for this bake. Edits you make to ingredients or
               instructions here only apply to this session — the original recipe stays unchanged.
             </AlertDescription>
-          </Alert>
+          </Alert>}
 
           <BakeDetailsCard {...data.details} />
 

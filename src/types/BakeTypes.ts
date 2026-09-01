@@ -6,6 +6,16 @@ export interface Bake {
   instructionVersions: BakeInstruction[];
 }
 
+export interface BakeRating {
+  overall: number | null;
+  taste: number | null;
+  texture: number | null;
+  appearance: number | null;
+  riseStructure: number | null;
+  difficulty: number | null;
+  createdAt: string;
+}
+
 export interface BakeDetail {
   id: string;
   recipeId: string;
@@ -15,6 +25,7 @@ export interface BakeDetail {
   createdAt: string;
   startDatetime: string;
   endDatetime: string | null;
+  ratings: BakeRating;
 }
 
 export interface BakeIngredient {
@@ -30,6 +41,13 @@ export interface BakeInstruction {
   instructionDeltaId: string | null;
   version: number | null;
   description: string;
+}
+
+export interface UpdateBakePayload {
+  bakeId: string,
+  elevation: number | null,
+  notes: String | null,
+  ratings: BakeRating | null,
 }
 
 export interface UpdateBakeIngredientPayload {
@@ -81,5 +99,21 @@ export interface InstructionDeltaEntry {
 export function completeBakePayloadToJson(payload: CompleteBakePayload) {
   return {
     set_deltas_as_best: payload.setDeltasAsBest
+  };
+}
+
+export function updateBakePayloadToJson(payload: UpdateBakePayload) {
+  return {
+    bake_id: payload.bakeId,
+    elevation: payload.elevation,
+    notes: payload.notes,
+    ratings: {
+      overall: payload.ratings?.overall,
+      taste: payload.ratings?.taste,
+      texture: payload.ratings?.texture,
+      appearance: payload.ratings?.appearance,
+      rise_structure: payload.ratings?.riseStructure,
+      difficulty: payload.ratings?.difficulty,
+    }
   };
 }

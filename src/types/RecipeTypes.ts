@@ -37,6 +37,8 @@ export interface RecipeDetail {
   createdAt: string;
   openBakeId: string | null;
   notes: string | null;
+  difficulty: number | null;
+  favorite: boolean;
 }
 
 export interface CreateIngredientPayload {
