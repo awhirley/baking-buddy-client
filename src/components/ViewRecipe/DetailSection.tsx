@@ -1,14 +1,11 @@
 import { DeleteRecipeTrigger } from "#components/ActionDialogs/DeleteRecipeTrigger";
 import { Badge } from "#components/SharedComponents/ui/badge";
 import { Button } from "#components/SharedComponents/ui/button";
-import { Textarea } from "#components/SharedComponents/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "#components/SharedComponents/ui/card";
 import {
   ChefHat,
   MoreVertical,
-  NotepadText,
   Pencil,
-  PencilSparklesIcon,
   Plus,
 } from "lucide-react";
 import { useState, type Dispatch, type SetStateAction } from "react";
@@ -18,7 +15,6 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { recipeService } from "../../services/RecipeService";
 import { bakeService } from "../../services/BakeService";
 import { useToast } from "../../contexts/ToastContext";
-import { Spinner } from "#components/SharedComponents/ui/spinner";
 import { Toggle } from "#components/SharedComponents/ui/toggle";
 import { Tooltip, TooltipContent, TooltipTrigger } from "#components/SharedComponents/ui/tooltip";
 import {
@@ -29,6 +25,7 @@ import {
   DropdownMenuTrigger,
 } from "#components/SharedComponents/ui/dropdown-menu";
 import { useNavigate } from "react-router-dom";
+import { NoteEditor } from "#components/SharedComponents/NoteEditor";
 
 interface RecipeDetailsCardProps {
   details: RecipeDetail;
@@ -190,36 +187,13 @@ export function RecipeDetailsCard({ details, editModeOn, setEditModeOn }: Recipe
           </div>
         )}
 
-        {editModeOn && (
-          <div className="flex flex-col gap-2 group border-l-4 border-amber-300 pl-3 py-1 bg-input/50 rounded-xl">
-            <span className="flex items-center gap-1 font-semibold pb-2">
-              <NotepadText className="w-4 h-4" />
-              Recipe Notes
-            </span>
-            <Textarea
-              value={note ?? undefined}
-              onChange={(event) => setNote(event.target.value)}
-              className="border"
-              placeholder="Recipe notes: enter anything you'd like to remember about your recipe"
-            ></Textarea>
-            <Button onClick={() => saveNote(note)} className="hidden group-focus-within:block self-end">
-              <span className="flex items-center gap-2">
-                {isSaving ? <Spinner /> : <PencilSparklesIcon />}
-                Save note
-              </span>
-            </Button>
-          </div>
-        )}
-
-        {!editModeOn && note && (
-          <div className="border-l-4 border-amber-300 pl-3 py-1 bg-input/50 rounded-xl">
-            <span className="flex items-center gap-1 font-semibold pb-2">
-              <NotepadText className="w-4 h-4" />
-              Recipe Notes
-            </span>
-            {note}
-          </div>
-        )}
+        <NoteEditor
+          existingNote={details.notes}
+          editModeOn={editModeOn}
+          onSaveNote={saveNote}
+          isSaving={isSaving}
+          subject="Recipe"
+        />
       </CardContent>
     </Card>
   );
