@@ -35,7 +35,6 @@ interface RecipeDetailsCardProps {
 
 export function RecipeDetailsCard({ details, editModeOn, setEditModeOn }: RecipeDetailsCardProps) {
   const [deleteDialogIsOpen, setDeleteDialogIsOpen] = useState(false);
-  const [note, setNote] = useState<string | null>(details.notes);
   const { addToast } = useToast();
   const navigate = useNavigate();
 
@@ -53,6 +52,22 @@ export function RecipeDetailsCard({ details, editModeOn, setEditModeOn }: Recipe
     queryKey: ["bakes", "recipe", details.id],
     queryFn: () => bakeService.listBakesForRecipe(details.id),
   });
+
+  const { mutate: createBake } = useMutation({
+    mutationFn: (recipeId: string) =>
+      bakeService.createBake(recipeId),
+    onSuccess: (data) => {
+      addToast('New bake started!', null, { type: 'default' });
+      navigate(`/bake/${data.id}`)
+    },
+    onError: () => {
+      addToast('Failed to start new bake', "Please try again.", { type: 'destructive', duration: 6000 });
+    },
+  });
+
+  const handleBakeCreate = () => {
+    createBake(details.id);
+  };
 
   const sortedBakes = bakes?.slice().sort((a, b) => b.startDatetime.localeCompare(a.startDatetime)) ?? [];
   const mostRecentBake = sortedBakes[0];
@@ -127,7 +142,7 @@ export function RecipeDetailsCard({ details, editModeOn, setEditModeOn }: Recipe
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => navigate(`/bakes/new/${details.id}`)}>
+              <DropdownMenuItem onClick={handleBakeCreate}>
                 <Plus className="h-4 w-4 mr-2" />
                 New bake
               </DropdownMenuItem>
