@@ -11,6 +11,7 @@ import { RATING_FIELDS } from "#components/Bakes/RatingSummary";
 import type { BakeRating, UpdateBakePayload } from "../../types/BakeTypes";
 import { DialogContent, DialogHeader, DialogFooter, Dialog, DialogTitle, DialogDescription } from "#components/SharedComponents/ui/dialog";
 import { Input } from "#components/SharedComponents/ui/input";
+import { Rating } from "#components/SharedComponents/ui/rating";
 
 export function EditBakeDetailsTrigger({ bakeId, elevation, notes, ratings }: { bakeId: string; elevation: number | null; notes: string | null; ratings: BakeRating }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -20,12 +21,12 @@ export function EditBakeDetailsTrigger({ bakeId, elevation, notes, ratings }: { 
   const buildInitialRatingsInput = () =>
     RATING_FIELDS.reduce((acc, { key }) => {
       const value = ratings?.[key];
-      acc[key] = value != null ? String(value) : "";
+      acc[key] = value != null ? value : null;
       return acc;
-    }, {} as Record<string, string>);
+    }, {} as Record<string, number | null>);
 
   const [elevationInput, setElevationInput] = useState<string>(elevation != null ? String(elevation) : "");
-  const [ratingsInput, setRatingsInput] = useState<Record<string, string>>(buildInitialRatingsInput);
+  const [ratingsInput, setRatingsInput] = useState<Record<string, number | null>>(buildInitialRatingsInput);
 
   const resetForm = () => {
     setElevationInput(elevation != null ? String(elevation) : "");
@@ -47,7 +48,11 @@ export function EditBakeDetailsTrigger({ bakeId, elevation, notes, ratings }: { 
       };
       RATING_FIELDS.forEach(({ key }) => {
         const raw = ratingsInput[key];
-        parsedRatings[key] = raw.trim() === "" ? null : Number(raw);
+        if (raw === 0) {
+          parsedRatings[key] = null;
+        } else {
+          parsedRatings[key] = raw;
+        }
       });
 
       const payload: UpdateBakePayload = {
@@ -75,7 +80,7 @@ export function EditBakeDetailsTrigger({ bakeId, elevation, notes, ratings }: { 
     setIsOpen(open);
   };
 
-  const handleRatingChange = (key: string, value: string) => {
+  const handleRatingChange = (key: string, value: number) => {
     setRatingsInput((prev) => ({ ...prev, [key]: value }));
   };
 
@@ -103,17 +108,14 @@ export function EditBakeDetailsTrigger({ bakeId, elevation, notes, ratings }: { 
           </Field>
 
           <div className="grid grid-cols-2 gap-4">
-            {RATING_FIELDS.map(({ key, label }) => (
+            {RATING_FIELDS.map(({ key, label, icon }) => (
               <Field key={key}>
                 <FieldLabel htmlFor={`${key}Input`}>{label}</FieldLabel>
-                <Input
-                  id={`${key}Input`}
-                  type="number"
-                  min={1}
-                  max={5}
-                  value={ratingsInput[key]}
-                  onChange={(e) => handleRatingChange(key, e.target.value)}
-                  placeholder="1–5"
+                <Rating
+                  id={`${key}Rating`}
+                  value={ratingsInput[key] ? Number(ratingsInput[key]) : undefined}
+                  onValueChange={(e) => handleRatingChange(key, e) }
+                  icon={icon}
                 />
               </Field>
             ))}

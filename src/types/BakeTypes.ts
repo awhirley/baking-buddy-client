@@ -29,36 +29,42 @@ export interface BakeDetail {
 }
 
 export interface BakeIngredient {
+  bakeIngredientId: string;
   ingredientId: string;
   ingredientDeltaId: string | null;
   version: number | null;
   amount: string;
   name: string;
+  notes: string | null;
 }
 
 export interface BakeInstruction {
+  bakeInstructionId: string;
   instructionId: string;
   instructionDeltaId: string | null;
   version: number | null;
   description: string;
+  notes: string | null;
 }
 
 export interface UpdateBakePayload {
   bakeId: string,
   elevation: number | null,
-  notes: String | null,
+  notes: string | null,
   ratings: BakeRating | null,
 }
 
 export interface UpdateBakeIngredientPayload {
-  deltaId: string,
-  amount: string,
-  name: string,
+  bakeIngredientId: string;
+  amount: string;
+  name: string;
+  notes?: string | null;
 }
 
 export interface UpdateBakeInstructionPayload {
-  deltaId: string,
-  description: string,
+  bakeInstructionId: string;
+  description: string;
+  notes?: string | null;
 }
 
 export interface CompleteBakePayload {
@@ -115,5 +121,22 @@ export function updateBakePayloadToJson(payload: UpdateBakePayload) {
       rise_structure: payload.ratings?.riseStructure,
       difficulty: payload.ratings?.difficulty,
     }
+  };
+}
+
+export function updateBakeIngredientPayloadToJson(payload: UpdateBakeIngredientPayload) {
+  return {
+    bake_ingredient_id: payload.bakeIngredientId,
+    amount: payload.amount,
+    name: payload.name,
+    notes: payload.notes
+  };
+}
+
+export function updateBakeInstructionPayloadToJson(payload: UpdateBakeInstructionPayload) {
+  return {
+    bake_instruction_id: payload.bakeInstructionId,
+    description: payload.description,
+    notes: payload.notes
   };
 }

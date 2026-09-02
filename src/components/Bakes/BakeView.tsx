@@ -16,7 +16,7 @@ export function BakeView() {
   const [alertIsOpen, setAlertIsOpen] = useState(true);
 
   const { data, isLoading, error } = useQuery({
-    queryKey: ["bake", "new", bakeId],
+    queryKey: ["bake", bakeId],
     queryFn: bakeId
       ? async () => {
           const response = await bakeService.getBake(bakeId!);
@@ -57,9 +57,9 @@ export function BakeView() {
 
           <BakeDetailsCard {...data.details} />
 
-          <BakeIngredientsSection ingredients={data.ingredientVersions} />
+          <BakeIngredientsSection bakeId={bakeId!} ingredients={data.ingredientVersions} />
 
-          <BakeInstructionsSection instructions={data.instructionVersions} />
+          <BakeInstructionsSection bakeId={bakeId!} instructions={data.instructionVersions} />
         </div>
       )}
     </div>
