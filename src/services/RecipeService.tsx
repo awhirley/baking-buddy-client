@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { createRecipePayloadtoApiPayload, type CreateRecipePayload, type EditIngredientPayload, type EditInstructionPayload, type Recipe, type RecipeDetail } from '../types/RecipeTypes';
+import { createRecipePayloadtoApiPayload, type CreateRecipePayload, type UpdateIngredientPayload, type UpdateInstructionPayload, type Recipe, type RecipeDetail } from '../types/RecipeTypes';
 import { toCamelCase } from './utils';
 import type { IngredientHistory, InstructionHistory } from '../types/BakeTypes';
 
@@ -45,28 +45,12 @@ export const recipeService = {
       });
     },
 
-    async addNotesToIngredient(id: string, note: string | null): Promise<void> {
-      await api.patch(`/ingredients/notes/${id}`, note, {
-        headers: {
-          'Content-Type': 'text/plain',
-        },
-      });
-    },
-
-    async addNotesToInstruction(id: string, note: string | null): Promise<void> {
-      await api.patch(`/instructions/notes/${id}`, note, {
-        headers: {
-          'Content-Type': 'text/plain',
-        },
-      });
-    },
-
-    async editIngredient(id: string, args: EditIngredientPayload): Promise<Recipe> {
+    async updateIngredient(id: string, args: UpdateIngredientPayload): Promise<Recipe> {
       const response = await api.patch<Recipe>(`/ingredients/${id}`, args);
       return response.data;
     },
 
-    async editInstruction(id: string, args: EditInstructionPayload): Promise<Recipe> {
+    async updateInstruction(id: string, args: UpdateInstructionPayload): Promise<Recipe> {
       const response = await api.patch<Recipe>(`/instructions/${id}`, args);
       return response.data;
     },

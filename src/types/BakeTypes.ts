@@ -31,20 +31,27 @@ export interface BakeDetail {
 export interface BakeIngredient {
   bakeIngredientId: string;
   ingredientId: string;
-  ingredientDeltaId: string | null;
-  version: number | null;
+  ingredientDeltaId: string;
+  version: number;
   amount: string;
   name: string;
   notes: string | null;
+  updatedAmount: string | null;
+  updatedName: string | null;
+  updatedNotes: string | null;
+  notesUpdatedToNull: boolean;
 }
 
 export interface BakeInstruction {
   bakeInstructionId: string;
   instructionId: string;
-  instructionDeltaId: string | null;
-  version: number | null;
+  instructionDeltaId: string;
+  version: number;
   description: string;
   notes: string | null;
+  updatedDescription: string | null;
+  updatedNotes: string | null;
+  notesUpdatedToNull: boolean;
 }
 
 export interface UpdateBakePayload {

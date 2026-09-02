@@ -46,13 +46,15 @@ export interface CreateIngredientPayload {
   name: string;
 }
 
-export interface EditIngredientPayload {
+export interface UpdateIngredientPayload {
   amount: string;
   name: string;
+  notes: string | null;
 }
 
-export interface EditInstructionPayload {
+export interface UpdateInstructionPayload {
   description: string;
+  notes: string | null;
 }
 
 export interface CreateRecipePayload {

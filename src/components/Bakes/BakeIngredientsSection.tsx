@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Pencil, PencilSparklesIcon, StickyNote } from "lucide-react";
+import { History, Pencil, PencilSparklesIcon, StickyNote } from "lucide-react";
 
 import { LoadingButton } from "#components/SharedComponents/LoadingButton";
 import { Badge } from "#components/SharedComponents/ui/badge";
@@ -16,8 +16,17 @@ import { useToast } from "../../contexts/ToastContext";
 import type { BakeIngredient } from "../../types/BakeTypes";
 import { bakeService } from "../../services/BakeService";
 
-function isModified({ version, ingredientDeltaId }: BakeIngredient) {
-  return version === null && ingredientDeltaId === null;
+// name/amount are always the original delta values; updatedName/updatedAmount are the
+// nullable per-bake overrides. "Modified" tracks name/amount only (not notes), matching
+// the original badge's meaning.
+function ingredientIsModified(ingredient: BakeIngredient) {
+  const amountIsModified = ingredient.updatedAmount !== null && ingredient.updatedAmount !== ingredient.amount;
+  const nameIsModified = ingredient.updatedName!== null && ingredient.updatedName !== ingredient.name;
+  return amountIsModified || nameIsModified;
+}
+
+function noteIsModified({ notes, updatedNotes, notesUpdatedToNull }: BakeIngredient) {
+  return notesUpdatedToNull || (notes != null && notes !== updatedNotes);
 }
 
 export function BakeIngredientsSection({
@@ -48,13 +57,22 @@ function BakeIngredientRow({ bakeId, ingredient }: { bakeId: string; ingredient:
   const queryClient = useQueryClient();
   const { addToast } = useToast();
 
+  const ingredientModified = ingredientIsModified(ingredient);
+  const noteModified = noteIsModified(ingredient);
+
+  const effectiveName = ingredient.updatedName ?? ingredient.name;
+  const effectiveAmount = ingredient.updatedAmount ?? ingredient.amount;
+  const effectiveNotes = (ingredient.updatedNotes || ingredient.notesUpdatedToNull) ? ingredient.updatedNotes : ingredient.notes;
+
+
   const [isEditingNote, setIsEditingNote] = useState(false);
-  const [noteDraft, setNoteDraft] = useState(ingredient.notes ?? "");
-  const [savedNote, setSavedNote] = useState(ingredient.notes ?? "");
+  const [noteDraft, setNoteDraft] = useState(effectiveNotes);
 
   const [isEditingIngredient, setIsEditingIngredient] = useState(false);
-  const [nameDraft, setNameDraft] = useState(ingredient.name);
-  const [amountDraft, setAmountDraft] = useState(ingredient.amount);
+  const [nameDraft, setNameDraft] = useState(effectiveName);
+  const [amountDraft, setAmountDraft] = useState(effectiveAmount);
+
+  const [showOriginal, setShowOriginal] = useState(false);
 
   const { mutate: editIngredient, isPending: isSavingIngredient } = useMutation({
     mutationFn: ({ name, amount }: { name: string; amount: string }) =>
@@ -68,6 +86,7 @@ function BakeIngredientRow({ bakeId, ingredient }: { bakeId: string; ingredient:
       queryClient.invalidateQueries({ queryKey: ["bake", bakeId] });
       addToast("Ingredient updated", null, { type: "default" });
       setIsEditingIngredient(false);
+      setShowOriginal(false);
     },
     onError: () => {
       addToast("Failed to update ingredient", "Please try again.", { type: "destructive", duration: 6000 });
@@ -78,12 +97,14 @@ function BakeIngredientRow({ bakeId, ingredient }: { bakeId: string; ingredient:
     mutationFn: ({ note }: { note: string | null }) =>
       bakeService.updateBakeIngredient(bakeId, {
         bakeIngredientId: ingredient.bakeIngredientId,
-        amount: ingredient.amount,
-        name: ingredient.name,
+        // send the current *effective* amount/name back unchanged so a note-only save can't
+        // accidentally look like a revert-to-original for an already-modified ingredient
+        amount: effectiveAmount,
+        name: effectiveName,
         notes: note,
       }),
-    onSuccess: (_, variables) => {
-      setSavedNote(variables.note ?? "");
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["bake", bakeId] });
       addToast("Note saved successfully", "and it's a good note, too.", { type: "default" });
       setIsEditingNote(false);
     },
@@ -93,16 +114,17 @@ function BakeIngredientRow({ bakeId, ingredient }: { bakeId: string; ingredient:
   });
 
   function openNoteEditor() {
-    setNoteDraft(ingredient.notes ?? "");
+    setNoteDraft(effectiveNotes);
     setIsEditingIngredient(false);
     setIsEditingNote(true);
   }
 
   function openIngredientEditor() {
-    setNameDraft(ingredient.name);
-    setAmountDraft(ingredient.amount);
+    setNameDraft(effectiveName);
+    setAmountDraft(effectiveAmount);
     setIsEditingNote(false);
     setIsEditingIngredient(true);
+    setShowOriginal(false);
   }
 
   const isEditingSomething = isEditingNote || isEditingIngredient;
@@ -128,10 +150,15 @@ function BakeIngredientRow({ bakeId, ingredient }: { bakeId: string; ingredient:
         ) : (
           <span className="text-sm flex items-center gap-2">
             <span>
-              <span className="font-medium">{ingredient.amount}</span> {ingredient.name}
+              <span className="font-medium">{effectiveAmount}</span> {effectiveName}
             </span>
-            {isModified(ingredient) && (
-              <Badge variant="secondary" className="shrink-0">
+            {ingredientModified && (
+              <Badge
+                variant="secondary"
+                className="shrink-0 cursor-pointer gap-1"
+                onClick={() => setShowOriginal((prev) => !prev)}
+              >
+                <History className="h-3 w-3" />
                 Modified
               </Badge>
             )}
@@ -153,7 +180,7 @@ function BakeIngredientRow({ bakeId, ingredient }: { bakeId: string; ingredient:
                 isLoading={isSavingIngredient}
                 size="sm"
                 onClick={() => editIngredient({ name: nameDraft, amount: amountDraft })}
-                disabled={isSavingIngredient || (nameDraft === ingredient.name && amountDraft === ingredient.amount)}
+                disabled={isSavingIngredient || (nameDraft === effectiveName && amountDraft === effectiveAmount)}
               >
                 Save
               </LoadingButton>
@@ -184,15 +211,21 @@ function BakeIngredientRow({ bakeId, ingredient }: { bakeId: string; ingredient:
         </div>
       </div>
 
-      {!isEditingNote && savedNote && (
-        <p className="text-sm text-muted-foreground italic pb-4">{savedNote}</p>
+      {ingredientModified && showOriginal && !isEditingIngredient && (
+        <p className="text-sm text-muted-foreground pb-2">
+          Originally: <span className="font-medium">{ingredient.amount}</span> {ingredient.name}
+        </p>
+      )}
+
+      {!isEditingNote && effectiveNotes && (
+        <p className="text-sm text-muted-foreground italic pb-4">{effectiveNotes}</p>
       )}
 
       {isEditingNote && (
         <div className="flex flex-col gap-2 pb-2">
           <Textarea
             autoFocus
-            value={noteDraft}
+            value={noteDraft ?? undefined}
             onChange={(event) => setNoteDraft(event.target.value)}
             className="border p-2"
             placeholder="Add a note about this ingredient..."
@@ -203,7 +236,7 @@ function BakeIngredientRow({ bakeId, ingredient }: { bakeId: string; ingredient:
             </Button>
             <Button
               size="sm"
-              onClick={() => saveNote({ note: noteDraft.trim() === "" ? null : noteDraft })}
+              onClick={() => saveNote({ note: noteDraft?.trim() === "" ? null : noteDraft })}
               disabled={isSavingNote}
             >
               <span className="flex items-center gap-2">

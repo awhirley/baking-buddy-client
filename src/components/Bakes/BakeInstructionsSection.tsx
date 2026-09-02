@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Pencil, PencilSparklesIcon, StickyNote } from "lucide-react";
+import { History, Pencil, PencilSparklesIcon, StickyNote } from "lucide-react";
 
 import { Badge } from "#components/SharedComponents/ui/badge";
 import { Button } from "#components/SharedComponents/ui/button";
@@ -14,8 +14,15 @@ import { useToast } from "../../contexts/ToastContext";
 import type { BakeInstruction } from "../../types/BakeTypes";
 import { bakeService } from "../../services/BakeService";
 
-function isModified({ version, instructionDeltaId }: BakeInstruction) {
-  return version === null && instructionDeltaId === null;
+// description is always the original delta value; updatedDescription is the nullable
+// per-bake override. "Modified" tracks description only (not notes), matching the
+// original badge's meaning.
+function instructionIsModified(instruction: BakeInstruction) {
+  return instruction.updatedDescription !== null && instruction.updatedDescription !== instruction.description;
+}
+
+function noteIsModified({ notes, updatedNotes, notesUpdatedToNull }: BakeInstruction) {
+  return notesUpdatedToNull || (notes != null && notes !== updatedNotes);
 }
 
 export function BakeInstructionsSection({
@@ -54,12 +61,23 @@ function BakeInstructionRow({
   const queryClient = useQueryClient();
   const { addToast } = useToast();
 
+  const instructionModified = instructionIsModified(instruction);
+  const noteModified = noteIsModified(instruction);
+
+  const effectiveDescription = instruction.updatedDescription ?? instruction.description;
+  const effectiveNotes = (instruction.updatedNotes || instruction.notesUpdatedToNull) ? instruction.updatedNotes : instruction.notes;
+  console.log('effectiveNotes', effectiveNotes);
+  console.log('instruction.updatedNotes', instruction.updatedNotes);
+  console.log('instruction.notesUpdatedToNull', instruction.notesUpdatedToNull);
+  console.log('instruction.notes', instruction.notes);
+
   const [isEditingNote, setIsEditingNote] = useState(false);
-  const [noteDraft, setNoteDraft] = useState(instruction.notes ?? "");
-  const [savedNote, setSavedNote] = useState(instruction.notes ?? "");
+  const [noteDraft, setNoteDraft] = useState(effectiveNotes);
 
   const [isEditingInstruction, setIsEditingInstruction] = useState(false);
-  const [descriptionDraft, setDescriptionDraft] = useState(instruction.description);
+  const [descriptionDraft, setDescriptionDraft] = useState(effectiveDescription);
+
+  const [showOriginal, setShowOriginal] = useState(false);
 
   const { mutate: editInstruction, isPending: isSavingInstruction } = useMutation({
     mutationFn: ({ description }: { description: string }) =>
@@ -72,6 +90,7 @@ function BakeInstructionRow({
       queryClient.invalidateQueries({ queryKey: ["bake", bakeId] });
       addToast("Instruction updated", null, { type: "default" });
       setIsEditingInstruction(false);
+      setShowOriginal(false);
     },
     onError: () => {
       addToast("Failed to update instruction", "Please try again.", { type: "destructive", duration: 6000 });
@@ -82,11 +101,13 @@ function BakeInstructionRow({
     mutationFn: ({ note }: { note: string | null }) =>
       bakeService.updateBakeInstruction(bakeId, {
         bakeInstructionId: instruction.bakeInstructionId,
-        description: instruction.description,
+        // send the current *effective* description back unchanged so a note-only save can't
+        // accidentally look like a revert-to-original for an already-modified instruction
+        description: effectiveDescription,
         notes: note,
       }),
-    onSuccess: (_, variables) => {
-      setSavedNote(variables.note ?? "");
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["bake", bakeId] });
       addToast("Note saved successfully", "and it's a good note, too.", { type: "default" });
       setIsEditingNote(false);
     },
@@ -96,15 +117,16 @@ function BakeInstructionRow({
   });
 
   function openNoteEditor() {
-    setNoteDraft(instruction.notes ?? "");
+    setNoteDraft(effectiveNotes);
     setIsEditingInstruction(false);
     setIsEditingNote(true);
   }
 
   function openInstructionEditor() {
-    setDescriptionDraft(instruction.description);
+    setDescriptionDraft(effectiveDescription);
     setIsEditingNote(false);
     setIsEditingInstruction(true);
+    setShowOriginal(false);
   }
 
   const isEditingSomething = isEditingNote || isEditingInstruction;
@@ -126,10 +148,15 @@ function BakeInstructionRow({
         ) : (
           <span className="text-sm flex items-start gap-2">
             <span>
-              <span className="font-medium text-muted-foreground">{stepNumber}.</span> {instruction.description}
+              <span className="font-medium text-muted-foreground">{stepNumber}.</span> {effectiveDescription}
             </span>
-            {isModified(instruction) && (
-              <Badge variant="secondary" className="shrink-0">
+            {instructionModified && (
+              <Badge
+                variant="secondary"
+                className="shrink-0 cursor-pointer gap-1"
+                onClick={() => setShowOriginal((prev) => !prev)}
+              >
+                <History className="h-3 w-3" />
                 Modified
               </Badge>
             )}
@@ -150,7 +177,7 @@ function BakeInstructionRow({
               <Button
                 size="sm"
                 onClick={() => editInstruction({ description: descriptionDraft })}
-                disabled={isSavingInstruction || descriptionDraft === instruction.description}
+                disabled={isSavingInstruction || descriptionDraft === effectiveDescription}
               >
                 <span className="flex items-center gap-2">
                   {isSavingInstruction ? <Spinner className="h-4 w-4" /> : <Pencil className="h-4 w-4" />}
@@ -184,15 +211,21 @@ function BakeInstructionRow({
         </div>
       </div>
 
-      {!isEditingNote && savedNote && (
-        <p className="text-sm text-muted-foreground italic pb-4">{savedNote}</p>
+      {instructionModified && showOriginal && !isEditingInstruction && (
+        <p className="text-sm text-muted-foreground pb-2">
+          Originally: <span className="font-medium">{instruction.description}</span>
+        </p>
+      )}
+
+      {!isEditingNote && effectiveNotes && (
+        <p className="text-sm text-muted-foreground italic pb-4">{effectiveNotes}</p>
       )}
 
       {isEditingNote && (
         <div className="flex flex-col gap-2 pb-2">
           <Textarea
             autoFocus
-            value={noteDraft}
+            value={noteDraft ?? undefined}
             onChange={(event) => setNoteDraft(event.target.value)}
             className="border p-2"
             placeholder="Add a note about this instruction..."
@@ -203,7 +236,7 @@ function BakeInstructionRow({
             </Button>
             <Button
               size="sm"
-              onClick={() => saveNote({ note: noteDraft.trim() === "" ? null : noteDraft })}
+              onClick={() => saveNote({ note: noteDraft?.trim() === "" ? null : noteDraft })}
               disabled={isSavingNote}
             >
               <span className="flex items-center gap-2">
