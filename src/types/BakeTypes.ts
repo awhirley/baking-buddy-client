@@ -56,9 +56,9 @@ export interface BakeInstruction {
 
 export interface UpdateBakePayload {
   bakeId: string,
-  elevation: number | null,
-  notes: string | null,
-  ratings: BakeRating | null,
+  elevation: number | null | undefined,
+  notes: string | null | undefined,
+  ratings: BakeRating | null | undefined,
 }
 
 export interface UpdateBakeIngredientPayload {
@@ -115,19 +115,25 @@ export function completeBakePayloadToJson(payload: CompleteBakePayload) {
   };
 }
 
+function presentOrOmit<K extends string, V>(key: K, value: V | undefined): { [P in K]?: V } {
+  return value === undefined ? {} : { [key]: value } as { [P in K]?: V };
+}
+
 export function updateBakePayloadToJson(payload: UpdateBakePayload) {
   return {
     bake_id: payload.bakeId,
-    elevation: payload.elevation,
-    notes: payload.notes,
-    ratings: {
-      overall: payload.ratings?.overall,
-      taste: payload.ratings?.taste,
-      texture: payload.ratings?.texture,
-      appearance: payload.ratings?.appearance,
-      rise_structure: payload.ratings?.riseStructure,
-      difficulty: payload.ratings?.difficulty,
-    }
+    ...presentOrOmit("elevation", payload.elevation),
+    ...presentOrOmit("notes", payload.notes),
+    ...(payload.ratings !== undefined && {
+      ratings: {
+        ...presentOrOmit("overall", payload.ratings?.overall),
+        ...presentOrOmit("taste", payload.ratings?.taste),
+        ...presentOrOmit("texture", payload.ratings?.texture),
+        ...presentOrOmit("appearance", payload.ratings?.appearance),
+        ...presentOrOmit("rise_structure", payload.ratings?.riseStructure),
+        ...presentOrOmit("difficulty", payload.ratings?.difficulty),
+      },
+    }),
   };
 }
 

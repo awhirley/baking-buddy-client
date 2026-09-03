@@ -14,85 +14,118 @@ import { RatingsSummary } from "./RatingSummary";
 import { recipeService } from "../../services/RecipeService";
 import type { BakeDetail } from "../../types/BakeTypes";
 import { Badge } from "#components/SharedComponents/ui/badge";
+import { UpdateElevationTrigger } from "./UpdateElevationTrigger";
 
-export function BakeDetailsCard({ id, recipeId, recipeName, startDatetime, endDatetime, elevation, notes, ratings }: BakeDetail) {
-  const { data } = useQuery({
-      queryKey: ["recipe", recipeId],
-      queryFn: async () => {
-          const response = await recipeService.getRecipeById(recipeId!);
-          return response;
-        }
-    });
+export function BakeDetailsCard({ bake }: { bake: BakeDetail }) {
+  const bakeIsCompleted = !!bake.endDatetime;
 
   return (
-    <>
-      <Card>
-        <CardHeader className="flex flex-row items-start justify-between gap-4">
-          <div>
-            <CardTitle className="text-2xl">Bake Session: {recipeName}</CardTitle>
-            <p className="text-sm text-muted-foreground mt-1">
-              Started {formatAddedDate(startDatetime)}
-              {endDatetime && <span>, completed {formatAddedDate(endDatetime)}</span>}
-            </p>
-          </div>
-          <div className="flex items-center gap-2">
-            {endDatetime && <Badge variant="secondary">
-              Completed
-            </Badge>}
-            <Tooltip>
-              <TooltipTrigger
-                render={
-                  <Link to={`/recipe/${recipeId}`} target="_blank" rel="noopener noreferrer">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                  >
-                    <SquareArrowOutUpRight />
-                  </Button>
-                </Link>
-                }
-              />
-              <TooltipContent>
-                <p>Open recipe page in new tab</p>
-              </TooltipContent>
-            </Tooltip>
-            {!endDatetime && <CompleteBakeTrigger bakeId={id} recipeId={recipeId} />}
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {(data?.details.recipeSourceType || data?.details.recipeSource) && (
-              <p className="text-sm">
-                Recipe from: {data?.details.recipeSourceType} {data?.details.recipeSource}
-              </p>
-            )}
-          <p className="text-sm">{data?.details.description}</p>
-        </CardContent>
-      </Card>
-      <Card>
-        <CardHeader className="flex flex-row items-start justify-between gap-4">
-          <div>
-            <CardTitle className="text-lg">Bake details</CardTitle>
-            {/* <p className="text-sm text-muted-foreground mt-1"></p> */}
-          </div>
-          <div className="flex items-center gap-2">
-            <EditBakeDetailsTrigger bakeId={id} elevation={elevation} notes={notes} ratings={ratings} />
-          </div>
-        </CardHeader>
-        <CardContent className="flex flex-col gap-4">
-          {elevation != null && `Baked at ${elevation} feet`}
-          {!elevation && <p className="text-sm text-muted-foreground">No elevation data available.</p>}
-          <RatingsSummary ratings={ratings} />
-          <span className="pt-4">
-            <NoteEditor
-              existingNote={notes}
-              editModeOn
-              onSaveNote={() => {}}
-              isSaving={false}
-              subject="Bake"
-            />
-          </span>
-        </CardContent>
-      </Card>
-    </>
+    <div className="space-y-6">
+      <HeaderCard bake={bake} />
+      { bakeIsCompleted && <ResultsCard bake={bake} /> }
+      <DetailsCard bake={bake} />
+    </div>
   );
+}
+
+function HeaderCard({ bake } : { bake: BakeDetail }) {
+  const { data } = useQuery({
+    queryKey: ["recipe", bake.recipeId],
+    queryFn: async () => {
+        const response = await recipeService.getRecipeById(bake.recipeId!);
+        return response;
+      }
+  });
+
+  return (
+    <Card>
+      <CardHeader className="flex flex-row items-start justify-between gap-4">
+        <div>
+          <CardTitle className="text-2xl">Bake Session: {data?.details.name}</CardTitle>
+          <p className="text-sm text-muted-foreground mt-1">
+            Started {formatAddedDate(bake.startDatetime)}
+            {bake.endDatetime && <span>, completed {formatAddedDate(bake.endDatetime)}</span>}
+          </p>
+        </div>
+        <div className="flex items-center gap-2">
+          {bake.endDatetime && <Badge variant="secondary">
+            Completed
+          </Badge>}
+          <Tooltip>
+            <TooltipTrigger
+              render={
+                <Link to={`/recipe/${bake.recipeId}`} target="_blank" rel="noopener noreferrer">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                >
+                  <SquareArrowOutUpRight />
+                </Button>
+              </Link>
+              }
+            />
+            <TooltipContent>
+              <p>Open recipe page in new tab</p>
+            </TooltipContent>
+          </Tooltip>
+          {!bake.endDatetime && <CompleteBakeTrigger bakeId={bake.id} recipeId={bake.recipeId} />}
+        </div>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        {(data?.details.recipeSourceType || data?.details.recipeSource) && (
+            <p className="text-sm">
+              Recipe from: {data?.details.recipeSourceType} {data?.details.recipeSource}
+            </p>
+          )}
+        <p className="text-sm">{data?.details.description}</p>
+      </CardContent>
+    </Card>
+  );
+}
+
+function DetailsCard({ bake } : { bake: BakeDetail }) {
+  return (
+    <Card className="gap-1">
+      <CardHeader className="flex flex-row items-start justify-between gap-4">
+        <div>
+          <CardTitle className="text-lg">Details</CardTitle>
+          {/* <p className="text-sm text-muted-foreground mt-1"></p> */}
+        </div>
+        <EditBakeDetailsTrigger bakeId={bake.id} elevation={bake.elevation} notes={bake.notes} ratings={bake.ratings} />
+      </CardHeader>
+      <CardContent className="flex flex-col gap-4">
+        <UpdateElevationTrigger
+          triggerType = {bake.elevation != null ? "ICON" : "LINK"}
+          bakeId={bake.id}
+          elevation={bake.elevation}
+        />
+        <NoteEditor
+          existingNote={bake.notes}
+          editModeOn
+          onSaveNote={() => {}}
+          isSaving={false}
+          subject="Bake"
+        />
+      </CardContent>
+    </Card>
+  )
+}
+
+
+function ResultsCard({ bake } : { bake: BakeDetail }) {
+    return (
+    <Card className="gap-1">
+      <CardHeader className="flex flex-row items-start justify-between gap-4">
+        <div>
+          <CardTitle className="text-lg">Results</CardTitle>
+        </div>
+        <div className="flex items-center gap-2">
+          <EditBakeDetailsTrigger bakeId={bake.id} elevation={bake.elevation} notes={bake.notes} ratings={bake.ratings} />
+        </div>
+      </CardHeader>
+      <CardContent className="flex flex-col gap-4">
+        <RatingsSummary ratings={bake.ratings} />
+      </CardContent>
+    </Card>
+  )
 }

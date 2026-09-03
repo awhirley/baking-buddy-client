@@ -58,7 +58,7 @@ export function BakeView() {
             </AlertAction>
           </Alert>}
 
-          <BakeDetailsCard {...data.details} />
+          <BakeDetailsCard bake={data.details} />
 
           <BakeIngredientsSection bakeId={bakeId!} ingredients={data.ingredientVersions} />
 
@@ -69,7 +69,7 @@ export function BakeView() {
       {/* Complete Bake */}
       {(data && data.details.endDatetime) && (
         <div className="flex flex-col gap-6">
-          <BakeDetailsCard {...data.details} />
+          <BakeDetailsCard bake={data.details} />
 
           <CompletedBakeIngredientsSection ingredients={data.ingredientVersions} />
 

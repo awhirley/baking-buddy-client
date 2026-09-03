@@ -32,20 +32,34 @@ function BakeInstructionRow({
   instruction: BakeInstruction;
   stepNumber: number;
 }) {
+  const descriptionChanged = instruction.updatedDescription !== null;
+  const notesChanged = instruction.updatedNotes !== null || instruction.notesUpdatedToNull;
 
   const effectiveDescription = instruction.updatedDescription ?? instruction.description;
-  const effectiveNotes = (instruction.updatedNotes || instruction.notesUpdatedToNull) ? instruction.updatedNotes : instruction.notes
+  const effectiveNotes = notesChanged ? instruction.updatedNotes : instruction.notes;
 
   return (
     <div className="flex flex-col gap-1">
-      <div className="flex items-start justify-between py-2 gap-4">
-        <span className="text-sm flex items-start gap-2">
-            <span>
-              <span className="font-medium text-muted-foreground">{stepNumber}.</span> {effectiveDescription}
-            </span>
+      <div className="flex flex-col py-2 gap-1">
+        {descriptionChanged && (
+          <span className="text-xs text-muted-foreground line-through decoration-muted-foreground/50 pl-5">
+            {instruction.description}
           </span>
+        )}
+        <span className="text-sm flex items-start gap-2">
+          <span className="font-medium text-muted-foreground">{stepNumber}.</span>
+          <span>{effectiveDescription}</span>
+        </span>
       </div>
-      {effectiveNotes && <p className="text-sm text-muted-foreground italic pb-4">{effectiveNotes}</p> }
+
+      {notesChanged && instruction.notes && (
+        <p className="text-sm text-muted-foreground/60 italic line-through decoration-muted-foreground/50">
+          {instruction.notes}
+        </p>
+      )}
+      {effectiveNotes && (
+        <p className="text-sm text-muted-foreground italic pb-4">{effectiveNotes}</p>
+      )}
     </div>
   );
 }
