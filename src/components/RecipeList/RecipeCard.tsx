@@ -86,7 +86,7 @@ function ActionMenu({ recipeId, openBakeId }: { recipeId: string, openBakeId: st
           </LoadingButton>
         }
         { openBakeId && <Button variant="outline" onClick={() => navigate(`/bake/${openBakeId}`)}>See In Progress Bake</Button>}
-        <Button variant="outline" onClick={() => navigate(`/view/${recipeId}`)}>View Recipe</Button>
+        <Button variant="outline" onClick={() => navigate(`/recipe/${recipeId}`)}>View Recipe</Button>
       </ButtonGroup>
     </ButtonGroup>
   )

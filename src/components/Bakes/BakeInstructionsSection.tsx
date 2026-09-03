@@ -66,10 +66,6 @@ function BakeInstructionRow({
 
   const effectiveDescription = instruction.updatedDescription ?? instruction.description;
   const effectiveNotes = (instruction.updatedNotes || instruction.notesUpdatedToNull) ? instruction.updatedNotes : instruction.notes;
-  console.log('effectiveNotes', effectiveNotes);
-  console.log('instruction.updatedNotes', instruction.updatedNotes);
-  console.log('instruction.notesUpdatedToNull', instruction.notesUpdatedToNull);
-  console.log('instruction.notes', instruction.notes);
 
   const [isEditingNote, setIsEditingNote] = useState(false);
   const [noteDraft, setNoteDraft] = useState(effectiveNotes);

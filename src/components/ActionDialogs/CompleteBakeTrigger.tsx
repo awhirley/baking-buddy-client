@@ -1,18 +1,18 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
+import { Info } from 'lucide-react';
 
 import { LoadingButton } from "#components/SharedComponents/LoadingButton";
 import { AlertDialogFooter, AlertDialogCancel, AlertDialogAction, AlertDialog, AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle } from "#components/SharedComponents/ui/alert-dialog";
-import { Field, FieldContent, FieldDescription, FieldLabel } from "#components/SharedComponents/ui/field";
+import { Field, FieldContent, FieldLabel } from "#components/SharedComponents/ui/field";
 
 import { useToast } from "../../contexts/ToastContext";
 import { bakeService } from "../../services/BakeService";
 import { Button } from "#components/SharedComponents/ui/button";
 import { Checkbox } from "#components/SharedComponents/ui/checkbox";
+import { Tooltip, TooltipContent, TooltipTrigger } from "#components/SharedComponents/ui/tooltip";
 
 export function CompleteBakeTrigger({ bakeId, recipeId }: { bakeId: string, recipeId: string }) {
-  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const queryClient = useQueryClient();
   const { addToast } = useToast();
@@ -22,10 +22,10 @@ export function CompleteBakeTrigger({ bakeId, recipeId }: { bakeId: string, reci
     mutationFn: () => bakeService.completeBake(bakeId, { setDeltasAsBest: deltasAsBest }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["bakes"] });
+      queryClient.invalidateQueries({ queryKey: ["bake", bakeId] });
       queryClient.invalidateQueries({ queryKey: ["bakes", "recipe", recipeId] });
       addToast("Bake completed!", null, { type: "default" });
       setIsOpen(false);
-       navigate(`/view/${recipeId}`);
     },
     onError: () => {
       addToast("Failed to complete bake", "Please try again.", { type: "destructive", duration: 6000 });
@@ -49,12 +49,15 @@ export function CompleteBakeTrigger({ bakeId, recipeId }: { bakeId: string, reci
               />
               <FieldContent>
                 <FieldLabel htmlFor="setDeltasAsBestCheckbox">
-                  Update the recipe with these versions
+                  <span>Update the recipe with these versions</span>
+                  <Tooltip>
+                    <TooltipTrigger render={ <Info className="h-4 w-4" /> } />
+                    <TooltipContent className="flex flex-col gap-2">
+                      <p>By clicking this checkbox, the recipe's ingredients and instructions will be updated with the changes you made here.</p>
+                      <p>You can always update them at a later time from the main recipe view.</p>
+                    </TooltipContent>
+                  </Tooltip>
                 </FieldLabel>
-                <FieldDescription>
-                  <p className="pt-2">By clicking this checkbox, the recipe's ingredients and instructions will be updated with the changes you made here.</p>
-                  <p className="pt-2">You can always update them at a later time from the main recipe view.</p>
-                </FieldDescription>
               </FieldContent>
             </Field>
           </AlertDialogDescription>

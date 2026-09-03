@@ -13,6 +13,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "#components/SharedCompo
 import { RatingsSummary } from "./RatingSummary";
 import { recipeService } from "../../services/RecipeService";
 import type { BakeDetail } from "../../types/BakeTypes";
+import { Badge } from "#components/SharedComponents/ui/badge";
 
 export function BakeDetailsCard({ id, recipeId, recipeName, startDatetime, endDatetime, elevation, notes, ratings }: BakeDetail) {
   const { data } = useQuery({
@@ -35,10 +36,13 @@ export function BakeDetailsCard({ id, recipeId, recipeName, startDatetime, endDa
             </p>
           </div>
           <div className="flex items-center gap-2">
+            {endDatetime && <Badge variant="secondary">
+              Completed
+            </Badge>}
             <Tooltip>
               <TooltipTrigger
                 render={
-                  <Link to={`/view/${recipeId}`} target="_blank" rel="noopener noreferrer">
+                  <Link to={`/recipe/${recipeId}`} target="_blank" rel="noopener noreferrer">
                   <Button
                     variant="ghost"
                     size="icon"
@@ -78,13 +82,15 @@ export function BakeDetailsCard({ id, recipeId, recipeName, startDatetime, endDa
           {elevation != null && `Baked at ${elevation} feet`}
           {!elevation && <p className="text-sm text-muted-foreground">No elevation data available.</p>}
           <RatingsSummary ratings={ratings} />
-          <NoteEditor
-            existingNote={notes}
-            editModeOn
-            onSaveNote={() => {}}
-            isSaving={false}
-            subject="Bake"
-          />
+          <span className="pt-4">
+            <NoteEditor
+              existingNote={notes}
+              editModeOn
+              onSaveNote={() => {}}
+              isSaving={false}
+              subject="Bake"
+            />
+          </span>
         </CardContent>
       </Card>
     </>

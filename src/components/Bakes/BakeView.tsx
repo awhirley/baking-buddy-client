@@ -10,6 +10,8 @@ import { BakeIngredientsSection } from "./BakeIngredientsSection";
 import { BakeInstructionsSection } from "./BakeInstructionsSection";
 import { Button } from "#components/SharedComponents/ui/button";
 import { useState } from "react";
+import { CompletedBakeIngredientsSection } from "./CompletedBakeIngredientsSection";
+import { CompletedBakeInstructionsSection } from "./CompletedBakeInstructionsSection";
 
 export function BakeView() {
   const { bakeId } = useParams();
@@ -39,7 +41,8 @@ export function BakeView() {
         </Alert>
       )}
 
-      {data && (
+      {/* Incomplete Bake */}
+      {(data && !data.details.endDatetime) && (
         <div className="flex flex-col gap-6">
           { (!data.details.endDatetime && alertIsOpen) && <Alert>
             <Info className="h-4 w-4" />
@@ -60,6 +63,17 @@ export function BakeView() {
           <BakeIngredientsSection bakeId={bakeId!} ingredients={data.ingredientVersions} />
 
           <BakeInstructionsSection bakeId={bakeId!} instructions={data.instructionVersions} />
+        </div>
+      )}
+
+      {/* Complete Bake */}
+      {(data && data.details.endDatetime) && (
+        <div className="flex flex-col gap-6">
+          <BakeDetailsCard {...data.details} />
+
+          <CompletedBakeIngredientsSection ingredients={data.ingredientVersions} />
+
+          <CompletedBakeInstructionsSection instructions={data.instructionVersions} />
         </div>
       )}
     </div>

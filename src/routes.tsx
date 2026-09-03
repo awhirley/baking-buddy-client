@@ -17,7 +17,7 @@ const routes: RouteObject[] = [
     element: <CreateRecipe />,
   },
   {
-    path: '/view/:id',
+    path: '/recipe/:id',
     element: <ViewRecipe />,
   },
   {

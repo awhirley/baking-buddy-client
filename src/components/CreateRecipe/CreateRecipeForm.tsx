@@ -108,9 +108,9 @@ export function RecipeForm() {
       recipeService.createRecipe(newRecipe),
     onSuccess: (data) => {
       addToast('Recipe created successfully', null, { type: 'default' });
-      navigate(`/view/${data.id}`)
+      navigate(`/recipe/${data.id}`)
     },
-    onError: (error) => {
+    onError: () => {
       addToast('Failed to create recipe', "Please try again.", { type: 'destructive', duration: 6000 });
     },
   });

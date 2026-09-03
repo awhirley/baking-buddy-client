@@ -109,7 +109,7 @@ npm run lint
 |-------|-------------|
 | `/` | Home page - Browse recipes |
 | `/create` | Create a new recipe |
-| `/view/:id` | View detailed recipe information |
+| `/recipe/:id` | View detailed recipe information |
 
 ---
 
