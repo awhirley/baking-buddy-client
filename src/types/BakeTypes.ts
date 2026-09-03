@@ -33,6 +33,7 @@ export interface BakeIngredient {
   ingredientId: string;
   ingredientDeltaId: string;
   version: number;
+  order: number;
   amount: string;
   name: string;
   notes: string | null;
@@ -47,6 +48,7 @@ export interface BakeInstruction {
   instructionId: string;
   instructionDeltaId: string;
   version: number;
+  order: number;
   description: string;
   notes: string | null;
   updatedDescription: string | null;
@@ -66,12 +68,14 @@ export interface UpdateBakeIngredientPayload {
   amount: string;
   name: string;
   notes?: string | null;
+  order: number;
 }
 
 export interface UpdateBakeInstructionPayload {
   bakeInstructionId: string;
   description: string;
   notes?: string | null;
+  order: number;
 }
 
 export interface CompleteBakePayload {
@@ -92,6 +96,7 @@ export interface IngredientDeltaEntry {
   amount: string;
   name: string;
   createdAt: string;
+  order: number;
 }
 
 export interface InstructionHistory {
@@ -106,6 +111,7 @@ export interface InstructionDeltaEntry {
   instructionId: string;
   version: number;
   description: string;
+  order: number;
   createdAt: string;
 }
 
@@ -142,7 +148,8 @@ export function updateBakeIngredientPayloadToJson(payload: UpdateBakeIngredientP
     bake_ingredient_id: payload.bakeIngredientId,
     amount: payload.amount,
     name: payload.name,
-    notes: payload.notes
+    notes: payload.notes,
+    order: payload.order,
   };
 }
 
@@ -150,6 +157,7 @@ export function updateBakeInstructionPayloadToJson(payload: UpdateBakeInstructio
   return {
     bake_instruction_id: payload.bakeInstructionId,
     description: payload.description,
-    notes: payload.notes
+    notes: payload.notes,
+    order: payload.order,
   };
 }

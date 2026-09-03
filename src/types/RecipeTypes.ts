@@ -50,11 +50,13 @@ export interface UpdateIngredientPayload {
   amount: string;
   name: string;
   notes: string | null;
+  order: number;
 }
 
 export interface UpdateInstructionPayload {
   description: string;
   notes: string | null;
+  order: number;
 }
 
 export interface CreateRecipePayload {

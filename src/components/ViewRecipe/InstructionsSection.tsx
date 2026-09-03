@@ -62,7 +62,7 @@ function InstructionRow({
 
   const { mutate: updateInstruction, isPending: isSavingInstruction } = useMutation({
     mutationFn: ({ description, notes }: { description: string; notes: string | null }) =>
-      recipeService.updateInstruction(instruction.id, { description, notes }),
+      recipeService.updateInstruction(instruction.id, { description, notes, order: instruction.order }),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ["recipe", id] });
       addToast("Instruction updated", null, { type: "default" });

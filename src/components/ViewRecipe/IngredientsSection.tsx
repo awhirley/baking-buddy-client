@@ -56,8 +56,8 @@ function IngredientRow({ ingredient, editModeOn }: { ingredient: Ingredient; edi
   const { addToast } = useToast();
 
   const { mutate: updateIngredient, isPending: isSavingIngredient } = useMutation({
-    mutationFn: ({ name, amount, notes }: { name: string; amount: string; notes: string | null }) =>
-      recipeService.updateIngredient(ingredient.id, { name, amount, notes }),
+    mutationFn: ({ name, amount, notes }: { name: string; amount: string; notes: string | null; }) =>
+      recipeService.updateIngredient(ingredient.id, { name, amount, notes, order: ingredient.order }),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ["recipe", id] });
       addToast("Ingredient updated", null, { type: "default" });

@@ -80,6 +80,7 @@ function BakeIngredientRow({ bakeId, ingredient }: { bakeId: string; ingredient:
         bakeIngredientId: ingredient.bakeIngredientId,
         amount,
         name,
+        order: ingredient.order,
         // notes intentionally omitted — leaves notes untouched on the backend (PatchField.Absent)
       }),
     onSuccess: () => {
@@ -102,6 +103,7 @@ function BakeIngredientRow({ bakeId, ingredient }: { bakeId: string; ingredient:
         amount: effectiveAmount,
         name: effectiveName,
         notes: note,
+        order: ingredient.order,
       }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["bake", bakeId] });

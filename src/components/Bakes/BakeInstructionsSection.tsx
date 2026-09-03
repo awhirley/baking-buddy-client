@@ -80,6 +80,7 @@ function BakeInstructionRow({
       bakeService.updateBakeInstruction(bakeId, {
         bakeInstructionId: instruction.bakeInstructionId,
         description,
+        order: instruction.order,
         // notes intentionally omitted — leaves notes untouched on the backend (PatchField.Absent)
       }),
     onSuccess: () => {
@@ -101,6 +102,7 @@ function BakeInstructionRow({
         // accidentally look like a revert-to-original for an already-modified instruction
         description: effectiveDescription,
         notes: note,
+        order: instruction.order,
       }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["bake", bakeId] });
