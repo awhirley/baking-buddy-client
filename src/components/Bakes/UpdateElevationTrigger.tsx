@@ -6,7 +6,7 @@ import { LoadingButton } from "#components/SharedComponents/LoadingButton";
 import { useToast } from "../../contexts/ToastContext";
 import { bakeService } from "../../services/BakeService";
 import { Button } from "#components/SharedComponents/ui/button";
-import type { BakeRating, UpdateBakePayload } from "../../types/BakeTypes";
+import type { UpdateBakePayload } from "../../types/BakeTypes";
 import { DialogContent, DialogHeader, DialogFooter, Dialog, DialogTitle } from "#components/SharedComponents/ui/dialog";
 import { Input } from "#components/SharedComponents/ui/input";
 import { MountainSnow, Pencil } from "lucide-react";
