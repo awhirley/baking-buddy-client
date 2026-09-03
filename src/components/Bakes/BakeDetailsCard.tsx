@@ -15,6 +15,7 @@ import { recipeService } from "../../services/RecipeService";
 import type { BakeDetail } from "../../types/BakeTypes";
 import { Badge } from "#components/SharedComponents/ui/badge";
 import { UpdateElevationTrigger } from "../ActionDialogs/UpdateElevationTrigger";
+import { H4 } from "#components/SharedComponents/ui/typography";
 
 export function BakeDetailsCard({ bake }: { bake: BakeDetail }) {
   const bakeIsCompleted = !!bake.endDatetime;
@@ -41,7 +42,7 @@ function HeaderCard({ bake } : { bake: BakeDetail }) {
     <Card>
       <CardHeader className="flex flex-row items-start justify-between gap-4">
         <div>
-          <CardTitle className="text-2xl">Bake Session: {data?.details.name}</CardTitle>
+          <CardTitle className="text-2xl">{data?.details.name}</CardTitle>
           <p className="text-sm text-muted-foreground mt-1">
             Started {formatAddedDate(bake.startDatetime)}
             {bake.endDatetime && <span>, completed {formatAddedDate(bake.endDatetime)}</span>}
