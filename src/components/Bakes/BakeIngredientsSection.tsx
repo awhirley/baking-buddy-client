@@ -154,7 +154,7 @@ function BakeIngredientRow({ bakeId, ingredient }: { bakeId: string; ingredient:
             <span>
               <span className="font-medium">{effectiveAmount}</span> {effectiveName}
             </span>
-            {ingredientModified && (
+            {ingredientModified || noteModified && (
               <Badge
                 variant="secondary"
                 className="shrink-0 cursor-pointer gap-1"
@@ -220,7 +220,14 @@ function BakeIngredientRow({ bakeId, ingredient }: { bakeId: string; ingredient:
       )}
 
       {!isEditingNote && effectiveNotes && (
-        <p className="text-sm text-muted-foreground italic pb-4">{effectiveNotes}</p>
+        <>
+          {noteModified && showOriginal && (
+            <p className="text-sm text-muted-foreground/60 italic line-through decoration-muted-foreground/50">
+              {ingredient.notes}
+            </p>
+          )}
+          <p className="text-sm text-muted-foreground italic pb-4">{effectiveNotes}</p>
+        </>
       )}
 
       {isEditingNote && (

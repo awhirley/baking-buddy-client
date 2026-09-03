@@ -216,7 +216,14 @@ function BakeInstructionRow({
       )}
 
       {!isEditingNote && effectiveNotes && (
-        <p className="text-sm text-muted-foreground italic pb-4">{effectiveNotes}</p>
+        <>
+          {noteModified && showOriginal && (
+            <p className="text-sm text-muted-foreground/60 italic line-through decoration-muted-foreground/50">
+              {instruction.notes}
+            </p>
+          )}
+          <p className="text-sm text-muted-foreground italic pb-4">{effectiveNotes}</p>
+        </>
       )}
 
       {isEditingNote && (
