@@ -25,7 +25,7 @@ import {
 import { Trash2 } from "lucide-react";
 
 export function BakeCard({ bake }: { bake: BakeDetail }) {
-  const isInProgress = bake.endDatetime === null;
+  const isInProgress = !bake.endDatetime;
 
   return (
     <Card className="mb-4 outline-1 transition-shadow hover:shadow-md">

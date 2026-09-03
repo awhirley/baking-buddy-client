@@ -44,8 +44,8 @@ function IngredientRow({ ingredient, editModeOn }: { ingredient: Ingredient; edi
   const { id } = useParams();
 
   const [isEditingNote, setIsEditingNote] = useState(false);
-  const [noteDraft, setNoteDraft] = useState(ingredient.notes ?? "");
-  const [savedNote, setSavedNote] = useState(ingredient.notes ?? "");
+  const [noteDraft, setNoteDraft] = useState(ingredient.notes);
+  const [savedNote, setSavedNote] = useState(ingredient.notes);
 
   const [isEditingIngredient, setIsEditingIngredient] = useState(false);
   const [nameDraft, setNameDraft] = useState(ingredient.name);
@@ -55,29 +55,18 @@ function IngredientRow({ ingredient, editModeOn }: { ingredient: Ingredient; edi
 
   const { addToast } = useToast();
 
-  const { mutate: editIngredient, isPending: isSavingIngredient } = useMutation({
-    mutationFn: ({ name, amount }: { name: string; amount: string }) =>
-      recipeService.editIngredient(ingredient.id, { name, amount }),
-    onSuccess: () => {
+  const { mutate: updateIngredient, isPending: isSavingIngredient } = useMutation({
+    mutationFn: ({ name, amount, notes }: { name: string; amount: string; notes: string | null; }) =>
+      recipeService.updateIngredient(ingredient.id, { name, amount, notes, order: ingredient.order }),
+    onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ["recipe", id] });
       addToast("Ingredient updated", null, { type: "default" });
       setIsEditingIngredient(false);
+      setIsEditingNote(false);
+      setSavedNote(variables.notes);
     },
     onError: () => {
       addToast("Failed to update ingredient", "Please try again.", { type: "destructive", duration: 6000 });
-    },
-  });
-
-  const { mutate: saveNote, isPending: isSavingNote } = useMutation({
-    mutationFn: ({ id, note }: { id: string; note: string | null }) =>
-      recipeService.addNotesToIngredient(id, note),
-    onSuccess: (_, variables) => {
-      setSavedNote(variables.note ?? "");
-      addToast("Note saved successfully", "and it's a good note, too.", { type: "default" });
-      setIsEditingNote(false);
-    },
-    onError: () => {
-      addToast("Failed to save note", "Please try again :(", { type: "destructive", duration: 6000 });
     },
   });
 
@@ -156,7 +145,7 @@ function IngredientRow({ ingredient, editModeOn }: { ingredient: Ingredient; edi
                 <LoadingButton
                   isLoading={isSavingIngredient}
                   size="sm"
-                  onClick={() => editIngredient({ name: nameDraft, amount: amountDraft })}
+                  onClick={() => updateIngredient({ name: nameDraft, amount: amountDraft, notes: noteDraft?.trim() === "" ? null : noteDraft })}
                   disabled={isSavingIngredient || (nameDraft === ingredient.name && amountDraft === ingredient.amount)}
                 >
                   Save
@@ -207,18 +196,18 @@ function IngredientRow({ ingredient, editModeOn }: { ingredient: Ingredient; edi
         <div className="flex flex-col gap-2 pb-2">
           <Textarea
             autoFocus
-            value={noteDraft}
+            value={noteDraft ?? undefined}
             onChange={(event) => setNoteDraft(event.target.value)}
             className="border p-2"
             placeholder="Add a note about this ingredient..."
           />
           <div className="flex gap-2 self-end">
-            <Button variant="ghost" size="sm" onClick={() => setIsEditingNote(false)} disabled={isSavingNote}>
+            <Button variant="ghost" size="sm" onClick={() => setIsEditingNote(false)} disabled={isSavingIngredient}>
               Cancel
             </Button>
-            <Button size="sm" onClick={() => saveNote({ id: ingredient.id, note: noteDraft })} disabled={isSavingNote}>
+            <Button size="sm" onClick={() => updateIngredient({ amount: amountDraft, name: nameDraft, notes: noteDraft })} disabled={isSavingIngredient}>
               <span className="flex items-center gap-2">
-                {isSavingNote ? <Spinner className="h-4 w-4" /> : <PencilSparklesIcon className="h-4 w-4" />}
+                {isSavingIngredient ? <Spinner className="h-4 w-4" /> : <PencilSparklesIcon className="h-4 w-4" />}
                 Save note
               </span>
             </Button>

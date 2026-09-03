@@ -4,7 +4,7 @@ import { Spinner } from "./ui/spinner";
 
 interface LoadingButtonSpecificProps {
   children: ReactNode;
-  onClick?: ((event: any) => void) | undefined;
+  onClick?: ((event: React.MouseEvent<HTMLButtonElement>) => void) | undefined;
   isLoading: boolean;
 }
 

@@ -1,110 +1,128 @@
-// components/Bake/BakeDetailsCard.tsx
+import { Link } from "react-router-dom";
+import { SquareArrowOutUpRight } from 'lucide-react';
+import { useQuery } from "@tanstack/react-query";
+
+import { CompleteBakeTrigger } from "#components/ActionDialogs/CompleteBakeTrigger";
+import { UpdateBakeRatingsTrigger } from "#components/ActionDialogs/UpdateBakeRatingsTrigger";
+import { NoteEditor } from "#components/SharedComponents/NoteEditor";
+import { formatAddedDate } from "#components/RecipeList/utils";
 import { Button } from "#components/SharedComponents/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "#components/SharedComponents/ui/card";
-import { formatAddedDate } from "#components/RecipeList/utils";
-import type { BakeDetail } from "../../types/BakeTypes";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useToast } from "../../contexts/ToastContext";
-import { bakeService } from "../../services/BakeService";
-import { useState } from "react";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "#components/SharedComponents/ui/alert-dialog";
-import { LoadingButton } from "#components/SharedComponents/LoadingButton";
-import { Field, FieldContent, FieldDescription, FieldLabel } from "#components/SharedComponents/ui/field";
-import { Checkbox } from "#components/SharedComponents/ui/checkbox";
-import { useNavigate } from "react-router-dom";
-import { recipeService } from "../../services/RecipeService";
+import { Tooltip, TooltipContent, TooltipTrigger } from "#components/SharedComponents/ui/tooltip";
 
-export function BakeDetailsCard({ id, recipeId, recipeName, startDatetime, endDatetime, elevation, notes }: BakeDetail) {
-   const { data, isLoading, error } = useQuery({
-      queryKey: ["recipe", recipeId],
-      queryFn: async () => {
-            const response = await recipeService.getRecipeById(recipeId!);
-            return response;
-          }
-    });
+import { RatingsSummary } from "./RatingSummary";
+import { recipeService } from "../../services/RecipeService";
+import type { BakeDetail } from "../../types/BakeTypes";
+import { Badge } from "#components/SharedComponents/ui/badge";
+import { UpdateElevationTrigger } from "../ActionDialogs/UpdateElevationTrigger";
+
+export function BakeDetailsCard({ bake }: { bake: BakeDetail }) {
+  const bakeIsCompleted = !!bake.endDatetime;
+
+  return (
+    <div className="space-y-6">
+      <HeaderCard bake={bake} />
+      { bakeIsCompleted && <ResultsCard bake={bake} /> }
+      <DetailsCard bake={bake} />
+    </div>
+  );
+}
+
+function HeaderCard({ bake } : { bake: BakeDetail }) {
+  const { data } = useQuery({
+    queryKey: ["recipe", bake.recipeId],
+    queryFn: async () => {
+        const response = await recipeService.getRecipeById(bake.recipeId!);
+        return response;
+      }
+  });
 
   return (
     <Card>
       <CardHeader className="flex flex-row items-start justify-between gap-4">
         <div>
-          <CardTitle className="text-2xl">Bake Session: {recipeName}</CardTitle>
+          <CardTitle className="text-2xl">{data?.details.name}</CardTitle>
           <p className="text-sm text-muted-foreground mt-1">
-            Started {formatAddedDate(startDatetime)}
-            {endDatetime && <span>, completed {formatAddedDate(endDatetime)}</span>}
-            {elevation != null && <span>, {elevation}ft elevation</span>}
+            Started {formatAddedDate(bake.startDatetime)}
+            {bake.endDatetime && <span>, completed {formatAddedDate(bake.endDatetime)}</span>}
           </p>
         </div>
-        <CompleteBakeTrigger bakeId={id} recipeId={recipeId} />
+        <div className="flex items-center gap-2">
+          {bake.endDatetime && <Badge variant="secondary">
+            Completed
+          </Badge>}
+          <Tooltip>
+            <TooltipTrigger
+              render={
+                <Link to={`/recipe/${bake.recipeId}`} target="_blank" rel="noopener noreferrer">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                >
+                  <SquareArrowOutUpRight />
+                </Button>
+              </Link>
+              }
+            />
+            <TooltipContent>
+              <p>Open recipe page in new tab</p>
+            </TooltipContent>
+          </Tooltip>
+          {!bake.endDatetime && <CompleteBakeTrigger bakeId={bake.id} recipeId={bake.recipeId} />}
+        </div>
       </CardHeader>
-      {notes && (
-        <CardContent>
-          <p className="text-sm">{notes}</p>
-        </CardContent>
-      )}
+      <CardContent className="space-y-4">
+        {(data?.details.recipeSourceType || data?.details.recipeSource) && (
+            <p className="text-sm">
+              Recipe from: {data?.details.recipeSourceType} {data?.details.recipeSource}
+            </p>
+          )}
+        <p className="text-sm">{data?.details.description}</p>
+      </CardContent>
     </Card>
   );
 }
 
-function CompleteBakeTrigger({ bakeId, recipeId }: { bakeId: string, recipeId: string }) {
-  const navigate = useNavigate();
-  const [isOpen, setIsOpen] = useState(false);
-  const queryClient = useQueryClient();
-  const { addToast } = useToast();
-  const [deltasAsBest, setDeltasAsBest] = useState(false);
-
-  const { mutate: completeBake, isPending: isCompleting } = useMutation({
-    mutationFn: () => bakeService.completeBake(bakeId, { setDeltasAsBest: deltasAsBest }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["bakes"] });
-      queryClient.invalidateQueries({ queryKey: ["bakes", "recipe", recipeId] });
-      addToast("Bake completed!", null, { type: "default" });
-      setIsOpen(false);
-       navigate(`/view/${recipeId}`);
-    },
-    onError: () => {
-      addToast("Failed to complete bake", "Please try again.", { type: "destructive", duration: 6000 });
-    },
-  });
-
+function DetailsCard({ bake } : { bake: BakeDetail }) {
   return (
-    <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
-      <Button variant="outline" onClick={() => setIsOpen(true)}>
-        Complete bake
-      </Button>
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle>Complete this bake?</AlertDialogTitle>
-          <AlertDialogDescription>
-            You will still be able to report results, but you will no longer be able to update ingredients or instructions.
-            <Field orientation="horizontal" className="pt-6">
-              <Checkbox
-                name="setDeltasAsBestCheckbox"
-                onCheckedChange={(checked) => { checked ? setDeltasAsBest(true) : setDeltasAsBest(false)}}
-              />
-              <FieldContent>
-                <FieldLabel htmlFor="setDeltasAsBestCheckbox">
-                  Update the recipe with these versions
-                </FieldLabel>
-                <FieldDescription>
-                  <p className="pt-2">By clicking this checkbox, the recipe's ingredients and instructions will be updated with the changes you made here.</p>
-                  <p className="pt-2">You can always update them at a later time from the main recipe view.</p>
-                </FieldDescription>
-              </FieldContent>
-            </Field>
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel disabled={isCompleting}>Cancel</AlertDialogCancel>
-          <AlertDialogAction>
-            <LoadingButton
-              isLoading={isCompleting}
-              onClick={() => completeBake()}
-            >
-              Complete bake
-            </LoadingButton>
-          </AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
-  );
+    <Card className="gap-1">
+      <CardHeader className="flex flex-row items-start justify-between gap-4">
+      <CardTitle className="text-lg">Details</CardTitle>
+      </CardHeader>
+      <CardContent className="flex flex-col gap-4">
+        <UpdateElevationTrigger
+          triggerType = {bake.elevation != null ? "ICON" : "LINK"}
+          bakeId={bake.id}
+          elevation={bake.elevation}
+        />
+        <NoteEditor
+          existingNote={bake.notes}
+          editModeOn
+          onSaveNote={() => {}}
+          isSaving={false}
+          subject="Bake"
+          hideSaveNoteButton
+        />
+      </CardContent>
+    </Card>
+  )
+}
+
+
+function ResultsCard({ bake } : { bake: BakeDetail }) {
+    return (
+    <Card className="gap-1">
+      <CardHeader className="flex flex-row items-start justify-between gap-4">
+        <div>
+          <CardTitle className="text-lg">Results</CardTitle>
+        </div>
+        <div className="flex items-center gap-2">
+          <UpdateBakeRatingsTrigger bakeId={bake.id} elevation={bake.elevation} notes={bake.notes} ratings={bake.ratings} />
+        </div>
+      </CardHeader>
+      <CardContent className="flex flex-col gap-4">
+        <RatingsSummary ratings={bake.ratings} />
+      </CardContent>
+    </Card>
+  )
 }

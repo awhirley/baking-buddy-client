@@ -50,8 +50,8 @@ function InstructionRow({
   const { id } = useParams();
 
   const [isEditingNote, setIsEditingNote] = useState(false);
-  const [noteDraft, setNoteDraft] = useState(instruction.notes ?? "");
-  const [savedNote, setSavedNote] = useState(instruction.notes ?? "");
+  const [noteDraft, setNoteDraft] = useState(instruction.notes);
+  const [savedNote, setSavedNote] = useState(instruction.notes);
 
   const [isEditingInstruction, setIsEditingInstruction] = useState(false);
   const [descriptionDraft, setDescriptionDraft] = useState(instruction.description);
@@ -60,29 +60,18 @@ function InstructionRow({
 
   const { addToast } = useToast();
 
-  const { mutate: editInstruction, isPending: isSavingInstruction } = useMutation({
-    mutationFn: ({ description }: { description: string }) =>
-      recipeService.editInstruction(instruction.id, { description }),
-    onSuccess: () => {
+  const { mutate: updateInstruction, isPending: isSavingInstruction } = useMutation({
+    mutationFn: ({ description, notes }: { description: string; notes: string | null }) =>
+      recipeService.updateInstruction(instruction.id, { description, notes, order: instruction.order }),
+    onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ["recipe", id] });
       addToast("Instruction updated", null, { type: "default" });
+      setSavedNote(variables.notes);
       setIsEditingInstruction(false);
-    },
-    onError: () => {
-      addToast("Failed to update instruction", "Please try again.", { type: "destructive", duration: 6000 });
-    },
-  });
-
-  const { mutate: saveNote, isPending: isSavingNote } = useMutation({
-    mutationFn: ({ id, note }: { id: string; note: string | null }) =>
-      recipeService.addNotesToInstruction(id, note),
-    onSuccess: (_, variables) => {
-      setSavedNote(variables.note ?? "");
-      addToast("Note saved successfully", "and it's a good note, too.", { type: "default" });
       setIsEditingNote(false);
     },
     onError: () => {
-      addToast("Failed to save note", "Please try again :(", { type: "destructive", duration: 6000 });
+      addToast("Failed to update instruction", "Please try again.", { type: "destructive", duration: 6000 });
     },
   });
 
@@ -155,7 +144,7 @@ function InstructionRow({
                 </Button>
                 <Button
                   size="sm"
-                  onClick={() => editInstruction({ description: descriptionDraft })}
+                  onClick={() => updateInstruction({ description: descriptionDraft, notes: savedNote })}
                   disabled={isSavingInstruction}
                 >
                   <span className="flex items-center gap-2">
@@ -209,18 +198,18 @@ function InstructionRow({
         <div className="flex flex-col gap-2 pb-2">
           <Textarea
             autoFocus
-            value={noteDraft}
+            value={noteDraft ?? undefined}
             onChange={(event) => setNoteDraft(event.target.value)}
             className="border p-2"
             placeholder="Add a note about this instruction..."
           />
           <div className="flex gap-2 self-end">
-            <Button variant="ghost" size="sm" onClick={() => setIsEditingNote(false)} disabled={isSavingNote}>
+            <Button variant="ghost" size="sm" onClick={() => setIsEditingNote(false)} disabled={isSavingInstruction}>
               Cancel
             </Button>
-            <Button size="sm" onClick={() => saveNote({ id: instruction.id, note: noteDraft })} disabled={isSavingNote}>
+            <Button size="sm" onClick={() => updateInstruction({ description: descriptionDraft, notes: noteDraft })} disabled={isSavingInstruction}>
               <span className="flex items-center gap-2">
-                {isSavingNote ? <Spinner className="h-4 w-4" /> : <PencilSparklesIcon className="h-4 w-4" />}
+                {isSavingInstruction ? <Spinner className="h-4 w-4" /> : <PencilSparklesIcon className="h-4 w-4" />}
                 Save note
               </span>
             </Button>

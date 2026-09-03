@@ -6,6 +6,10 @@ import {
   type UpdateBakeIngredientPayload,
   type CompleteBakePayload,
   completeBakePayloadToJson,
+  type UpdateBakePayload,
+  updateBakePayloadToJson,
+  updateBakeIngredientPayloadToJson,
+  updateBakeInstructionPayloadToJson,
 } from '../types/BakeTypes';
 
 export const bakeService = {
@@ -34,16 +38,20 @@ export const bakeService = {
     return response.data;
   },
 
+  async updateBake(args: UpdateBakePayload): Promise<void> {
+    await api.patch<BakeDetail[]>(`/bakes`, updateBakePayloadToJson(args));
+  },
+
   async deleteBake(id: string): Promise<void> {
     await api.delete(`/bakes/${id}`);
   },
 
   async updateBakeInstruction(bakeId: string, args: UpdateBakeInstructionPayload): Promise<void> {
-    await api.patch(`/bakes/${bakeId}/instruction`, args);
+    await api.patch(`/bakes/${bakeId}/instruction`, updateBakeInstructionPayloadToJson(args));
   },
 
   async updateBakeIngredient(bakeId: string, args: UpdateBakeIngredientPayload): Promise<void> {
-    await api.patch(`/bakes/${bakeId}/ingredient`, args);
+    await api.patch(`/bakes/${bakeId}/ingredient`, updateBakeIngredientPayloadToJson(args));
   },
 
   async completeBake(bakeId: string, args: CompleteBakePayload): Promise<void> {

@@ -65,7 +65,7 @@ function ActionMenu({ recipeId, openBakeId }: { recipeId: string, openBakeId: st
       addToast('New bake started!', null, { type: 'default' });
       navigate(`/bake/${data.id}`)
     },
-    onError: (error) => {
+    onError: () => {
       addToast('Failed to start new bake', "Please try again.", { type: 'destructive', duration: 6000 });
     },
   });
@@ -81,12 +81,12 @@ function ActionMenu({ recipeId, openBakeId }: { recipeId: string, openBakeId: st
       </ButtonGroup>
       <ButtonGroup>
         { !openBakeId && 
-          <LoadingButton buttonVariant="outline" onClick={() => handleBakeCreate()} isLoading={isCreating}>
+          <LoadingButton variant="outline" onClick={() => handleBakeCreate()} isLoading={isCreating}>
             New Bake
           </LoadingButton>
         }
         { openBakeId && <Button variant="outline" onClick={() => navigate(`/bake/${openBakeId}`)}>See In Progress Bake</Button>}
-        <Button variant="outline" onClick={() => navigate(`/view/${recipeId}`)}>View Recipe</Button>
+        <Button variant="outline" onClick={() => navigate(`/recipe/${recipeId}`)}>View Recipe</Button>
       </ButtonGroup>
     </ButtonGroup>
   )
