@@ -3,7 +3,7 @@ import { SquareArrowOutUpRight } from 'lucide-react';
 import { useQuery } from "@tanstack/react-query";
 
 import { CompleteBakeTrigger } from "#components/ActionDialogs/CompleteBakeTrigger";
-import { EditBakeDetailsTrigger } from "#components/ActionDialogs/EditBakeDetailsTrigger";
+import { UpdateBakeRatingsTrigger } from "#components/ActionDialogs/UpdateBakeRatingsTrigger";
 import { NoteEditor } from "#components/SharedComponents/NoteEditor";
 import { formatAddedDate } from "#components/RecipeList/utils";
 import { Button } from "#components/SharedComponents/ui/button";
@@ -14,7 +14,7 @@ import { RatingsSummary } from "./RatingSummary";
 import { recipeService } from "../../services/RecipeService";
 import type { BakeDetail } from "../../types/BakeTypes";
 import { Badge } from "#components/SharedComponents/ui/badge";
-import { UpdateElevationTrigger } from "./UpdateElevationTrigger";
+import { UpdateElevationTrigger } from "../ActionDialogs/UpdateElevationTrigger";
 
 export function BakeDetailsCard({ bake }: { bake: BakeDetail }) {
   const bakeIsCompleted = !!bake.endDatetime;
@@ -87,11 +87,7 @@ function DetailsCard({ bake } : { bake: BakeDetail }) {
   return (
     <Card className="gap-1">
       <CardHeader className="flex flex-row items-start justify-between gap-4">
-        <div>
-          <CardTitle className="text-lg">Details</CardTitle>
-          {/* <p className="text-sm text-muted-foreground mt-1"></p> */}
-        </div>
-        <EditBakeDetailsTrigger bakeId={bake.id} elevation={bake.elevation} notes={bake.notes} ratings={bake.ratings} />
+      <CardTitle className="text-lg">Details</CardTitle>
       </CardHeader>
       <CardContent className="flex flex-col gap-4">
         <UpdateElevationTrigger
@@ -120,7 +116,7 @@ function ResultsCard({ bake } : { bake: BakeDetail }) {
           <CardTitle className="text-lg">Results</CardTitle>
         </div>
         <div className="flex items-center gap-2">
-          <EditBakeDetailsTrigger bakeId={bake.id} elevation={bake.elevation} notes={bake.notes} ratings={bake.ratings} />
+          <UpdateBakeRatingsTrigger bakeId={bake.id} elevation={bake.elevation} notes={bake.notes} ratings={bake.ratings} />
         </div>
       </CardHeader>
       <CardContent className="flex flex-col gap-4">

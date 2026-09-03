@@ -10,10 +10,9 @@ import { Button } from "#components/SharedComponents/ui/button";
 import { RATING_FIELDS } from "#components/Bakes/RatingSummary";
 import type { BakeRating, UpdateBakePayload } from "../../types/BakeTypes";
 import { DialogContent, DialogHeader, DialogFooter, Dialog, DialogTitle, DialogDescription } from "#components/SharedComponents/ui/dialog";
-import { Input } from "#components/SharedComponents/ui/input";
 import { Rating } from "#components/SharedComponents/ui/rating";
 
-export function EditBakeDetailsTrigger({ bakeId, elevation, notes, ratings }: { bakeId: string; elevation: number | null; notes: string | null; ratings: BakeRating }) {
+export function UpdateBakeRatingsTrigger({ bakeId, ratings }: { bakeId: string; elevation: number | null; notes: string | null; ratings: BakeRating }) {
   const [isOpen, setIsOpen] = useState(false);
   const queryClient = useQueryClient();
   const { addToast } = useToast();
@@ -25,18 +24,14 @@ export function EditBakeDetailsTrigger({ bakeId, elevation, notes, ratings }: { 
       return acc;
     }, {} as Record<string, number | null>);
 
-  const [elevationInput, setElevationInput] = useState<string>(elevation != null ? String(elevation) : "");
   const [ratingsInput, setRatingsInput] = useState<Record<string, number | null>>(buildInitialRatingsInput);
 
   const resetForm = () => {
-    setElevationInput(elevation != null ? String(elevation) : "");
     setRatingsInput(buildInitialRatingsInput());
   };
 
   const { mutate: updateDetails, isPending: isSaving } = useMutation({
     mutationFn: () => {
-      const parsedElevation = elevationInput.trim() === "" ? null : Number(elevationInput);
-
       const parsedRatings: BakeRating = {
         overall: null,
         taste: null,
@@ -57,8 +52,8 @@ export function EditBakeDetailsTrigger({ bakeId, elevation, notes, ratings }: { 
 
       const payload: UpdateBakePayload = {
         bakeId,
-        elevation: parsedElevation,
-        notes,
+        elevation: undefined,
+        notes: undefined,
         ratings: parsedRatings,
       };
 
@@ -67,11 +62,11 @@ export function EditBakeDetailsTrigger({ bakeId, elevation, notes, ratings }: { 
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["bakes"] });
       queryClient.invalidateQueries({ queryKey: ["bake", bakeId] });
-      addToast("Bake details updated", null, { type: "default" });
+      addToast("Bake ratings updated", null, { type: "default" });
       setIsOpen(false);
     },
     onError: () => {
-      addToast("Failed to update bake details", "Please try again.", { type: "destructive", duration: 6000 });
+      addToast("Failed to update bake ratings", "Please try again.", { type: "destructive", duration: 6000 });
     },
   });
 
@@ -86,26 +81,14 @@ export function EditBakeDetailsTrigger({ bakeId, elevation, notes, ratings }: { 
 
   return (
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
-      <Button variant="outline" onClick={() => handleOpenChange(true)}>Edit</Button>
+      <Button variant="outline" onClick={() => handleOpenChange(true)}>Rate</Button>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Edit bake details</DialogTitle>
+          <DialogTitle>Rate this bake</DialogTitle>
           <DialogDescription>
-            Update the elevation and ratings for this bake.
+            Update the ratings for this bake.
           </DialogDescription>
         </DialogHeader>
-
-        <div className="space-y-4 py-2">
-          <Field>
-            <FieldLabel htmlFor="elevationInput">Elevation (ft)</FieldLabel>
-            <Input
-              id="elevationInput"
-              type="number"
-              value={elevationInput}
-              onChange={(e) => setElevationInput(e.target.value)}
-              placeholder="e.g. 5280"
-            />
-          </Field>
 
           <div className="grid grid-cols-2 gap-4">
             {RATING_FIELDS.map(({ key, label, icon }) => (
@@ -120,7 +103,6 @@ export function EditBakeDetailsTrigger({ bakeId, elevation, notes, ratings }: { 
               </Field>
             ))}
           </div>
-        </div>
 
         <DialogFooter>
           <Button variant="outline" disabled={isSaving} onClick={() => setIsOpen(false)}>
