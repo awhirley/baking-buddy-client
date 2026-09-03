@@ -12,7 +12,6 @@ import { Button } from "#components/SharedComponents/ui/button";
 import { useState } from "react";
 import { CompletedBakeIngredientsSection } from "./CompletedBakeIngredientsSection";
 import { CompletedBakeInstructionsSection } from "./CompletedBakeInstructionsSection";
-import { H1, H3 } from "#components/SharedComponents/ui/typography";
 
 export function BakeView() {
   const { bakeId } = useParams();

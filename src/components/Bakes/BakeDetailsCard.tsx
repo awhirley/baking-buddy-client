@@ -15,7 +15,6 @@ import { recipeService } from "../../services/RecipeService";
 import type { BakeDetail } from "../../types/BakeTypes";
 import { Badge } from "#components/SharedComponents/ui/badge";
 import { UpdateElevationTrigger } from "../ActionDialogs/UpdateElevationTrigger";
-import { H4 } from "#components/SharedComponents/ui/typography";
 
 export function BakeDetailsCard({ bake }: { bake: BakeDetail }) {
   const bakeIsCompleted = !!bake.endDatetime;

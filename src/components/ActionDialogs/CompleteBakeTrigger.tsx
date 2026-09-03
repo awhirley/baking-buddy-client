@@ -45,7 +45,7 @@ export function CompleteBakeTrigger({ bakeId, recipeId }: { bakeId: string, reci
             <Field orientation="horizontal" className="pt-6">
               <Checkbox
                 name="setDeltasAsBestCheckbox"
-                onCheckedChange={(checked) => { checked ? setDeltasAsBest(true) : setDeltasAsBest(false)}}
+                onCheckedChange={(checked) => setDeltasAsBest(checked)}
               />
               <FieldContent>
                 <FieldLabel htmlFor="setDeltasAsBestCheckbox">

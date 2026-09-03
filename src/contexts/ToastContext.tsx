@@ -1,6 +1,6 @@
 import { Alert, AlertAction, AlertDescription, AlertTitle } from '#components/SharedComponents/ui/alert';
 import { Button } from '#components/SharedComponents/ui/button';
-import { AlertCircleIcon, Croissant, XCircle } from 'lucide-react';
+import { AlertCircleIcon, Croissant } from 'lucide-react';
 import { createContext, useContext, useState, useCallback, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 
@@ -74,6 +74,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   );
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useToast(): ToastContextValue {
   const ctx = useContext(ToastContext);
   if (!ctx) throw new Error('useToast must be used within a ToastProvider');

@@ -7,10 +7,10 @@ import { Field, FieldLabel } from "#components/SharedComponents/ui/field";
 import { useToast } from "../../contexts/ToastContext";
 import { bakeService } from "../../services/BakeService";
 import { Button } from "#components/SharedComponents/ui/button";
-import { RATING_FIELDS } from "#components/Bakes/RatingSummary";
 import type { BakeRating, UpdateBakePayload } from "../../types/BakeTypes";
 import { DialogContent, DialogHeader, DialogFooter, Dialog, DialogTitle, DialogDescription } from "#components/SharedComponents/ui/dialog";
 import { Rating } from "#components/SharedComponents/ui/rating";
+import { RATING_FIELDS } from "../../types/RatingFields";
 
 export function UpdateBakeRatingsTrigger({ bakeId, ratings }: { bakeId: string; elevation: number | null; notes: string | null; ratings: BakeRating }) {
   const [isOpen, setIsOpen] = useState(false);

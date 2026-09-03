@@ -1,24 +1,6 @@
-// overall: star
-// taste: utensils
-// texture: waves-horizontal
-// appearance: eye
-// rise & structure: chevrons-up
-// difficulty: sword or swords
-
-import { StarIcon, ThumbsUp, WavesHorizontal, EyeIcon, ArrowBigUp, Sword } from 'lucide-react';
-
-import { type IconElementProps, Rating } from "#components/SharedComponents/ui/rating";
-import type { ReactElement } from "react";
+import { Rating } from "#components/SharedComponents/ui/rating";
 import type { BakeRating } from "../../types/BakeTypes";
-
-export const RATING_FIELDS: { key: keyof Omit<BakeRating, "createdAt">; label: string; icon: ReactElement<IconElementProps> }[] = [
-  { key: "overall", label: "Overall", icon: <StarIcon /> },
-  { key: "taste", label: "Taste", icon: <ThumbsUp /> },
-  { key: "texture", label: "Texture", icon: <WavesHorizontal /> },
-  { key: "appearance", label: "Appearance", icon: <EyeIcon /> },
-  { key: "riseStructure", label: "Rise / Structure", icon: <ArrowBigUp /> },
-  { key: "difficulty", label: "Difficulty", icon: <Sword /> },
-];
+import { RATING_FIELDS } from "../../types/RatingFields";
 
 export function RatingsSummary({ ratings }: { ratings: BakeRating }) {
   const hasAnyRating = RATING_FIELDS.some(({ key }) => ratings?.[key] != null);
