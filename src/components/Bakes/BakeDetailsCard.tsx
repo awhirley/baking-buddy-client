@@ -101,6 +101,7 @@ function DetailsCard({ bake } : { bake: BakeDetail }) {
           onSaveNote={() => {}}
           isSaving={false}
           subject="Bake"
+          hideSaveNoteButton
         />
       </CardContent>
     </Card>
