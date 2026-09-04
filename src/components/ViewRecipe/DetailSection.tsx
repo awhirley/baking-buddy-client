@@ -136,11 +136,11 @@ export function RecipeDetailsCard({ details, editModeOn, setEditModeOn }: Recipe
           </Tooltip>
 
           <DropdownMenu>
-            <DropdownMenuTrigger>
+            <DropdownMenuTrigger render={
               <Button variant="outline" size="icon" aria-label="More actions">
                 <MoreVertical className="h-4 w-4" />
               </Button>
-            </DropdownMenuTrigger>
+            } />
             <DropdownMenuContent align="end">
               <DropdownMenuItem onClick={handleBakeCreate}>
                 <Plus className="h-4 w-4 mr-2" />

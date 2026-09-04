@@ -1,7 +1,7 @@
 // BakeCard.tsx
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { type BakeDetail } from "../../types/BakeTypes";
 import { Badge } from "#components/SharedComponents/ui/badge";
@@ -10,6 +10,7 @@ import { ButtonGroup } from "#components/SharedComponents/ui/button-group";
 import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from "#components/SharedComponents/ui/card";
 import { formatAddedDate } from "../RecipeList/utils";
 import { bakeService } from "../../services/BakeService";
+import { recipeService } from "../../services/RecipeService";
 import { useToast } from "../../contexts/ToastContext";
 import { LoadingButton } from "#components/SharedComponents/LoadingButton";
 import {
@@ -22,19 +23,24 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "#components/SharedComponents/ui/alert-dialog";
-import { Trash2 } from "lucide-react";
+import { Trash2, Mountain } from "lucide-react";
+import { RatingsSummary } from "./RatingSummary";
 
 export function BakeCard({ bake }: { bake: BakeDetail }) {
   const isInProgress = !bake.endDatetime;
 
+  const { data: recipe } = useQuery({
+    queryKey: ["recipe", bake.recipeId],
+    queryFn: () => recipeService.getRecipeById(bake.recipeId!),
+  });
+
   return (
     <Card className="mb-4 outline-1 transition-shadow hover:shadow-md">
       <CardHeader>
-        {/* TODO: swap for the real recipe name once BakeDetail includes it */}
         <CardTitle className="flex items-center gap-2">
-          Bake Session: {bake.recipeName}
+          {recipe?.details.name ?? "Loading recipe…"}
           {isInProgress && (
-            <Badge variant="secondary" className="text-amber-600">
+            <Badge variant="secondary">
               In progress
             </Badge>
           )}
@@ -48,9 +54,21 @@ export function BakeCard({ bake }: { bake: BakeDetail }) {
         </CardAction>
       </CardHeader>
       <CardContent className="flex flex-col gap-3">
-        <div className="flex flex-wrap items-center gap-x-2 text-xs text-muted-foreground">
-          {bake.elevation != null && <span>{bake.elevation}ft elevation</span>}
+        <div className="flex flex-wrap items-center gap-x-4 text-xs text-muted-foreground">
+          {bake.elevation != null && (
+            <span className="flex items-center gap-1">
+              <Mountain className="h-3 w-3" />
+              {bake.elevation}ft elevation
+            </span>
+          )}
         </div>
+
+        {!isInProgress && bake.ratings && (
+          <div className="border-t pt-3">
+            <RatingsSummary ratings={bake.ratings} />
+          </div>
+        )}
+
         {bake.notes && <p className="text-sm text-muted-foreground italic line-clamp-2">{bake.notes}</p>}
       </CardContent>
     </Card>
