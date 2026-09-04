@@ -26,13 +26,13 @@ export function CompletedBakeIngredientsSection({
 }
 
 function BakeIngredientRow({ ingredient }: { ingredient: BakeIngredient }) {
-  const nameChanged = ingredient.updatedName !== null;
-  const amountChanged = ingredient.updatedAmount !== null;
-  const notesChanged = ingredient.updatedNotes !== null || ingredient.notesUpdatedToNull;
+  const nameChanged = ingredient.initialDeltaValues.name !== ingredient.updatedDeltaValues.updatedName;
+  const amountChanged = ingredient.initialDeltaValues.amount !== ingredient.updatedDeltaValues.updatedAmount;
+  const notesChanged = ingredient.initialDeltaValues.notes !== ingredient.updatedDeltaValues.updatedNotes;
 
-  const effectiveName = ingredient.updatedName ?? ingredient.name;
-  const effectiveAmount = ingredient.updatedAmount ?? ingredient.amount;
-  const effectiveNotes = notesChanged ? ingredient.updatedNotes : ingredient.notes;
+  const effectiveName = ingredient.updatedDeltaValues.updatedName;
+  const effectiveAmount = ingredient.updatedDeltaValues.updatedAmount;
+  const effectiveNotes = ingredient.updatedDeltaValues.updatedNotes;
 
   return (
     <div className="flex flex-col gap-1">
@@ -40,18 +40,18 @@ function BakeIngredientRow({ ingredient }: { ingredient: BakeIngredient }) {
         <span className="text-sm flex flex-col gap-0.5">
           {(nameChanged || amountChanged) && (
             <span className="text-xs text-muted-foreground line-through decoration-muted-foreground/50">
-              {ingredient.amount} {ingredient.name}
+              <span className="pr-3">{ingredient.initialDeltaValues.amount}</span> {ingredient.initialDeltaValues.name}
             </span>
           )}
-          <span>
-            <span className="font-medium">{effectiveAmount}</span> {effectiveName}
+          <span className="flex flex-row gap-3">
+            <span className="font-medium bold">{effectiveAmount}</span> {effectiveName}
           </span>
         </span>
       </div>
 
-      {notesChanged && ingredient.notes && (
+      {notesChanged && ingredient.initialDeltaValues.notes && (
         <p className="text-sm text-muted-foreground/60 italic line-through decoration-muted-foreground/50">
-          {ingredient.notes}
+          {ingredient.initialDeltaValues.notes}
         </p>
       )}
       {effectiveNotes && (

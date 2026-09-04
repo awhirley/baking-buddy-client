@@ -18,11 +18,14 @@ import { bakeService } from "../../services/BakeService";
 // per-bake override. "Modified" tracks description only (not notes), matching the
 // original badge's meaning.
 function instructionIsModified(instruction: BakeInstruction) {
-  return instruction.updatedDescription !== null && instruction.updatedDescription !== instruction.description;
+  console.log(instruction.initialDeltaValues.description);
+  console.log(instruction.updatedDeltaValues.updatedDescription);
+  console.log(instruction.initialDeltaValues.description !== instruction.updatedDeltaValues.updatedDescription);
+  return instruction.initialDeltaValues.description !== instruction.updatedDeltaValues.updatedDescription;
 }
 
-function noteIsModified({ notes, updatedNotes, notesUpdatedToNull }: BakeInstruction) {
-  return notesUpdatedToNull || (notes != null && notes !== updatedNotes);
+function noteIsModified(instruction: BakeInstruction) {
+  return instruction.initialDeltaValues.notes !== instruction.updatedDeltaValues.updatedNotes;
 }
 
 export function BakeInstructionsSection({
@@ -64,8 +67,8 @@ function BakeInstructionRow({
   const instructionModified = instructionIsModified(instruction);
   const noteModified = noteIsModified(instruction);
 
-  const effectiveDescription = instruction.updatedDescription ?? instruction.description;
-  const effectiveNotes = (instruction.updatedNotes || instruction.notesUpdatedToNull) ? instruction.updatedNotes : instruction.notes;
+  const effectiveDescription = instruction.updatedDeltaValues.updatedDescription;
+  const effectiveNotes = instruction.updatedDeltaValues.updatedNotes;
 
   const [isEditingNote, setIsEditingNote] = useState(false);
   const [noteDraft, setNoteDraft] = useState(effectiveNotes);
@@ -80,7 +83,7 @@ function BakeInstructionRow({
       bakeService.updateBakeInstruction(bakeId, {
         bakeInstructionId: instruction.bakeInstructionId,
         description,
-        order: instruction.order,
+        order: instruction.updatedDeltaValues.updatedOrder,
         // notes intentionally omitted — leaves notes untouched on the backend (PatchField.Absent)
       }),
     onSuccess: () => {
@@ -98,11 +101,9 @@ function BakeInstructionRow({
     mutationFn: ({ note }: { note: string | null }) =>
       bakeService.updateBakeInstruction(bakeId, {
         bakeInstructionId: instruction.bakeInstructionId,
-        // send the current *effective* description back unchanged so a note-only save can't
-        // accidentally look like a revert-to-original for an already-modified instruction
         description: effectiveDescription,
         notes: note,
-        order: instruction.order,
+        order: instruction.updatedDeltaValues.updatedOrder,
       }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["bake", bakeId] });
@@ -130,8 +131,8 @@ function BakeInstructionRow({
   const isEditingSomething = isEditingNote || isEditingInstruction;
 
   return (
-    <div className="flex flex-col gap-1">
-      <div className="flex items-start justify-between py-2 gap-4">
+    <div className="flex flex-col">
+      <div className="flex items-center justify-between gap-4">
         {isEditingInstruction ? (
           <div className="flex items-start gap-2 flex-1">
             <span className="font-medium text-muted-foreground pt-2">{stepNumber}.</span>
@@ -144,24 +145,15 @@ function BakeInstructionRow({
             />
           </div>
         ) : (
-          <span className="text-sm flex items-start gap-2">
+          <span className="text-sm flex items-start gap-2 items-center">
             <span>
               <span className="font-medium text-muted-foreground">{stepNumber}.</span> {effectiveDescription}
             </span>
-            {instructionModified && (
-              <Badge
-                variant="secondary"
-                className="shrink-0 cursor-pointer gap-1"
-                onClick={() => setShowOriginal((prev) => !prev)}
-              >
-                <History className="h-3 w-3" />
-                Modified
-              </Badge>
-            )}
+            
           </span>
         )}
 
-        <div className="flex shrink-0 gap-1">
+        <div className="flex shrink-0 gap-1 items-center">
           {isEditingInstruction ? (
             <>
               <Button
@@ -185,9 +177,20 @@ function BakeInstructionRow({
             </>
           ) : (
             <>
+              {(instructionModified || noteModified) && (
+                <Badge
+                  variant="secondary"
+                  className="shrink-0 cursor-pointer gap-1"
+                  onClick={() => setShowOriginal((prev) => !prev)}
+                >
+                  <History className="h-3 w-3" />
+                  Modified
+                </Badge>
+              )}
               <Button
                 variant={isEditingNote ? "secondary" : "ghost"}
                 size="icon"
+                className="pl-2"
                 aria-label="Add note"
                 aria-pressed={isEditingNote}
                 disabled={isEditingSomething && !isEditingNote}
@@ -210,19 +213,19 @@ function BakeInstructionRow({
       </div>
 
       {instructionModified && showOriginal && !isEditingInstruction && (
-        <p className="text-sm text-muted-foreground pb-2">
-          Originally: <span className="font-medium">{instruction.description}</span>
+        <p className="text-xs text-muted-foreground line-through decoration-muted-foreground/50 font-medium">
+          {instruction.initialDeltaValues.description}
         </p>
       )}
 
       {!isEditingNote && effectiveNotes && (
         <>
+          <p className="text-sm text-muted-foreground italic pt-4 pb-2">{effectiveNotes}</p>
           {noteModified && showOriginal && (
-            <p className="text-sm text-muted-foreground/60 italic line-through decoration-muted-foreground/50">
-              {instruction.notes}
+            <p className="text-sm text-muted-foreground/60 italic line-through decoration-muted-foreground/50 pb-2">
+              {instruction.initialDeltaValues.notes}
             </p>
           )}
-          <p className="text-sm text-muted-foreground italic pb-4">{effectiveNotes}</p>
         </>
       )}
 

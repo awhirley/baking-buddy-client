@@ -32,9 +32,9 @@ export function BakeView() {
       {isLoading && <BakeSkeleton />}
 
       {error && (
-        <Alert variant="destructive">
+        <Alert variant="destructive" className="mb-4">
           <AlertCircle className="h-4 w-4" />
-          <AlertTitle>Couldn't start this bake</AlertTitle>
+          <AlertTitle>There was an error while loading this bake</AlertTitle>
           <AlertDescription>
             {error instanceof Error ? error.message : "Something went wrong. Try refreshing the page."}
           </AlertDescription>

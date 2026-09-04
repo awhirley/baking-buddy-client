@@ -32,18 +32,18 @@ function BakeInstructionRow({
   instruction: BakeInstruction;
   stepNumber: number;
 }) {
-  const descriptionChanged = instruction.updatedDescription !== null;
-  const notesChanged = instruction.updatedNotes !== null || instruction.notesUpdatedToNull;
+  const descriptionChanged = instruction.initialDeltaValues.description !== instruction.updatedDeltaValues.updatedDescription;
+  const notesChanged = instruction.initialDeltaValues.notes !== instruction.updatedDeltaValues.updatedNotes;
 
-  const effectiveDescription = instruction.updatedDescription ?? instruction.description;
-  const effectiveNotes = notesChanged ? instruction.updatedNotes : instruction.notes;
+  const effectiveDescription = instruction.updatedDeltaValues.updatedDescription;
+  const effectiveNotes = instruction.updatedDeltaValues.updatedNotes;
 
   return (
     <div className="flex flex-col gap-1">
       <div className="flex flex-col py-2 gap-1">
         {descriptionChanged && (
           <span className="text-xs text-muted-foreground line-through decoration-muted-foreground/50 pl-5">
-            {instruction.description}
+            {instruction.initialDeltaValues.description}
           </span>
         )}
         <span className="text-sm flex items-start gap-2">
@@ -52,9 +52,9 @@ function BakeInstructionRow({
         </span>
       </div>
 
-      {notesChanged && instruction.notes && (
+      {notesChanged && instruction.initialDeltaValues.notes && (
         <p className="text-sm text-muted-foreground/60 italic line-through decoration-muted-foreground/50">
-          {instruction.notes}
+          {instruction.initialDeltaValues.notes}
         </p>
       )}
       {effectiveNotes && (

@@ -30,30 +30,29 @@ export interface BakeDetail {
 
 export interface BakeIngredient {
   bakeIngredientId: string;
-  ingredientId: string;
-  ingredientDeltaId: string;
-  version: number;
-  order: number;
-  amount: string;
-  name: string;
-  notes: string | null;
-  updatedAmount: string | null;
-  updatedName: string | null;
+  initialDeltaValues: IngredientDeltaEntry;
+  updatedDeltaValues: UpdatedBakeIngredient;
+  completedBakeDeltaId: string | null;
+}
+
+export interface UpdatedBakeIngredient {
+  updatedAmount: string;
+  updatedName: string;
   updatedNotes: string | null;
-  notesUpdatedToNull: boolean;
+  updatedOrder: number;
 }
 
 export interface BakeInstruction {
   bakeInstructionId: string;
-  instructionId: string;
-  instructionDeltaId: string;
-  version: number;
-  order: number;
-  description: string;
-  notes: string | null;
-  updatedDescription: string | null;
+  initialDeltaValues: InstructionDeltaEntry;
+  updatedDeltaValues: UpdatedBakeInstruction;
+  completedBakeDeltaId: string | null;
+}
+
+export interface UpdatedBakeInstruction {
+  updatedDescription: string;
   updatedNotes: string | null;
-  notesUpdatedToNull: boolean;
+  updatedOrder: number;
 }
 
 export interface UpdateBakePayload {
@@ -95,6 +94,7 @@ export interface IngredientDeltaEntry {
   version: number;
   amount: string;
   name: string;
+  notes: string | null;
   createdAt: string;
   order: number;
 }
@@ -111,6 +111,7 @@ export interface InstructionDeltaEntry {
   instructionId: string;
   version: number;
   description: string;
+  notes: string | null;
   order: number;
   createdAt: string;
 }
