@@ -19,19 +19,6 @@ export function BakeList() {
     },
   });
 
-  const sortedBakes = data
-    ?.slice()
-    .sort((a, b) => {
-      // Open bakes (no endDatetime) first, most recently started first;
-      // completed bakes after, most recently completed first.
-      if (a.endDatetime === null && b.endDatetime !== null) return -1;
-      if (a.endDatetime !== null && b.endDatetime === null) return 1;
-      if (a.endDatetime === null && b.endDatetime === null) {
-        return b.startDatetime.localeCompare(a.startDatetime);
-      }
-      return b.endDatetime!.localeCompare(a.endDatetime!);
-    });
-
   return (
     <div>
       <H3 className="mb-4">Bakes</H3>
@@ -39,9 +26,9 @@ export function BakeList() {
       {error !== null ? (
         <ListErrorView />
       ) : (
-        sortedBakes?.map((bake: BakeDetail) => <BakeCard key={bake.id} bake={bake} />)
+        data?.map((bake: BakeDetail) => <BakeCard key={bake.id} bake={bake} />)
       )}
-      {!isLoading && !error && sortedBakes?.length === 0 && <EmptyView />}
+      {!isLoading && !error && data?.length === 0 && <EmptyView />}
     </div>
   );
 }

@@ -26,8 +26,6 @@ export function UpdateElevationTrigger({ triggerType, bakeId, elevation }: { tri
     mutationFn: () => {
       const parsedElevation = elevationInput.trim() === "" ? null : Number(elevationInput);
 
-      console.log('parsedElevation', parsedElevation);
-
       const payload: UpdateBakePayload = {
         bakeId,
         elevation: parsedElevation,

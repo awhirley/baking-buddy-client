@@ -19,7 +19,7 @@ export const bakeService = {
   },
 
   async listBakes(): Promise<BakeDetail[]> {
-    const response = await api.get<BakeDetail[]>(`/bakes/`);
+    const response = await api.get<BakeDetail[]>(`/bakes`);
     return response.data;
   },
 

@@ -14,13 +14,7 @@ import { useToast } from "../../contexts/ToastContext";
 import type { BakeInstruction } from "../../types/BakeTypes";
 import { bakeService } from "../../services/BakeService";
 
-// description is always the original delta value; updatedDescription is the nullable
-// per-bake override. "Modified" tracks description only (not notes), matching the
-// original badge's meaning.
 function instructionIsModified(instruction: BakeInstruction) {
-  console.log(instruction.initialDeltaValues.description);
-  console.log(instruction.updatedDeltaValues.updatedDescription);
-  console.log(instruction.initialDeltaValues.description !== instruction.updatedDeltaValues.updatedDescription);
   return instruction.initialDeltaValues.description !== instruction.updatedDeltaValues.updatedDescription;
 }
 
