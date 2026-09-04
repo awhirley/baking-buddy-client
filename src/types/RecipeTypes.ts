@@ -8,7 +8,7 @@ export interface Recipe {
 export interface Ingredient {
   id: string;
   recipeId: string;
-  bestVersion: number;
+  version: number;
   notes: string | null;
   amount: string;
   name: string;
@@ -19,7 +19,7 @@ export interface Ingredient {
 export interface Instruction {
   id: string;
   recipeId: string;
-  bestVersion: number;
+  version: number;
   notes: string | null;
   description: string;
   order: number;

@@ -16,17 +16,14 @@ import { useToast } from "../../contexts/ToastContext";
 import type { BakeIngredient } from "../../types/BakeTypes";
 import { bakeService } from "../../services/BakeService";
 
-// name/amount are always the original delta values; updatedName/updatedAmount are the
-// nullable per-bake overrides. "Modified" tracks name/amount only (not notes), matching
-// the original badge's meaning.
 function ingredientIsModified(ingredient: BakeIngredient) {
-  const amountIsModified = ingredient.updatedAmount !== null && ingredient.updatedAmount !== ingredient.amount;
-  const nameIsModified = ingredient.updatedName!== null && ingredient.updatedName !== ingredient.name;
+  const amountIsModified = ingredient.initialDeltaValues.amount !== ingredient.updatedDeltaValues.updatedAmount;
+  const nameIsModified = ingredient.initialDeltaValues.name !== ingredient.updatedDeltaValues.updatedName;
   return amountIsModified || nameIsModified;
 }
 
-function noteIsModified({ notes, updatedNotes, notesUpdatedToNull }: BakeIngredient) {
-  return notesUpdatedToNull || (notes != null && notes !== updatedNotes);
+function noteIsModified(ingredient: BakeIngredient) {
+  return ingredient.initialDeltaValues.notes !== ingredient.updatedDeltaValues.updatedNotes;
 }
 
 export function BakeIngredientsSection({
@@ -60,10 +57,9 @@ function BakeIngredientRow({ bakeId, ingredient }: { bakeId: string; ingredient:
   const ingredientModified = ingredientIsModified(ingredient);
   const noteModified = noteIsModified(ingredient);
 
-  const effectiveName = ingredient.updatedName ?? ingredient.name;
-  const effectiveAmount = ingredient.updatedAmount ?? ingredient.amount;
-  const effectiveNotes = (ingredient.updatedNotes || ingredient.notesUpdatedToNull) ? ingredient.updatedNotes : ingredient.notes;
-
+  const effectiveName = ingredient.updatedDeltaValues.updatedName;
+  const effectiveAmount = ingredient.updatedDeltaValues.updatedAmount;
+  const effectiveNotes = ingredient.updatedDeltaValues.updatedNotes;
 
   const [isEditingNote, setIsEditingNote] = useState(false);
   const [noteDraft, setNoteDraft] = useState(effectiveNotes);
@@ -80,7 +76,7 @@ function BakeIngredientRow({ bakeId, ingredient }: { bakeId: string; ingredient:
         bakeIngredientId: ingredient.bakeIngredientId,
         amount,
         name,
-        order: ingredient.order,
+        order: ingredient.updatedDeltaValues.updatedOrder,
         // notes intentionally omitted — leaves notes untouched on the backend (PatchField.Absent)
       }),
     onSuccess: () => {
@@ -103,7 +99,7 @@ function BakeIngredientRow({ bakeId, ingredient }: { bakeId: string; ingredient:
         amount: effectiveAmount,
         name: effectiveName,
         notes: note,
-        order: ingredient.order,
+        order: ingredient.updatedDeltaValues.updatedOrder,
       }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["bake", bakeId] });
@@ -132,8 +128,8 @@ function BakeIngredientRow({ bakeId, ingredient }: { bakeId: string; ingredient:
   const isEditingSomething = isEditingNote || isEditingIngredient;
 
   return (
-    <div className="flex flex-col gap-1">
-      <div className="flex items-center justify-between py-2 gap-4">
+    <div className="flex flex-col">
+      <div className="flex items-center justify-between gap-4">
         {isEditingIngredient ? (
           <div className="flex items-center gap-2 flex-1">
             <Input
@@ -150,24 +146,12 @@ function BakeIngredientRow({ bakeId, ingredient }: { bakeId: string; ingredient:
             />
           </div>
         ) : (
-          <span className="text-sm flex items-center gap-2">
             <span>
-              <span className="font-medium">{effectiveAmount}</span> {effectiveName}
+              <span className="font-medium bold pr-3">{effectiveAmount}</span> {effectiveName}
             </span>
-            {ingredientModified || noteModified && (
-              <Badge
-                variant="secondary"
-                className="shrink-0 cursor-pointer gap-1"
-                onClick={() => setShowOriginal((prev) => !prev)}
-              >
-                <History className="h-3 w-3" />
-                Modified
-              </Badge>
-            )}
-          </span>
         )}
 
-        <div className="flex shrink-0 gap-1">
+        <div className="flex items-center shrink-0 gap-1">
           {isEditingIngredient ? (
             <>
               <Button
@@ -189,8 +173,19 @@ function BakeIngredientRow({ bakeId, ingredient }: { bakeId: string; ingredient:
             </>
           ) : (
             <>
+              {(ingredientModified || noteModified) && (
+                <Badge
+                  variant="secondary"
+                  className="shrink-0 cursor-pointer gap-1"
+                  onClick={() => setShowOriginal((prev) => !prev)}
+                >
+                  <History className="h-3 w-3" />
+                  Modified
+                </Badge>
+              )}
               <Button
                 variant={isEditingNote ? "secondary" : "ghost"}
+                className="pl-2"
                 size="icon"
                 aria-label="Add note"
                 aria-pressed={isEditingNote}
@@ -213,20 +208,20 @@ function BakeIngredientRow({ bakeId, ingredient }: { bakeId: string; ingredient:
         </div>
       </div>
 
-      {ingredientModified && showOriginal && !isEditingIngredient && (
-        <p className="text-sm text-muted-foreground pb-2">
-          Originally: <span className="font-medium">{ingredient.amount}</span> {ingredient.name}
-        </p>
+      {!isEditingIngredient && ingredientModified && showOriginal && (
+        <div className="text-xs text-muted-foreground line-through decoration-muted-foreground/50">
+          <span className="pr-3">{ingredient.initialDeltaValues.amount}</span> {ingredient.initialDeltaValues.name}
+        </div>
       )}
 
       {!isEditingNote && effectiveNotes && (
         <>
+          <p className="text-sm text-muted-foreground italic pt-4 pb-2">{effectiveNotes}</p>
           {noteModified && showOriginal && (
-            <p className="text-sm text-muted-foreground/60 italic line-through decoration-muted-foreground/50">
-              {ingredient.notes}
+            <p className="text-sm text-muted-foreground/60 italic line-through decoration-muted-foreground/50 pb-2">
+              {ingredient.initialDeltaValues.notes}
             </p>
           )}
-          <p className="text-sm text-muted-foreground italic pb-4">{effectiveNotes}</p>
         </>
       )}
 
