@@ -42,7 +42,7 @@ export function Recipe() {
       )}
 
       { data?.details.favorite &&
-        <div className="flex flex-wrap gap-2 pb-2">
+        <div className="flex flex-wrap gap-2 pb-4">
           <Badge>
             <Sparkles data-icon="inline-start" />
             Favorite recipe
