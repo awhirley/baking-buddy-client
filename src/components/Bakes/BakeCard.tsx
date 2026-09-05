@@ -81,13 +81,13 @@ function BakeActionMenu({ bake }: { bake: BakeDetail }) {
 
   return (
     <ButtonGroup>
-      <ButtonGroup className="hidden sm:flex">
-        <DeleteBakeTrigger bakeId={bake.id} recipeId={bake.recipeId} />
-      </ButtonGroup>
       <ButtonGroup>
         <Button variant="outline" onClick={() => navigate(`/bake/${bake.id}`)}>
           {isInProgress ? "Continue Bake" : "View Bake"}
         </Button>
+      </ButtonGroup>
+      <ButtonGroup className="hidden sm:flex">
+        <DeleteBakeTrigger bakeId={bake.id} recipeId={bake.recipeId} />
       </ButtonGroup>
     </ButtonGroup>
   );
@@ -127,7 +127,7 @@ function DeleteBakeTrigger({ bakeId, recipeId }: { bakeId: string; recipeId: str
           <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
           <AlertDialogAction>
             <LoadingButton
-              variant="destructive"
+              variant="default"
               isLoading={isDeleting}
               onClick={() => deleteBake()}
             >
