@@ -1,22 +1,19 @@
 import { DeleteRecipeTrigger } from "#components/ActionDialogs/DeleteRecipeTrigger";
 import { Badge } from "#components/SharedComponents/ui/badge";
 import { Button } from "#components/SharedComponents/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "#components/SharedComponents/ui/card";
+import { Card, CardAction, CardContent, CardHeader, CardTitle } from "#components/SharedComponents/ui/card";
 import {
   ChefHat,
   MoreVertical,
-  Pencil,
   Plus,
+  Sword,
 } from "lucide-react";
 import { useState, type Dispatch, type SetStateAction } from "react";
 import type { RecipeDetail } from "../../types/RecipeTypes";
 import { formatAddedDate } from "#components/RecipeList/utils";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { recipeService } from "../../services/RecipeService";
 import { bakeService } from "../../services/BakeService";
 import { useToast } from "../../contexts/ToastContext";
-import { Toggle } from "#components/SharedComponents/ui/toggle";
-import { Tooltip, TooltipContent, TooltipTrigger } from "#components/SharedComponents/ui/tooltip";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -25,7 +22,8 @@ import {
   DropdownMenuTrigger,
 } from "#components/SharedComponents/ui/dropdown-menu";
 import { useNavigate } from "react-router-dom";
-import { NoteEditor } from "#components/SharedComponents/NoteEditor";
+import { UpdateRecipeDetailsTrigger } from "#components/ActionDialogs/UpdateRecipeDetailsTrigger";
+import { Rating } from "#components/SharedComponents/ui/rating";
 
 interface RecipeDetailsCardProps {
   details: RecipeDetail;
@@ -35,18 +33,9 @@ interface RecipeDetailsCardProps {
 
 export function RecipeDetailsCard({ details, editModeOn, setEditModeOn }: RecipeDetailsCardProps) {
   const [deleteDialogIsOpen, setDeleteDialogIsOpen] = useState(false);
+  const [updateDialogIsOpen, setUpdateDialogIsOpen] = useState(false);
   const { addToast } = useToast();
   const navigate = useNavigate();
-
-  const { mutate: saveNote, isPending: isSaving } = useMutation({
-    mutationFn: (note: string | null) => recipeService.addNotesToRecipe(details.id, note),
-    onSuccess: () => {
-      addToast("Note saved successfully", null, { type: "default" });
-    },
-    onError: () => {
-      addToast("Failed to save note", "Please try again.", { type: "destructive", duration: 6000 });
-    },
-  });
 
   const { data: bakes } = useQuery({
     queryKey: ["bakes", "recipe", details.id],
@@ -82,16 +71,10 @@ export function RecipeDetailsCard({ details, editModeOn, setEditModeOn }: Recipe
             Added {formatAddedDate(details.createdAt)}
             {(details.recipeSourceType || details.recipeSource) && (
               <span>
-                , from {details.recipeSourceType} {details.recipeSource}
+                , from {details.recipeSourceType}: {details.recipeSource}
               </span>
             )}
           </p>
-
-          {/*
-            Rating/"refined" indicator slot: once the rating system is designed,
-            this is the natural spot for it — e.g. a small row of topic scores
-            or a "Refined" badge, sitting right under the source line.
-          */}
 
           {bakes && (
             <button
@@ -116,32 +99,21 @@ export function RecipeDetailsCard({ details, editModeOn, setEditModeOn }: Recipe
           )}
         </div>
 
-        <div className="flex gap-2 shrink-0">
-          <Tooltip>
-            <TooltipTrigger
-              render={
-                <Toggle
-                  aria-label="Toggle edit mode"
-                  variant="outline"
-                  pressed={editModeOn}
-                  onPressedChange={setEditModeOn}
-                >
-                  <Pencil className="group-aria-pressed/toggle:fill-foreground" />
-                </Toggle>
-              }
-            />
-            <TooltipContent>
-              <p>Turn edit mode {editModeOn ? "off" : "on"}</p>
-            </TooltipContent>
-          </Tooltip>
-
+        <CardAction className="flex gap-2">
           <DropdownMenu>
             <DropdownMenuTrigger render={
               <Button variant="outline" size="icon" aria-label="More actions">
                 <MoreVertical className="h-4 w-4" />
               </Button>
             } />
-            <DropdownMenuContent align="end">
+            <DropdownMenuContent align="end" className="w-full">
+              <DropdownMenuItem onClick={() => setUpdateDialogIsOpen(true)}>
+                Edit recipe details
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setEditModeOn(!editModeOn)}>
+                Turn recipe edit mode { editModeOn ? "off" : "on"}
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
               <DropdownMenuItem onClick={handleBakeCreate}>
                 <Plus className="h-4 w-4 mr-2" />
                 New bake
@@ -171,7 +143,12 @@ export function RecipeDetailsCard({ details, editModeOn, setEditModeOn }: Recipe
             navigateToHome={true}
             renderButton={false}
           />
-        </div>
+          <UpdateRecipeDetailsTrigger
+            isOpen={updateDialogIsOpen}
+            setIsOpen={setUpdateDialogIsOpen}
+            recipe={{ ...details }}
+          />
+        </CardAction>
       </CardHeader>
 
       <CardContent className="flex flex-col gap-6">
@@ -179,6 +156,14 @@ export function RecipeDetailsCard({ details, editModeOn, setEditModeOn }: Recipe
 
         {(details.tags?.length > 0 || details.tools?.length > 0) && (
           <div className="flex flex-col gap-2">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-xs text-muted-foreground">Prep time:</span>
+              X minutes
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-xs text-muted-foreground">Bake time:</span>
+              X minutes
+            </div>
             {details.tags.length > 0 && (
               <div className="flex flex-wrap items-center gap-2">
                 <span className="text-xs text-muted-foreground">Tags:</span>
@@ -199,16 +184,14 @@ export function RecipeDetailsCard({ details, editModeOn, setEditModeOn }: Recipe
                 ))}
               </div>
             )}
+            {details.difficultyRating && (
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="text-xs text-muted-foreground">Difficulty rating:</span>
+                <Rating value={details.difficultyRating} max={5} icon={<Sword />} readOnly />
+              </div>
+            )}
           </div>
         )}
-
-        <NoteEditor
-          existingNote={details.notes}
-          editModeOn={editModeOn}
-          onSaveNote={saveNote}
-          isSaving={isSaving}
-          subject="Recipe"
-        />
       </CardContent>
     </Card>
   );

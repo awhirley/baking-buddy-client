@@ -1,11 +1,11 @@
 import { BakingBuddyPage } from "#components/SharedComponents/Header";
-import { BakeList } from "#components/Bakes/BakeList";
+import { HeroSection1 } from "#components/SharedComponents/ui/hero-section-1";
 
-export function BakeListPage() {
+export function AboutUsPage() {
   return (
     <BakingBuddyPage>
       <div className="w-full">
-        <BakeList />
+        <HeroSection1 />
       </div>
     </BakingBuddyPage>
   );

@@ -10,6 +10,7 @@ interface NoteEditorProps {
   isSaving: boolean;
   subject: string;
   hideSaveNoteButton?: boolean;
+  showHeader?: boolean;
 }
 
 export function NoteEditor(
@@ -20,6 +21,7 @@ export function NoteEditor(
     isSaving,
     subject,
     hideSaveNoteButton = false,
+    showHeader = true,
   }: NoteEditorProps) {
   const [note, setNote] = useState<string | null>(existingNote);
 
@@ -28,10 +30,12 @@ export function NoteEditor(
   if (editModeOn) {
     return (
       <div className="flex flex-col gap-2 group">
-        <span className="flex items-center font-semibold pb-2 gap-2">
-          <NotepadText className="w-4 h-4" />
-          {subject} Notes
-        </span>
+        {showHeader && (
+          <span className="flex items-center font-semibold pb-2 gap-2">
+            <NotepadText className="w-4 h-4" />
+            {subject} Notes
+          </span>
+        )}
         <div className="flex flex-col gap-2 border-l-4 border-amber-300 pl-3 py-1 bg-input/50 rounded-xl">
           <Textarea
             value={note ?? undefined}
@@ -55,10 +59,10 @@ export function NoteEditor(
   if (note) {
     return (
       <div className="flex flex-col gap-2">
-        <span className="flex items-center font-semibold pb-2 gap-2">
+        { showHeader && <span className="flex items-center font-semibold pb-2 gap-2">
           <NotepadText className="w-4 h-4" />
           {subject} Notes
-        </span>
+        </span>}
         <div className="border-l-4 border-amber-300 pl-3 py-1 bg-input/50 rounded-xl whitespace-pre-wrap break-words">
           <div className="m-3">
             {note}
@@ -70,9 +74,10 @@ export function NoteEditor(
 
   return (
     <div className="flex flex-col gap-2">
-      <span className="flex items-center font-semibold pb-2 gap-2">
+      { showHeader && <span className="flex items-center font-semibold pb-2 gap-2">
         <NotepadText className="w-4 h-4" />
         {subject} Notes
-      </span><p className="text-sm text-muted-foreground italic">No recipe notes yet.</p>
+      </span>}
+      <p className="text-sm text-muted-foreground italic">No recipe notes yet.</p>
     </div>);
 }

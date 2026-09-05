@@ -23,10 +23,14 @@ function Header() {
   return (
     <div className="flex flex-row gap-x-4 pb-10 flex flex-col justify-between w-200 items-center">
       <img src={headerImage} alt="Banner" style={{ height: '80px', width: 'auto' }}  />
-      {location.pathname === "/" && <Button onClick={() => navigate("/create")}>New Recipe</Button>}
-      {location.pathname.includes("create") && <Button onClick={() => navigate("/")}>Home</Button>}
-      {location.pathname.includes("recipe") && <Button onClick={() => navigate("/")}>Home</Button>}
-      {location.pathname.includes("bake") && <Button onClick={() => navigate("/")}>Home</Button>}
+      <div className="flex flex-row gap-x-4">
+        <Button variant="outline" onClick={() => navigate("/aboutus")}>About Us</Button>
+        {
+          location.pathname === "/" ?
+            <Button onClick={() => navigate("/create")}>New Recipe</Button> :
+            <Button onClick={() => navigate("/")}>Home</Button>
+        }
+      </div>
     </div>
   );
 }

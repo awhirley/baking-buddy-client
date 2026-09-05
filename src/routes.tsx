@@ -6,6 +6,7 @@ import { ErrorPage } from './pages/ErrorPage';
 import { ViewBake } from './pages/ViewBake';
 import { RecipeListPage } from './pages/RecipeListPage';
 import { BakeListPage } from './pages/BakeListPage';
+import { AboutUsPage } from './pages/AboutUsPage';
 
 const routes: RouteObject[] = [
   {
@@ -35,6 +36,10 @@ const routes: RouteObject[] = [
   {
     path: '/bake/:bakeId',
     element: <ViewBake />,
+  },
+  {
+    path: '/aboutus',
+    element: <AboutUsPage />,
   },
   {
     path: '*',

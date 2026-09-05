@@ -76,9 +76,6 @@ function ActionMenu({ recipeId, openBakeId }: { recipeId: string, openBakeId: st
 
   return (
     <ButtonGroup>
-      <ButtonGroup className="hidden sm:flex">
-        <DeleteRecipeTrigger isOpen={isOpen} setIsOpen={setIsOpen} recipeId={recipeId} />
-      </ButtonGroup>
       <ButtonGroup>
         { !openBakeId && 
           <LoadingButton variant="outline" onClick={() => handleBakeCreate()} isLoading={isCreating}>
@@ -87,6 +84,9 @@ function ActionMenu({ recipeId, openBakeId }: { recipeId: string, openBakeId: st
         }
         { openBakeId && <Button variant="outline" onClick={() => navigate(`/bake/${openBakeId}`)}>See In Progress Bake</Button>}
         <Button variant="outline" onClick={() => navigate(`/recipe/${recipeId}`)}>View Recipe</Button>
+      </ButtonGroup>
+      <ButtonGroup className="hidden sm:flex">
+        <DeleteRecipeTrigger isOpen={isOpen} setIsOpen={setIsOpen} recipeId={recipeId} />
       </ButtonGroup>
     </ButtonGroup>
   )

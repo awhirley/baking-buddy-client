@@ -37,7 +37,7 @@ export interface RecipeDetail {
   createdAt: string;
   openBakeId: string | null;
   notes: string | null;
-  difficulty: number | null;
+  difficultyRating: number | null;
   favorite: boolean;
 }
 
@@ -70,6 +70,17 @@ export interface CreateRecipePayload {
   instructions: string[];
 }
 
+export interface UpdateRecipePayload {
+  name: string | undefined;
+  description: string | null | undefined;
+  recipeSourceType: string | null | undefined;
+  recipeSource: string | null | undefined;
+  tags: string[] | undefined;
+  tools: string[] | undefined;
+  favorite: boolean | null | undefined;
+  difficultyRating: number | null | undefined;
+}
+
 // TODO: reorganize and put this somewhere else
 export function createRecipePayloadtoApiPayload(payload: CreateRecipePayload) {
   return {
@@ -84,3 +95,19 @@ export function createRecipePayloadtoApiPayload(payload: CreateRecipePayload) {
   };
 }
 
+function presentOrOmit<K extends string, V>(key: K, value: V | undefined): { [P in K]?: V } {
+  return value === undefined ? {} : { [key]: value } as { [P in K]?: V };
+}
+
+export function updatedRecipePayloadtoApiPayload(payload: UpdateRecipePayload) {
+  return {
+    ...presentOrOmit("name", payload.name),
+    ...presentOrOmit("description", payload.description),
+    ...presentOrOmit("recipe_source_type", payload.recipeSourceType),
+    ...presentOrOmit("recipe_source", payload.recipeSource),
+    ...presentOrOmit("tags", payload.tags),
+    ...presentOrOmit("tools", payload.tools),
+    ...presentOrOmit("favorite", payload.favorite),
+    ...presentOrOmit("difficulty_rating", payload.difficultyRating),
+  };
+}

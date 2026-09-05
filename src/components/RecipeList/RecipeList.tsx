@@ -19,10 +19,25 @@ export function RecipeList() {
     <div>
       <H3 className="mb-4">Recipes</H3>
         {isLoading && <ListLoadingSkeleton /> }
-        { (error !== null) ? <ListErrorView /> : data?.map((recipe: RecipeDetail) => (
+        {data?.length === 0 && !isLoading && <EmptyView />}
+        { (error !== null) && <ListErrorView /> }
+        { data && data.length > 0 && data?.map((recipe: RecipeDetail) => (
           <Recipe recipe={recipe} />
-        ))}
+        )) }
     </div>
+  );
+}
+
+function EmptyView() {
+  return (
+    <Card className="mb-4 outline-1">
+      <CardHeader>
+        <CardTitle>No recipes yet</CardTitle>
+      </CardHeader>
+      <CardContent className="text-sm text-muted-foreground">
+        Create a recipe to see it show up here.
+      </CardContent>
+    </Card>
   );
 }
 
