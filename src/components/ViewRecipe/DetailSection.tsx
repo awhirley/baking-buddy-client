@@ -7,6 +7,7 @@ import {
   MoreVertical,
   Pencil,
   Plus,
+  Sparkles,
 } from "lucide-react";
 import { useState, type Dispatch, type SetStateAction } from "react";
 import type { RecipeDetail } from "../../types/RecipeTypes";
@@ -26,6 +27,7 @@ import {
 } from "#components/SharedComponents/ui/dropdown-menu";
 import { useNavigate } from "react-router-dom";
 import { NoteEditor } from "#components/SharedComponents/NoteEditor";
+import { UpdateRecipeDetailsTrigger } from "#components/ActionDialogs/UpdateRecipeDetailsTrigger";
 
 interface RecipeDetailsCardProps {
   details: RecipeDetail;
@@ -74,6 +76,15 @@ export function RecipeDetailsCard({ details, editModeOn, setEditModeOn }: Recipe
   const openBake = sortedBakes.find((bake) => bake.endDatetime === null);
 
   return (
+    <>
+    { details.favorite &&
+      <div className="flex flex-wrap gap-2">
+        <Badge variant="outline">
+          <Sparkles data-icon="inline-start" />
+          Favorite recipe
+        </Badge>
+      </div>
+    }
     <Card>
       <CardHeader className="flex flex-row items-start justify-between gap-4">
         <div className="flex flex-col gap-1">
@@ -115,6 +126,8 @@ export function RecipeDetailsCard({ details, editModeOn, setEditModeOn }: Recipe
             </button>
           )}
         </div>
+
+        <UpdateRecipeDetailsTrigger recipe={{ ...details }} />
 
         <div className="flex gap-2 shrink-0">
           <Tooltip>
@@ -211,5 +224,6 @@ export function RecipeDetailsCard({ details, editModeOn, setEditModeOn }: Recipe
         />
       </CardContent>
     </Card>
+    </>
   );
 }

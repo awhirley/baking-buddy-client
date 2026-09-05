@@ -1,5 +1,5 @@
 import { BakingBuddyPage } from "#components/SharedComponents/Header";
-import { BakeList } from "#components/Bakes/BakesList";
+import { BakeList } from "#components/Bakes/BakeList";
 
 export function BakeListPage() {
   return (

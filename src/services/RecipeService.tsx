@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { createRecipePayloadtoApiPayload, type CreateRecipePayload, type UpdateIngredientPayload, type UpdateInstructionPayload, type Recipe, type RecipeDetail } from '../types/RecipeTypes';
+import { createRecipePayloadtoApiPayload, type CreateRecipePayload, type UpdateIngredientPayload, type UpdateInstructionPayload, type Recipe, type RecipeDetail, type UpdateRecipePayload, updatedRecipePayloadtoApiPayload } from '../types/RecipeTypes';
 import { toCamelCase } from './utils';
 import type { IngredientHistory, InstructionHistory } from '../types/BakeTypes';
 
@@ -30,6 +30,11 @@ export const recipeService = {
 
     async getRecipeById(id: string): Promise<Recipe> {
       const response = await api.get<Recipe>(`/recipes/${id}`);
+      return response.data;
+    },
+
+    async updateRecipe(id: string, args: UpdateRecipePayload): Promise<Recipe> {
+      const response = await api.patch<Recipe>(`/recipes/${id}`, updatedRecipePayloadtoApiPayload(args));
       return response.data;
     },
 
