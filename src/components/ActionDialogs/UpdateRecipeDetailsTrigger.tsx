@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, type Dispatch, type SetStateAction } from "react";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
 
 import { LoadingButton } from "#components/SharedComponents/LoadingButton";
@@ -23,6 +23,7 @@ import {
 import type { UpdateRecipePayload } from "../../types/RecipeTypes";
 import { CreatableDropdown } from "#components/SharedComponents/CreatableDropdown";
 import { TagInput } from "#components/TagInput";
+import { Sword } from "lucide-react";
 
 interface UpdateRecipeDetailsTriggerProps {
   id: string;
@@ -36,8 +37,16 @@ interface UpdateRecipeDetailsTriggerProps {
   favorite: boolean | undefined;
 }
 
-export function UpdateRecipeDetailsTrigger({ recipe }: { recipe: UpdateRecipeDetailsTriggerProps }) {
-  const [isOpen, setIsOpen] = useState(false);
+export function UpdateRecipeDetailsTrigger({
+  isOpen,
+  setIsOpen,
+  recipe
+}: { 
+  isOpen: boolean;
+  setIsOpen: Dispatch<SetStateAction<boolean>>;
+  recipe: UpdateRecipeDetailsTriggerProps, 
+}) {
+  // const [isOpen, setIsOpen] = useState(false);
   const queryClient = useQueryClient();
   const { addToast } = useToast();
 
@@ -83,9 +92,6 @@ export function UpdateRecipeDetailsTrigger({ recipe }: { recipe: UpdateRecipeDet
 
   return (
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
-      <Button variant="outline" onClick={() => handleOpenChange(true)}>
-        Edit
-      </Button>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Edit recipe</DialogTitle>
@@ -152,6 +158,7 @@ export function UpdateRecipeDetailsTrigger({ recipe }: { recipe: UpdateRecipeDet
                 id="difficultyRating"
                 value={formState.difficultyRating ? Number(formState.difficultyRating) : undefined}
                 onValueChange={(value) => updateField("difficultyRating", value)}
+                icon={<Sword />}
               />
             </Field>
 
@@ -162,7 +169,7 @@ export function UpdateRecipeDetailsTrigger({ recipe }: { recipe: UpdateRecipeDet
                   checked={formState.favorite ?? false}
                   onCheckedChange={(checked) => updateField("favorite", checked === true)}
                 />
-                <FieldLabel htmlFor="favoriteInput">Favorite</FieldLabel>
+                <FieldLabel htmlFor="favoriteInput">Set as favorite</FieldLabel>
               </div>
             </Field>
           </div>
