@@ -5,7 +5,7 @@ import { Button } from "#components/SharedComponents/ui/button";
 import { Input } from "#components/SharedComponents/ui/input";
 import { Separator } from "#components/SharedComponents/ui/separator";
 import { cn } from "#lib/utils";
-import { Popover, PopoverContent, PopoverTrigger } from "#components/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "#components/SharedComponents/ui/popover";
 
 interface CreatableDropdownProps {
   options: string[];

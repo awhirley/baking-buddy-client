@@ -11,6 +11,8 @@ import type { BakeRating, UpdateBakePayload } from "../../types/BakeTypes";
 import { DialogContent, DialogHeader, DialogFooter, Dialog, DialogTitle, DialogDescription } from "#components/SharedComponents/ui/dialog";
 import { Rating } from "#components/SharedComponents/ui/rating";
 import { RATING_FIELDS } from "../../types/RatingFields";
+import { Tooltip, TooltipContent, TooltipTrigger } from "#components/SharedComponents/ui/tooltip";
+import { StarPlus } from "lucide-react";
 
 export function UpdateBakeRatingsTrigger({ bakeId, ratings }: { bakeId: string; elevation: number | null; notes: string | null; ratings: BakeRating }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -81,7 +83,12 @@ export function UpdateBakeRatingsTrigger({ bakeId, ratings }: { bakeId: string; 
 
   return (
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
-      <Button variant="outline" onClick={() => handleOpenChange(true)}>Rate</Button>
+      <Tooltip>
+        <TooltipTrigger render={ <Button className="self-start max-w-sm" size="icon" onClick={() => handleOpenChange(true)}><StarPlus /></Button>} />
+        <TooltipContent className="flex flex-col gap-2">
+          <p>Rate this bake</p>
+        </TooltipContent>
+      </Tooltip>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Rate this bake</DialogTitle>
