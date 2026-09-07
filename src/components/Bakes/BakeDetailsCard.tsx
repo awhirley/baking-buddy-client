@@ -15,6 +15,8 @@ import { recipeService } from "../../services/RecipeService";
 import type { BakeDetail } from "../../types/BakeTypes";
 import { Badge } from "#components/SharedComponents/ui/badge";
 import { UpdateElevationTrigger } from "../ActionDialogs/UpdateElevationTrigger";
+import { BakeImageUploadTrigger } from "#components/ActionDialogs/BakeImageUploadTrigger";
+import { BakeImageCarousel } from "./BakeImageCarousel";
 
 export function BakeDetailsCard({ bake }: { bake: BakeDetail }) {
   const bakeIsCompleted = !!bake.endDatetime;
@@ -117,11 +119,13 @@ function ResultsCard({ bake } : { bake: BakeDetail }) {
           <CardTitle className="text-lg">Results</CardTitle>
         </div>
         <div className="flex items-center gap-2">
+          <BakeImageUploadTrigger bakeId={bake.id} />
           <UpdateBakeRatingsTrigger bakeId={bake.id} elevation={bake.elevation} notes={bake.notes} ratings={bake.ratings} />
         </div>
       </CardHeader>
       <CardContent className="flex flex-col gap-4">
         <RatingsSummary ratings={bake.ratings} />
+        <BakeImageCarousel bakeId={bake.id} />
       </CardContent>
     </Card>
   )
