@@ -12,3 +12,16 @@ export function formatAddedDate(iso: string): string {
   if (diffDays < 30) return `${Math.floor(diffDays / 7)}w ago`;
   return date.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
 }
+
+export function formatDuration(totalMinutes: number): string {
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
+
+  const hoursPart = hours > 0 ? `${hours} hour${hours === 1 ? "" : "s"}` : "";
+  const minutesPart = minutes > 0 ? `${minutes} minute${minutes === 1 ? "" : "s"}` : "";
+
+  if (hoursPart && minutesPart) return `${hoursPart} ${minutesPart}`;
+  if (hoursPart) return hoursPart;
+  if (minutesPart) return minutesPart;
+  return "0 minutes";
+}

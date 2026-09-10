@@ -24,12 +24,10 @@ function Header() {
     <div className="flex flex-row gap-x-4 pb-10 flex flex-col justify-between w-200 items-center">
       <img src={headerImage} alt="Banner" style={{ height: '80px', width: 'auto' }}  />
       <div className="flex flex-row gap-x-4">
-        <Button variant="outline" onClick={() => navigate("/aboutus")}>About Us</Button>
-        {
-          location.pathname === "/" ?
-            <Button onClick={() => navigate("/create")}>New Recipe</Button> :
-            <Button onClick={() => navigate("/")}>Home</Button>
-        }
+        
+        { location.pathname === "/" && <Button variant="outline" onClick={() => navigate("/aboutus")}>About Us</Button> }
+        { location.pathname === "/recipes" && <Button onClick={() => navigate("/create")}>Create Recipe</Button> }
+        { location.pathname !== "/" && <Button onClick={() => navigate("/")}>Home</Button> }
       </div>
     </div>
   );

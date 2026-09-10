@@ -1,4 +1,7 @@
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { useMutation } from "@tanstack/react-query";
+import { Clock, Star, Sword } from "lucide-react";
 
 import { type RecipeDetail } from '../../types/RecipeTypes';
 import { Badge } from '#components/SharedComponents/ui/badge';
@@ -6,18 +9,26 @@ import { Button } from '#components/SharedComponents/ui/button';
 import { ButtonGroup } from "#components/SharedComponents/ui/button-group"
 import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from '#components/SharedComponents/ui/card';
 import { DeleteRecipeTrigger } from "#components/ActionDialogs/DeleteRecipeTrigger";
-import { useState } from "react";
-import { formatAddedDate } from "./utils";
+import { formatAddedDate, formatDuration } from "./utils";
 import { bakeService } from "../../services/BakeService";
-import { useMutation } from "@tanstack/react-query";
 import { useToast } from "../../contexts/ToastContext";
 import { LoadingButton } from "#components/SharedComponents/LoadingButton";
 
-export function Recipe({ recipe }: { recipe: RecipeDetail }) {
+const MAX_DIFFICULTY = 5;
+
+export function RecipeListItem({ recipe }: { recipe: RecipeDetail }) {
   return (
     <Card className="mb-4 outline-1 transition-shadow hover:shadow-md">
       <CardHeader>
-        <CardTitle>{recipe.name}</CardTitle>
+        <CardTitle className="flex items-center gap-2">
+          {recipe.name}
+          {recipe.favorite && (
+            <Star
+              className="h-4 w-4 fill-yellow-400 text-yellow-400"
+              aria-label="Favorite recipe"
+            />
+          )}
+        </CardTitle>
         <CardDescription className="line-clamp-2">{recipe.description}</CardDescription>
         <CardAction className="flex flex-row gap-x-4">
           <ActionMenu recipeId={recipe.id} openBakeId={recipe.openBakeId}/>
@@ -33,6 +44,40 @@ export function Recipe({ recipe }: { recipe: RecipeDetail }) {
           )}
           <span>Added {formatAddedDate(recipe.createdAt)}</span>
         </div>
+
+        {(recipe.prepTime != null || recipe.bakeTime != null) && (
+          <div className="flex flex-wrap items-center gap-x-4 text-xs text-muted-foreground">
+            <Clock className="h-3 w-3" />
+            {recipe.prepTime != null && (
+              <span className="flex items-center gap-1">
+                Prep: {formatDuration(recipe.prepTime)}
+              </span>
+            )}
+            {recipe.bakeTime != null && (
+              <span className="flex items-center gap-1">
+                Bake: {formatDuration(recipe.bakeTime)}
+              </span>
+            )}
+          </div>
+        )}
+
+        {recipe.difficultyRating != null && (
+          <div className="flex items-center gap-1 text-xs text-muted-foreground">
+            <span>Difficulty:</span>
+            <div className="flex items-center gap-0.5">
+              {Array.from({ length: MAX_DIFFICULTY }).map((_, i) => (
+                <Sword
+                  key={i}
+                  className={
+                    i < recipe.difficultyRating!
+                      ? "h-3.5 w-3.5 fill-primary text-primary"
+                      : "h-3.5 w-3.5 text-muted-foreground/40"
+                  }
+                />
+              ))}
+            </div>
+          </div>
+        )}
 
         {(recipe.tags.length > 0 || recipe.tools.length > 0) && (
           <div className="flex flex-wrap gap-2">

@@ -10,6 +10,7 @@ import { Blender, Microwave, Pencil } from "lucide-react";
 import type { UpdateRecipePayload } from "../../types/RecipeTypes";
 import { recipeService } from "../../services/RecipeService";
 import { clampMinutes, clampNonNegative, hourValueFromMinutes, minutesValueFromMinutes, TimeCounter, timeToTotalMinutes } from "#components/SharedComponents/TimeCounter";
+import { formatDuration } from "#components/RecipeList/utils";
 
 export function UpdateTimesTrigger({ time, timeType, recipeId }: { timeType: "PREP" | "BAKE", triggerType: "LINK" | "ICON", recipeId: string; time: number | null; }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -70,7 +71,7 @@ export function UpdateTimesTrigger({ time, timeType, recipeId }: { timeType: "PR
         </Button>
       </div> :
       <div className="flex flex-row items-center text-xs text-muted-foreground">
-        {timeType === "BAKE" ? "Bake time:" : "Prep time:"} { hourValueFromMinutes(time) } hours { minutesValueFromMinutes(time) } minutes
+        {timeType === "BAKE" ? "Bake time:" : "Prep time:"} {formatDuration(time ?? 0)}
         <Button
           onClick={() => handleOpenChange(true)}
           variant="link"
