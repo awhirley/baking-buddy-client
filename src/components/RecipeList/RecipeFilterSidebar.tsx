@@ -48,9 +48,9 @@ export function RecipeFilterSidebar({
   return (
     <aside className="w-64 shrink-0 pr-6 border-r">
       <div className="mb-4 flex items-center justify-between">
-        <h4 className="text-sm font-medium">Filters</h4>
+        <h4 className="text-sm font-medium my-2 bold">Filters</h4>
         {activeFilterCount > 0 && (
-          <Button variant="ghost" size="sm" onClick={clearAll}>
+          <Button variant="link" size="sm" onClick={clearAll}>
             Clear all
           </Button>
         )}
@@ -59,11 +59,22 @@ export function RecipeFilterSidebar({
       <div className="relative mb-6">
         <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
         <Input
-          placeholder="Search name or description..."
+          placeholder="Search name or description"
           className="pl-8"
           value={filters.search}
           onChange={(e) => onFiltersChange({ ...filters, search: e.target.value })}
         />
+      </div>
+
+      <div className="mb-6 flex items-center gap-2">
+        <Checkbox
+          id="favorite-filter"
+          checked={filters.favorite}
+          onCheckedChange={(checked) => onFiltersChange({ ...filters, favorite: checked === true })}
+        />
+        <Label htmlFor="favorite-filter" className="flex items-center gap-1 text-sm font-normal">
+          Favorites only
+        </Label>
       </div>
 
       <div className="flex flex-col gap-6">

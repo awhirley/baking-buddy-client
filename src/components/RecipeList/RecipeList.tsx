@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { recipeService } from '../../services/RecipeService';
 import { type RecipeDetail } from "../../types/RecipeTypes"
 import { H3 } from '../SharedComponents/ui/typography';
-import { Recipe } from './RecipeCard';
+import { RecipeListItem } from './RecipeListItem';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '#components/SharedComponents/ui/card';
 import { Skeleton } from '#components/SharedComponents/ui/skeleton';
 import { useRecipeFilters } from './useRecipeFilters';
@@ -38,7 +38,7 @@ export function RecipeList() {
           )}
           {error !== null && <ListErrorView />}
           {filteredRecipes && filteredRecipes.length > 0 &&
-            filteredRecipes.map((recipe: RecipeDetail) => <Recipe key={recipe.id} recipe={recipe} />)}
+            filteredRecipes.map((recipe: RecipeDetail) => <RecipeListItem key={recipe.id} recipe={recipe} />)}
         </div>
       </div>
     </div>

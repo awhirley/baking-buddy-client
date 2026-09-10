@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import type { RecipeDetail } from "../../types/RecipeTypes";
 
 export type NumberRange = [number, number];
@@ -7,6 +8,7 @@ export interface RecipeFilters {
   search: string;
   tags: string[];
   tools: string[];
+  favorite: boolean;
   // null = filter not active (full range). Non-null = user has narrowed the slider.
   difficultyRange: NumberRange | null;
   prepTimeRange: NumberRange | null;
@@ -19,6 +21,7 @@ export const EMPTY_FILTERS: RecipeFilters = {
   search: "",
   tags: [],
   tools: [],
+  favorite: false,
   difficultyRange: null,
   prepTimeRange: null,
   bakeTimeRange: null,
@@ -37,7 +40,12 @@ function numericBounds(values: number[]): NumberRange | null {
 }
 
 export function useRecipeFilters(recipes: RecipeDetail[] | undefined) {
-  const [filters, setFilters] = useState<RecipeFilters>(EMPTY_FILTERS);
+  const [searchParams] = useSearchParams();
+
+  const [filters, setFilters] = useState<RecipeFilters>({
+    ...EMPTY_FILTERS,
+    favorite: searchParams.get("favorite") === "true",
+  });
 
   // Bounds are always computed from the full unfiltered list, so the sliders'
   // min/max don't shrink as the user narrows other filters.
@@ -60,6 +68,8 @@ export function useRecipeFilters(recipes: RecipeDetail[] | undefined) {
     if (!recipes) return recipes;
 
     return recipes.filter((recipe) => {
+      if (filters.favorite && !recipe.favorite) return false;
+
       if (filters.search.trim().length > 0) {
         const query = filters.search.trim().toLowerCase();
         const matchesName = recipe.name.toLowerCase().includes(query);
@@ -105,6 +115,7 @@ export function useRecipeFilters(recipes: RecipeDetail[] | undefined) {
   const activeFilterCount =
     filters.tags.length +
     filters.tools.length +
+    (filters.favorite ? 1 : 0) +
     (filters.difficultyRange ? 1 : 0) +
     (filters.prepTimeRange ? 1 : 0) +
     (filters.bakeTimeRange ? 1 : 0);
