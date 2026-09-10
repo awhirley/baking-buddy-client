@@ -51,25 +51,30 @@ export function TimeCounter({ value, onChange, label, step = 1 }: TimeCounterPro
   );
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function hourValueFromMinutes(timeInMinutes: number | undefined | null) {
   return timeInMinutes ? Math.floor(timeInMinutes / 60) : 0;
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function minutesValueFromMinutes(timeInMinutes: number | undefined | null) {
   return timeInMinutes ? timeInMinutes % 60 : 0;
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function clampNonNegative(value: number | undefined) {
   if (value === undefined || value < 0) return 0;
   return value;
 };
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function clampMinutes(value: number | undefined) {
   if (value === undefined || value < 0) return 0;
   if (value > 59) return 59;
   return value;
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function timeToTotalMinutes(hours: number | undefined, minutes: number | undefined) {
   const h = hours ?? 0;
   const m = minutes ?? 0;
