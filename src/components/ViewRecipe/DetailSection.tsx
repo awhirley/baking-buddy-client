@@ -24,6 +24,8 @@ import {
 import { useNavigate } from "react-router-dom";
 import { UpdateRecipeDetailsTrigger } from "#components/ActionDialogs/UpdateRecipeDetailsTrigger";
 import { Rating } from "#components/SharedComponents/ui/rating";
+import { UpdateTimesTrigger } from "#components/ActionDialogs/UpdateTimesTrigger";
+import { Separator } from "#components/SharedComponents/ui/separator";
 
 interface RecipeDetailsCardProps {
   details: RecipeDetail;
@@ -154,44 +156,42 @@ export function RecipeDetailsCard({ details, editModeOn, setEditModeOn }: Recipe
       <CardContent className="flex flex-col gap-6">
         <p className="text-sm">{details.description}</p>
 
-        {(details.tags?.length > 0 || details.tools?.length > 0) && (
-          <div className="flex flex-col gap-2">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="text-xs text-muted-foreground">Prep time:</span>
-              X minutes
-            </div>
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="text-xs text-muted-foreground">Bake time:</span>
-              X minutes
-            </div>
-            {details.tags.length > 0 && (
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="text-xs text-muted-foreground">Tags:</span>
-                {details.tags.map((tag) => (
-                  <Badge key={tag} variant="secondary">
-                    {tag}
-                  </Badge>
-                ))}
-              </div>
-            )}
-            {details.tools.length > 0 && (
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="text-xs text-muted-foreground">Tools:</span>
-                {details.tools.map((tool) => (
-                  <Badge key={tool} variant="outline">
-                    {tool}
-                  </Badge>
-                ))}
-              </div>
-            )}
-            {details.difficultyRating && (
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="text-xs text-muted-foreground">Difficulty rating:</span>
-                <Rating value={details.difficultyRating} max={5} icon={<Sword />} readOnly />
-              </div>
-            )}
+        <Separator />
+
+        <div className="flex flex-col gap-2">
+          <div className="flex flex-wrap items-center gap-2">
+            <UpdateTimesTrigger time={details.prepTime} timeType="PREP" triggerType="ICON" recipeId={details.id} />
           </div>
-        )}
+          <div className="flex flex-wrap items-center gap-2">
+            <UpdateTimesTrigger time={details.bakeTime} timeType="BAKE" triggerType="ICON" recipeId={details.id} />
+          </div>
+          {details.tags.length > 0 && (
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-xs text-muted-foreground">Tags:</span>
+              {details.tags.map((tag) => (
+                <Badge key={tag} variant="secondary">
+                  {tag}
+                </Badge>
+              ))}
+            </div>
+          )}
+          {details.tools.length > 0 && (
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-xs text-muted-foreground">Tools:</span>
+              {details.tools.map((tool) => (
+                <Badge key={tool} variant="outline">
+                  {tool}
+                </Badge>
+              ))}
+            </div>
+          )}
+          {details.difficultyRating && (
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-xs text-muted-foreground">Difficulty rating:</span>
+              <Rating value={details.difficultyRating} max={5} icon={<Sword />} readOnly />
+            </div>
+          )}
+        </div>
       </CardContent>
     </Card>
   );

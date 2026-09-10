@@ -39,6 +39,8 @@ export interface RecipeDetail {
   notes: string | null;
   difficultyRating: number | null;
   favorite: boolean;
+  bakeTime: number | null;
+  prepTime: number | null;
 }
 
 export interface CreateIngredientPayload {
@@ -68,6 +70,8 @@ export interface CreateRecipePayload {
   tools: string[] | null;
   ingredients: CreateIngredientPayload[];
   instructions: string[];
+  bakeTime: number | null;
+  prepTime: number | null;
 }
 
 export interface UpdateRecipePayload {
@@ -79,6 +83,8 @@ export interface UpdateRecipePayload {
   tools: string[] | undefined;
   favorite: boolean | null | undefined;
   difficultyRating: number | null | undefined;
+  bakeTime: number | null | undefined;
+  prepTime: number | null | undefined;
 }
 
 // TODO: reorganize and put this somewhere else
@@ -92,6 +98,8 @@ export function createRecipePayloadtoApiPayload(payload: CreateRecipePayload) {
     tools: payload.tools,
     ingredients: payload.ingredients,
     instructions: payload.instructions,
+    bake_time: payload.bakeTime,
+    prep_time: payload.prepTime,
   };
 }
 
@@ -109,5 +117,7 @@ export function updatedRecipePayloadtoApiPayload(payload: UpdateRecipePayload) {
     ...presentOrOmit("tools", payload.tools),
     ...presentOrOmit("favorite", payload.favorite),
     ...presentOrOmit("difficulty_rating", payload.difficultyRating),
+    ...presentOrOmit("bake_time", payload.bakeTime),
+    ...presentOrOmit("prep_time", payload.prepTime),
   };
 }

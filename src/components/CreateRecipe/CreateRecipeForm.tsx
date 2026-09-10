@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Plus, Trash2, ChefHat, BookOpen, Link as LinkIcon, Images as InstagramIcon, PenLine } from "lucide-react";
+import { Plus, Trash2, ChefHat } from "lucide-react";
 import { Button } from "../SharedComponents/ui/button";
 import { Input } from "../SharedComponents/ui/input";
 import { Label } from "../SharedComponents/ui/label";
@@ -13,18 +13,13 @@ import {
   CardDescription,
 } from "../SharedComponents/ui/card";
 import { Separator } from "../SharedComponents/ui/separator";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "../SharedComponents/ui/select";
 import { recipeService } from "../../services/RecipeService";
 import { useMutation } from "@tanstack/react-query";
 import type { CreateRecipePayload } from "../../types/RecipeTypes";
 import { Spinner } from "#components/SharedComponents/ui/spinner";
 import { useToast } from "../../contexts/ToastContext";
+import { CreatableDropdown } from "#components/SharedComponents/CreatableDropdown";
+import { clampMinutes, clampNonNegative, TimeCounter } from "#components/SharedComponents/TimeCounter";
 
 interface Ingredient {
   id: string;
@@ -44,9 +39,14 @@ export function RecipeForm() {
   const navigate = useNavigate();
   const { addToast } = useToast();
   const [name, setName] = useState<string>("");
-  const [description, setDescription] = useState<string>("");
-  const [sourceType, setSourceType] = useState<"cookbook" | "url"| "instagram" | "other">("cookbook");
-  const [source, setSource] = useState<string>("");
+  const [description, setDescription] = useState<string | undefined>(undefined);
+  const [sourceType, setSourceType] = useState<string | undefined>(undefined);
+  const [source, setSource] = useState<string | undefined>(undefined);
+
+  const [prepHours, setPrepHours] = useState<number | undefined>(undefined);
+  const [prepMinutes, setPrepMinutes] = useState<number | undefined>(undefined);
+  const [bakeHours, setBakeHours] = useState<number | undefined>(undefined);
+  const [bakeMinutes, setBakeMinutes] = useState<number | undefined>(undefined);
 
   const [ingredients, setIngredients] = useState<Ingredient[]>([
     { id: nextId(), amount: null, name: null },
@@ -118,11 +118,15 @@ export function RecipeForm() {
   const handleCreate = () => {
     const payload: CreateRecipePayload = {
       name,
-      description: description === "" ? null : description,
-      recipeSourceType: sourceType,
-      recipeSource: source === "" ? null : source,
+      description: description ?? null,
+      recipeSourceType: sourceType ?? null,
+      recipeSource: source ?? null,
       tags: [],
       tools: [],
+      // Assumes CreateRecipePayload.prepTime / bakeTime are stored as total minutes.
+      // Update these field names/shape if your payload type differs.
+      prepTime: prepHours === null && prepMinutes === null ? null : (prepHours ?? 0) * 60 + (prepMinutes ?? 0),
+      bakeTime: bakeHours === null && bakeMinutes === null ? null : (bakeHours ?? 0) * 60 + (bakeMinutes ?? 0),
       // Safe to assume non-null here: the create button is disabled
       // whenever any ingredient/instruction field is still null.
       ingredients: ingredients.map(({ amount, name }) => ({
@@ -178,47 +182,12 @@ export function RecipeForm() {
             <div className="space-y-2">
               <Label htmlFor="recipe-source">Source</Label>
               <div className="flex gap-2">
-                {/* TODO: Make this a type to add your own dropdown */}
-                <Select
-                  value={sourceType}
-                  onValueChange={(value: "cookbook" | "url" | "instagram" | "other" | null) => {
-                    if (value !== null) {
-                      setSourceType(value);
-                    } else {
-                      setSourceType("other");
-                    }
-                  }}
-                > 
-                  <SelectTrigger className="w-[140px] shrink-0">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="cookbook">
-                      <span className="flex items-center gap-2">
-                        <BookOpen className="h-4 w-4" />
-                        Cookbook
-                      </span>
-                    </SelectItem>
-                    <SelectItem value="url">
-                      <span className="flex items-center gap-2">
-                        <LinkIcon className="h-4 w-4" />
-                        URL
-                      </span>
-                    </SelectItem>
-                    <SelectItem value="instagram">
-                      <span className="flex items-center gap-2">
-                        <InstagramIcon className="h-4 w-4" />
-                        Instagram
-                      </span>
-                    </SelectItem>
-                    <SelectItem value="other">
-                      <span className="flex items-center gap-2">
-                        <PenLine className="h-4 w-4" />
-                        Add your own
-                      </span>
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
+                <CreatableDropdown
+                  options={["Cookbook", "Instagram"]}
+                  value={sourceType ?? null}
+                  onValueChange={(value) => setSourceType(value)}
+                  placeholder="Select a source type"
+                />
                 <Input
                   id="recipe-source"
                   placeholder={
@@ -230,6 +199,45 @@ export function RecipeForm() {
                   }
                   value={source}
                   onChange={(e) => setSource(e.target.value)}
+                />
+              </div>
+            </div>
+          </div>
+
+          <Separator />
+
+          {/* Time */}
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+            <div className="space-y-2">
+              <Label>Preparation time</Label>
+              <div className="space-y-2">
+                <TimeCounter
+                  label="Hours"
+                  value={prepHours}
+                  onChange={(v) => setPrepHours(clampNonNegative(v))}
+                />
+                <TimeCounter
+                  label="Minutes"
+                  value={prepMinutes}
+                  step={5}
+                  onChange={(v) => setPrepMinutes(clampMinutes(v))}
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label>Baking time</Label>
+              <div className="space-y-2">
+                <TimeCounter
+                  label="Hours"
+                  value={bakeHours}
+                  onChange={(v) => setBakeHours(clampNonNegative(v))}
+                />
+                <TimeCounter
+                  label="Minutes"
+                  value={bakeMinutes}
+                  step={5}
+                  onChange={(v) => setBakeMinutes(clampMinutes(v))}
                 />
               </div>
             </div>

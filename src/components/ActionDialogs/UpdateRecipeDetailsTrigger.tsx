@@ -35,6 +35,8 @@ interface UpdateRecipeDetailsTriggerProps {
   tools: string[];
   difficultyRating: number | null | undefined;
   favorite: boolean | undefined;
+  bakeTime: number | null | undefined;
+  prepTime: number | null | undefined;
 }
 
 export function UpdateRecipeDetailsTrigger({
@@ -64,6 +66,8 @@ export function UpdateRecipeDetailsTrigger({
         description: formState.description?.trim() || null,
         recipeSourceType: formState.recipeSourceType?.trim() || null,
         recipeSource: formState.recipeSource?.trim() || null,
+        bakeTime: undefined,
+        prepTime: undefined,
       };
 
       return recipeService.updateRecipe(recipe.id, payload);
