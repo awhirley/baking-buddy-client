@@ -7,7 +7,7 @@ import { Button } from "#components/SharedComponents/ui/button";
 import { Card, CardContent } from "#components/SharedComponents/ui/card";
 import { recipeService } from "../services/RecipeService";
 import { bakeService } from "../services/BakeService";
-import { BakeCard } from "./Bakes/BakeCard";
+import { BakeListItem } from "./Bakes/BakeListItem";
 import { RecipeListItem } from "./RecipeList/RecipeListItem";
 
 export function BakingBuddySummary() {
@@ -101,7 +101,7 @@ export function BakingBuddySummary() {
           <p className="text-sm text-muted-foreground">No bakes yet.</p>
         )}
         {recentBakes.map((bake) => (
-          <BakeCard key={bake.id} bake={bake} />
+          <BakeListItem key={bake.id} bake={bake} />
         ))}
       </section>
 

@@ -1,4 +1,3 @@
-// BakeCard.tsx
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -26,7 +25,7 @@ import {
 import { Trash2, Mountain } from "lucide-react";
 import { RatingsSummary } from "./RatingSummary";
 
-export function BakeCard({ bake }: { bake: BakeDetail }) {
+export function BakeListItem({ bake }: { bake: BakeDetail }) {
   const isInProgress = !bake.endDatetime;
 
   const { data: recipe } = useQuery({

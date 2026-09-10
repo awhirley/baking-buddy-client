@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { bakeService } from "../../services/BakeService";
 import { type BakeDetail } from "../../types/BakeTypes";
 import { H3 } from "../SharedComponents/ui/typography";
-import { BakeCard } from "./BakeCard";
+import { BakeListItem } from "./BakeListItem";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "#components/SharedComponents/ui/card";
 import { Skeleton } from "#components/SharedComponents/ui/skeleton";
 import { useParams } from "react-router-dom";
@@ -26,7 +26,7 @@ export function BakeList() {
       {error !== null ? (
         <ListErrorView />
       ) : (
-        data?.map((bake: BakeDetail) => <BakeCard key={bake.id} bake={bake} />)
+        data?.map((bake: BakeDetail) => <BakeListItem key={bake.id} bake={bake} />)
       )}
       {!isLoading && !error && data?.length === 0 && <EmptyView />}
     </div>
