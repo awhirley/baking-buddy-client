@@ -5,6 +5,8 @@ import { H3 } from '../SharedComponents/ui/typography';
 import { Recipe } from './RecipeCard';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '#components/SharedComponents/ui/card';
 import { Skeleton } from '#components/SharedComponents/ui/skeleton';
+import { useRecipeFilters } from './useRecipeFilters';
+import { RecipeFilterSidebar } from './RecipeFilterSidebar';
 
 export function RecipeList() {
   const { data, isLoading, error } = useQuery({
@@ -15,27 +17,44 @@ export function RecipeList() {
     }
   });
 
+  const { filters, setFilters, bounds, filteredRecipes, activeFilterCount } = useRecipeFilters(data);
+  const hasActiveSearchOrFilters = activeFilterCount > 0 || filters.search.trim().length > 0;
+
   return (
     <div>
       <H3 className="mb-4">Recipes</H3>
-        {isLoading && <ListLoadingSkeleton /> }
-        {data?.length === 0 && !isLoading && <EmptyView />}
-        { (error !== null) && <ListErrorView /> }
-        { data && data.length > 0 && data?.map((recipe: RecipeDetail) => (
-          <Recipe recipe={recipe} />
-        )) }
+      <div className="flex gap-6">
+        <RecipeFilterSidebar
+          filters={filters}
+          onFiltersChange={setFilters}
+          bounds={bounds}
+          activeFilterCount={activeFilterCount}
+        />
+
+        <div className="flex-1">
+          {isLoading && <ListLoadingSkeleton />}
+          {filteredRecipes?.length === 0 && !isLoading && (
+            <EmptyView hasActiveFilters={hasActiveSearchOrFilters} />
+          )}
+          {error !== null && <ListErrorView />}
+          {filteredRecipes && filteredRecipes.length > 0 &&
+            filteredRecipes.map((recipe: RecipeDetail) => <Recipe key={recipe.id} recipe={recipe} />)}
+        </div>
+      </div>
     </div>
   );
 }
 
-function EmptyView() {
+function EmptyView({ hasActiveFilters }: { hasActiveFilters: boolean }) {
   return (
     <Card className="mb-4 outline-1">
       <CardHeader>
-        <CardTitle>No recipes yet</CardTitle>
+        <CardTitle>{hasActiveFilters ? "No matching recipes" : "No recipes yet"}</CardTitle>
       </CardHeader>
       <CardContent className="text-sm text-muted-foreground">
-        Create a recipe to see it show up here.
+        {hasActiveFilters
+          ? "Try adjusting your search or filters."
+          : "Create a recipe to see it show up here."}
       </CardContent>
     </Card>
   );
