@@ -106,7 +106,7 @@ export function BakingBuddySummary() {
       </section>
 
       <section className="flex flex-col gap-3">
-        <h2 className="text-lg font-semibold">Favorites you haven't baked in a while</h2>
+        <h2 className="text-lg font-semibold">Favorite recipes you haven't baked in a while</h2>
         {favoriteRecipes.length === 0 && (
           <p className="text-sm text-muted-foreground">No favorited recipes yet.</p>
         )}

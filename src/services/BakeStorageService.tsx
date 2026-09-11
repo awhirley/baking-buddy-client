@@ -19,5 +19,9 @@ export const BakeStorageService = {
   async listBakeImages(bakeId: string): Promise<BakeImage[]> {
     const response = await api.get<BakeImage[]>(`/bakes/${bakeId}/image`);
     return response.data;
+  },
+
+  async deleteBakeImage(bakeId: string, path: string) {
+    await api.delete(`/bakes/${bakeId}/image`, { data: { path: path}});
   }
 }
