@@ -1,4 +1,3 @@
-// BakeList.tsx
 import { useQuery } from "@tanstack/react-query";
 import { bakeService } from "../../services/BakeService";
 import { type BakeDetail } from "../../types/BakeTypes";
@@ -6,22 +5,54 @@ import { H3 } from "../SharedComponents/ui/typography";
 import { BakeListItem } from "./BakeListItem";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "#components/SharedComponents/ui/card";
 import { Skeleton } from "#components/SharedComponents/ui/skeleton";
-import { useParams } from "react-router-dom";
+import { deltaService } from "../../services/DeltaService";
 
-export function BakeList() {
-  const { recipeId } = useParams();
+type BakesFilter =
+  | { type: "all" }
+  | { type: "recipe"; recipeId: string }
+  | { type: "ingredientDelta"; ingredientDeltaId: string }
+  | { type: "instructionDelta"; instructionDeltaId: string };
 
-  const { data, isLoading, error } = useQuery({
-    queryKey: recipeId ? ["bakes", "recipe", recipeId] : ["bakes"],
-    queryFn: async () => {
-      const response = recipeId ? await bakeService.listBakesForRecipe(recipeId) : await bakeService.listBakes();
-      return response;
-    },
-  });
+export function BakeListAll() {
+  return <BakeList filter={{ type: "all" }} listTitle={"All Bakes"} />;
+}
+
+export function BakeListForRecipe({ recipeId } : { recipeId: string }) {
+  return <BakeList filter={{ type: "recipe", recipeId: recipeId }} listTitle={"Recipe Bakes"} />;
+}
+
+export function BakeListForIngredientDelta({ ingredientDeltaId } : { ingredientDeltaId: string }) {
+  return <BakeList filter={{ type: "ingredientDelta", ingredientDeltaId: ingredientDeltaId! }} listTitle={null} />;
+}
+
+export function BakeListForInstructionDelta({ instructionDeltaId } : { instructionDeltaId: string }) {
+  return <BakeList filter={{ type: "instructionDelta", instructionDeltaId: instructionDeltaId! }} listTitle={null}/>;
+}
+
+function BakeList({ filter, listTitle }: { filter: BakesFilter, listTitle: string | null }) {
+  function useBakesQuery(filter: BakesFilter) {
+    return useQuery({
+      queryKey: ["bakes", filter],
+      queryFn: async () => {
+        switch (filter.type) {
+          case "all":
+            return bakeService.listBakes();
+          case "recipe":
+            return bakeService.listBakesForRecipe(filter.recipeId);
+          case "ingredientDelta":
+            return deltaService.getBakesByIngredientDeltaId(filter.ingredientDeltaId);
+          case "instructionDelta":
+            return deltaService.getBakesByInstructionDeltaId(filter.instructionDeltaId);
+        }
+      },
+    });
+  }
+
+  const { data, isLoading, error } = useBakesQuery(filter);
 
   return (
     <div>
-      <H3 className="mb-4">Bakes</H3>
+      { listTitle && <H3 className="mb-4">{listTitle}</H3> }
       {isLoading && <ListLoadingSkeleton />}
       {error !== null ? (
         <ListErrorView />

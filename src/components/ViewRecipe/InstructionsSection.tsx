@@ -15,9 +15,11 @@ import { Spinner } from "#components/SharedComponents/ui/spinner";
 import { Textarea } from "#components/SharedComponents/ui/textarea";
 
 import { useToast } from "../../contexts/ToastContext";
+import { deltaService } from "../../services/DeltaService";
 import { recipeService } from "../../services/RecipeService";
 import type { InstructionDeltaEntry } from "../../types/BakeTypes";
 import type { Instruction } from "../../types/RecipeTypes";
+import { BakesRelatedToDeltaDialog } from "./BakesRelatedToDeltaDialog";
 
 export function InstructionsSection({ instructions, editModeOn }: { instructions: Instruction[]; editModeOn: boolean }) {
   return (
@@ -225,7 +227,7 @@ function InstructionRow({
 function InstructionHistoryPreview({ instructionId }: { instructionId: string }) {
   const { data, isLoading, error } = useQuery({
     queryKey: ["instructionHistory", instructionId],
-    queryFn: () => recipeService.getInstructionHistory(instructionId),
+    queryFn: () => deltaService.getInstructionHistory(instructionId),
   });
 
   const sortedHistory = data?.history.slice().sort((a, b) => b.version - a.version) ?? [];
@@ -276,6 +278,8 @@ function InstructionHistoryDialog({
   entries: InstructionDeltaEntry[];
   trigger: React.ReactNode;
 }) {
+  const [bakesByDeltaIsOpen, setBakesByDeltaIsOpen] = useState<boolean>(false);
+
   return (
     <Dialog>
       <DialogTrigger>{trigger}</DialogTrigger>
@@ -309,12 +313,20 @@ function InstructionHistoryDialog({
                     {!isCurrent && (
                       <DropdownMenuItem onClick={() => {}}>Revert to this version</DropdownMenuItem>
                     )}
-                    <DropdownMenuItem onClick={() => {}}>See bakes associated with this version</DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => {setBakesByDeltaIsOpen(true)}}>See bakes associated with this version</DropdownMenuItem>
                     <DropdownMenuItem className="text-destructive" disabled={isCurrent} onClick={() => {}}>
                       Delete this version
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
+                <BakesRelatedToDeltaDialog
+                    deltaType={"INSTRUCTION"}
+                    deltaId={entry.id}
+                    deltaName={entry.description}
+                    deltaVersion={entry.version}
+                    isOpen={bakesByDeltaIsOpen}
+                    setIsOpen={setBakesByDeltaIsOpen}
+                  />
               </div>
             );
           })}

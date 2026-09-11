@@ -1,11 +1,14 @@
 import { BakingBuddyPage } from "#components/SharedComponents/Header";
-import { BakeList } from "#components/Bakes/BakeList";
+import { BakeListAll, BakeListForRecipe } from "#components/Bakes/BakeList";
+import { useParams } from "react-router-dom";
 
 export function BakeListPage() {
+  const { recipeId } = useParams<{ recipeId?: string }>();
+
   return (
     <BakingBuddyPage>
       <div className="w-full">
-        <BakeList />
+        {recipeId ? <BakeListForRecipe recipeId={recipeId} /> : <BakeListAll />}
       </div>
     </BakingBuddyPage>
   );
