@@ -17,9 +17,11 @@ import { Spinner } from "#components/SharedComponents/ui/spinner";
 import { Textarea } from "#components/SharedComponents/ui/textarea";
 
 import { useToast } from "../../contexts/ToastContext";
+import { deltaService } from "../../services/DeltaService";
 import { recipeService } from "../../services/RecipeService";
 import type { IngredientDeltaEntry } from "../../types/BakeTypes";
 import type { Ingredient } from "../../types/RecipeTypes";
+import { BakesRelatedToDeltaDialog } from "./BakesRelatedToDeltaDialog";
 
 export function IngredientsSection({ ingredients, editModeOn }: { ingredients: Ingredient[]; editModeOn: boolean }) {
   return (
@@ -223,7 +225,7 @@ function IngredientRow({ ingredient, editModeOn }: { ingredient: Ingredient; edi
 function IngredientHistoryPreview({ ingredientId }: { ingredientId: string }) {
   const { data, isLoading, error } = useQuery({
     queryKey: ["ingredientHistory", ingredientId],
-    queryFn: () => recipeService.getIngredientHistory(ingredientId),
+    queryFn: () => deltaService.getIngredientHistory(ingredientId),
   });
 
   const sortedHistory = data?.history.slice().sort((a, b) => b.version - a.version) ?? [];
@@ -274,6 +276,8 @@ function IngredientHistoryDialog({
   entries: IngredientDeltaEntry[];
   trigger: React.ReactNode;
 }) {
+  const [bakesByDeltaIsOpen, setBakesByDeltaIsOpen] = useState(false);
+
   return (
     <Dialog>
       <DialogTrigger>{trigger}</DialogTrigger>
@@ -307,7 +311,7 @@ function IngredientHistoryDialog({
                     { !isCurrent && <DropdownMenuItem onClick={() => {}}>
                       Revert to this version
                     </DropdownMenuItem>}
-                    <DropdownMenuItem onClick={() => {}}>
+                    <DropdownMenuItem onClick={() => {setBakesByDeltaIsOpen(true)}}>
                       See bakes associated with this version
                     </DropdownMenuItem>
                     <DropdownMenuItem className="text-destructive" disabled={isCurrent} onClick={() => {}}>
@@ -315,6 +319,14 @@ function IngredientHistoryDialog({
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
+                <BakesRelatedToDeltaDialog
+                  deltaType={"INGREDIENT"}
+                  deltaId={entry.id}
+                  deltaName={entry.name}
+                  deltaVersion={entry.version}
+                  isOpen={bakesByDeltaIsOpen}
+                  setIsOpen={setBakesByDeltaIsOpen}
+                />
               </div>
             );
           })}

@@ -1,7 +1,6 @@
 import axios from 'axios';
 import { createRecipePayloadtoApiPayload, type CreateRecipePayload, type UpdateIngredientPayload, type UpdateInstructionPayload, type Recipe, type RecipeDetail, type UpdateRecipePayload, updatedRecipePayloadtoApiPayload } from '../types/RecipeTypes';
 import { toCamelCase } from './utils';
-import type { IngredientHistory, InstructionHistory } from '../types/BakeTypes';
 
 const recipeServiceApi = `${import.meta.env.VITE_API_URL}/api`;
 
@@ -57,16 +56,6 @@ export const recipeService = {
 
     async updateInstruction(id: string, args: UpdateInstructionPayload): Promise<Recipe> {
       const response = await api.patch<Recipe>(`/instructions/${id}`, args);
-      return response.data;
-    },
-
-    async getIngredientHistory(ingredientId: string): Promise<IngredientHistory> {
-      const response = await api.get<IngredientHistory>(`/ingredients/history/${ingredientId}`);
-      return response.data;
-    },
-
-    async getInstructionHistory(instructionId: string): Promise<InstructionHistory> {
-      const response = await api.get<InstructionHistory>(`/instructions/history/${instructionId}`);
       return response.data;
     },
 }
