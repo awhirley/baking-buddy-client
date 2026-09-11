@@ -7,10 +7,13 @@ import {
   CarouselPrevious,
   CarouselNext,
 } from "#components/SharedComponents/ui/carousel";
-import { Dialog, DialogContent } from "#components/SharedComponents/ui/dialog";
+import { Dialog, DialogContent, DialogHeader } from "#components/SharedComponents/ui/dialog";
 import { BakeStorageService } from "../../services/BakeStorageService";
 import type { BakeImage } from "../../types/BakeStorageTypes";
 import { cn } from "cn";
+import { X } from "lucide-react";
+import { Button } from "#components/SharedComponents/ui/button";
+import { DeleteImageTrigger } from "#components/ActionDialogs/DeleteImageTrigger";
 
 interface BakeImageCarouselProps {
   bakeId: string;
@@ -70,6 +73,7 @@ export function BakeImageCarousel({ bakeId }: BakeImageCarouselProps) {
 
       <BakeImageLightbox
         images={images}
+        isOpen={selectedIndex !== null}
         selectedIndex={selectedIndex}
         onSelectIndex={setSelectedIndex}
         onClose={() => setSelectedIndex(null)}
@@ -83,6 +87,7 @@ interface BakeImageLightboxProps {
   selectedIndex: number | null;
   onSelectIndex: (index: number) => void;
   onClose: () => void;
+  isOpen: boolean;
 }
 
 function BakeImageLightbox({
@@ -90,13 +95,18 @@ function BakeImageLightbox({
   selectedIndex,
   onSelectIndex,
   onClose,
+  isOpen
 }: BakeImageLightboxProps) {
-  const open = selectedIndex !== null;
   const selectedImage = selectedIndex !== null ? images[selectedIndex] : null;
+  const [deleteDialogIsOpen, setDeleteDialogIsOpen] = useState<boolean>(false);
 
   return (
-    <Dialog open={open} onOpenChange={(next) => !next && onClose()}>
-      <DialogContent className="max-w-3xl sm:max-w-3xl">
+    <Dialog open={isOpen} onOpenChange={(next) => !next && onClose()}>
+      <DialogContent className="max-w-3xl sm:max-w-3xl" showCloseButton={false}>
+        <DialogHeader className="flex flex-row justify-end">
+          {selectedImage && <DeleteImageTrigger bakeId={selectedImage?.bakeId} path={selectedImage?.path} isOpen={deleteDialogIsOpen} setIsOpen={setDeleteDialogIsOpen} /> }
+          <Button size="icon" variant="secondary" onClick={() => { onClose(); setDeleteDialogIsOpen(false); }}><X /></Button>
+        </DialogHeader>
         {selectedImage && (
           <div className="flex flex-col gap-4">
             <img
