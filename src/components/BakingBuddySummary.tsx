@@ -9,16 +9,17 @@ import { recipeService } from "../services/RecipeService";
 import { bakeService } from "../services/BakeService";
 import { BakeListItem } from "./Bakes/BakeListItem";
 import { RecipeListItem } from "./RecipeList/RecipeListItem";
+import { Skeleton } from "./SharedComponents/ui/skeleton";
 
 export function BakingBuddySummary() {
   const navigate = useNavigate();
 
-  const { data: recipes = [] } = useQuery({
+  const { data: recipes = [], isLoading: isLoadingRecipes } = useQuery({
     queryKey: ["recipes"],
     queryFn: () => recipeService.listRecipes(),
   });
 
-  const { data: bakes = [] } = useQuery({
+  const { data: bakes = [], isLoading: isLoadingBakes } = useQuery({
     queryKey: ["bakes"],
     queryFn: () => bakeService.listBakes(),
   });
@@ -74,46 +75,49 @@ export function BakingBuddySummary() {
         </div>
       </section>
 
-      <section className="grid grid-cols-3 gap-3">
-        <StatCard
-          icon={NotebookTabs}
-          label="recipe"
-          value={stats.recipeCount}
-          onClick={() => navigate("/recipes")}
-        />
-        <StatCard
-          icon={ChefHat}
-          label="bake"
-          value={stats.bakeCount}
-          onClick={() => navigate("/bakes")}
-        />
-        <StatCard
-          icon={Star}
-          label="favorite"
-          value={stats.favoriteCount}
-          onClick={() => navigate("/recipes?favorite=true")}
-        />
-      </section>
+      { (isLoadingBakes || isLoadingRecipes) ? <HomeSkeleton /> :
+        <>
+          <section className="grid grid-cols-3 gap-3">
+          <StatCard
+            icon={NotebookTabs}
+            label="recipe"
+            value={stats.recipeCount}
+            onClick={() => navigate("/recipes")}
+          />
+          <StatCard
+            icon={ChefHat}
+            label="bake"
+            value={stats.bakeCount}
+            onClick={() => navigate("/bakes")}
+          />
+          <StatCard
+            icon={Star}
+            label="favorite"
+            value={stats.favoriteCount}
+            onClick={() => navigate("/recipes?favorite=true")}
+          />
+        </section>
 
-      <section className="flex flex-col">
-        <h2 className="text-lg font-semibold pb-3">Recent Bakes</h2>
-        {recentBakes.length === 0 && (
-          <p className="text-sm text-muted-foreground">No bakes yet.</p>
-        )}
-        {recentBakes.map((bake) => (
-          <BakeListItem key={bake.id} bake={bake} />
-        ))}
-      </section>
+        <section className="flex flex-col">
+          <h2 className="text-lg font-semibold pb-3">Recent Bakes</h2>
+          {recentBakes.length === 0 && (
+            <p className="text-sm text-muted-foreground">No bakes yet.</p>
+          )}
+          {recentBakes.map((bake) => (
+            <BakeListItem key={bake.id} bake={bake} />
+          ))}
+        </section>
 
-      <section className="flex flex-col gap-3">
-        <h2 className="text-lg font-semibold">Favorite recipes you haven't baked in a while</h2>
-        {favoriteRecipes.length === 0 && (
-          <p className="text-sm text-muted-foreground">No favorited recipes yet.</p>
-        )}
-        {favoriteRecipes.map((recipe) => (
-          <RecipeListItem key={recipe.id} recipe={recipe} />
-        ))}
-      </section>
+        <section className="flex flex-col gap-3">
+          <h2 className="text-lg font-semibold">Favorite recipes you haven't baked in a while</h2>
+          {favoriteRecipes.length === 0 && (
+            <p className="text-sm text-muted-foreground">No favorited recipes yet.</p>
+          )}
+          {favoriteRecipes.map((recipe) => (
+            <RecipeListItem key={recipe.id} recipe={recipe} />
+          ))}
+        </section>
+      </>}
     </div>
   );
 }
@@ -139,5 +143,45 @@ function StatCard({
         <span className="text-xl leading-none"> <span className="font-bold">{value} </span>{label}{ value !== 1 ? 's' : ''}</span>
       </CardContent>
     </Card>
+  );
+}
+
+function StatCardSkeleton() {
+  return (
+    <div className="flex flex-col items-center justify-center gap-3 rounded-2xl bg-[#3d322b] px-6 py-8">
+      <Skeleton className="h-6 w-6 rounded-full bg-[#4a3c34]" />
+      <Skeleton className="h-7 w-24 bg-[#4a3c34]" />
+    </div>
+  );
+}
+ 
+function ListSectionSkeleton({ titleWidth = "w-40" }: { titleWidth?: string }) {
+  return (
+    <div className="flex flex-col gap-4">
+      <Skeleton className={`h-6 ${titleWidth} bg-[#4a3c34]`} />
+      <div className="flex flex-col gap-3">
+        <Skeleton className="h-14 w-full rounded-xl bg-[#4a3c34]" />
+        <Skeleton className="h-14 w-full rounded-xl bg-[#4a3c34]" />
+      </div>
+    </div>
+  );
+}
+ 
+export default function HomeSkeleton() {
+  return (
+    <div
+      className="flex min-h-screen flex-col gap-10 bg-[#2b2320] px-6 py-8"
+      role="status"
+      aria-label="Loading home screen"
+    >
+      <div className="grid grid-cols-3 gap-4">
+        <StatCardSkeleton />
+        <StatCardSkeleton />
+        <StatCardSkeleton />
+      </div>
+ 
+      <ListSectionSkeleton titleWidth="w-36" />
+      <ListSectionSkeleton titleWidth="w-64" />
+    </div>
   );
 }
