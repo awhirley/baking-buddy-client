@@ -41,6 +41,7 @@ export interface RecipeDetail {
   favorite: boolean;
   bakeTime: number | null;
   prepTime: number | null;
+  displayImage: string | null;
 }
 
 export interface CreateIngredientPayload {
@@ -87,7 +88,6 @@ export interface UpdateRecipePayload {
   prepTime: number | null | undefined;
 }
 
-// TODO: reorganize and put this somewhere else
 export function createRecipePayloadtoApiPayload(payload: CreateRecipePayload) {
   return {
     name: payload.name,

@@ -32,6 +32,30 @@ const CHIP_FIELD_CONFIG = {
 
 type ChipField = keyof typeof CHIP_FIELD_CONFIG;
 
+function capitalizeFirstLetter(value: string): string {
+  const trimmed = value.trim();
+  if (!trimmed) return trimmed;
+  return trimmed.charAt(0).toUpperCase() + trimmed.slice(1);
+}
+
+function normalizeChips(values: string[]): string[] {
+  const seen = new Set<string>();
+  const result: string[] = [];
+
+  for (const rawValue of values) {
+    const normalized = capitalizeFirstLetter(rawValue);
+    if (!normalized) continue;
+
+    const key = normalized.toLowerCase();
+    if (seen.has(key)) continue; // dedupe "cake" vs "Cake"
+
+    seen.add(key);
+    result.push(normalized);
+  }
+
+  return result;
+}
+
 export function UpdateChipsTrigger({
   field,
   recipeId,
@@ -104,7 +128,7 @@ export function UpdateChipsTrigger({
 
         <TagInput
           value={chipsInput}
-          onValueChange={(value) => setChipsInput(value ?? [])}
+          onValueChange={(value) => setChipsInput(normalizeChips(value ?? []))}
           placeholder={config.inputPlaceholder}
         />
 

@@ -60,7 +60,6 @@ function EmptyView({ hasActiveFilters }: { hasActiveFilters: boolean }) {
   );
 }
 
-// TODO: make this better
 function ListErrorView() {
   return (<>
     <Card className="mb-4 outline-1">

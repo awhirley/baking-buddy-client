@@ -14,12 +14,14 @@ import { cn } from "cn";
 import { X } from "lucide-react";
 import { Button } from "#components/SharedComponents/ui/button";
 import { DeleteImageTrigger } from "#components/Triggers/DeleteImageTrigger";
+import { SetImageAsRecipeDisplayTrigger } from "#components/Triggers/SetImageAsRecipeDisplayTrigger";
 
 interface BakeImageCarouselProps {
   bakeId: string;
+  recipeId: string;
 }
 
-export function BakeImageCarousel({ bakeId }: BakeImageCarouselProps) {
+export function BakeImageCarousel({ bakeId, recipeId }: BakeImageCarouselProps) {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
 
   const {
@@ -73,6 +75,7 @@ export function BakeImageCarousel({ bakeId }: BakeImageCarouselProps) {
 
       <BakeImageLightbox
         images={images}
+        recipeId={recipeId}
         isOpen={selectedIndex !== null}
         selectedIndex={selectedIndex}
         onSelectIndex={setSelectedIndex}
@@ -84,6 +87,7 @@ export function BakeImageCarousel({ bakeId }: BakeImageCarouselProps) {
 
 interface BakeImageLightboxProps {
   images: BakeImage[];
+  recipeId: string;
   selectedIndex: number | null;
   onSelectIndex: (index: number) => void;
   onClose: () => void;
@@ -92,6 +96,7 @@ interface BakeImageLightboxProps {
 
 function BakeImageLightbox({
   images,
+  recipeId,
   selectedIndex,
   onSelectIndex,
   onClose,
@@ -99,13 +104,15 @@ function BakeImageLightbox({
 }: BakeImageLightboxProps) {
   const selectedImage = selectedIndex !== null ? images[selectedIndex] : null;
   const [deleteDialogIsOpen, setDeleteDialogIsOpen] = useState<boolean>(false);
+  const [setImageDialogIsOpen, setSetImageDialogIsOpen] = useState<boolean>(false);
 
   return (
     <Dialog open={isOpen} onOpenChange={(next) => !next && onClose()}>
       <DialogContent className="max-w-3xl sm:max-w-3xl" showCloseButton={false}>
         <DialogHeader className="flex flex-row justify-end">
-          {selectedImage && <DeleteImageTrigger bakeId={selectedImage?.bakeId} path={selectedImage?.path} isOpen={deleteDialogIsOpen} setIsOpen={setDeleteDialogIsOpen} /> }
-          <Button size="icon" variant="secondary" onClick={() => { onClose(); setDeleteDialogIsOpen(false); }}><X /></Button>
+          {selectedImage && <SetImageAsRecipeDisplayTrigger recipeId={recipeId} bakeImageId={selectedImage.id} isOpen={setImageDialogIsOpen} setIsOpen={setSetImageDialogIsOpen} /> }
+          {selectedImage && <DeleteImageTrigger bakeId={selectedImage.bakeId} path={selectedImage.path} isOpen={deleteDialogIsOpen} setIsOpen={setDeleteDialogIsOpen} /> }
+          <Button size="icon" variant="secondary" onClick={() => { onClose(); setDeleteDialogIsOpen(false); setSetImageDialogIsOpen(false); }}><X /></Button>
         </DialogHeader>
         {selectedImage && (
           <div className="flex flex-col gap-4">

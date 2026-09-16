@@ -77,7 +77,6 @@ function EmptyView() {
   );
 }
 
-// TODO: make this better
 function ListErrorView() {
   return (
     <Card className="mb-4 outline-1">
