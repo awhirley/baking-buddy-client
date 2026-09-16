@@ -8,6 +8,8 @@ export interface RecipeFilters {
   search: string;
   tags: string[];
   tools: string[];
+  sources: string[];
+  sourceTypes: string[];
   favorite: boolean;
   // null = filter not active (full range). Non-null = user has narrowed the slider.
   difficultyRange: NumberRange | null;
@@ -21,6 +23,8 @@ export const EMPTY_FILTERS: RecipeFilters = {
   search: "",
   tags: [],
   tools: [],
+  sources: [],
+  sourceTypes: [],
   favorite: false,
   difficultyRange: null,
   prepTimeRange: null,
@@ -87,6 +91,14 @@ export function useRecipeFilters(recipes: RecipeDetail[] | undefined) {
         if (!filters.tools.every((tool) => recipeTools.includes(tool))) return false;
       }
 
+      if (filters.sources.length > 0) {
+        if (recipe.recipeSource == null || !filters.sources.includes(recipe.recipeSource)) return false;
+      }
+
+      if (filters.sourceTypes.length > 0) {
+        if (recipe.recipeSourceType == null || !filters.sourceTypes.includes(recipe.recipeSourceType)) return false;
+      }
+
       // A recipe with no difficulty set is excluded once the user narrows this
       // filter away from the full 1-5 range — there's nothing to match against.
       if (filters.difficultyRange) {
@@ -115,6 +127,8 @@ export function useRecipeFilters(recipes: RecipeDetail[] | undefined) {
   const activeFilterCount =
     filters.tags.length +
     filters.tools.length +
+    filters.sources.length +
+    filters.sourceTypes.length +
     (filters.favorite ? 1 : 0) +
     (filters.difficultyRange ? 1 : 0) +
     (filters.prepTimeRange ? 1 : 0) +

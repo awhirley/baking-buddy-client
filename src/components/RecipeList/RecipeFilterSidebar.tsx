@@ -37,6 +37,16 @@ export function RecipeFilterSidebar({
     queryFn: () => filterService.listTools(),
   });
 
+  const { data: sourceOptions } = useQuery({
+    queryKey: ["recipeSources"],
+    queryFn: () => filterService.listSources(),
+  });
+
+  const { data: sourceTypeOptions } = useQuery({
+    queryKey: ["recipeSourceTypes"],
+    queryFn: () => filterService.listSourceTypes(),
+  });
+
   function toggleValue(list: string[], value: string) {
     return list.includes(value) ? list.filter((v) => v !== value) : [...list, value];
   }
@@ -90,6 +100,22 @@ export function RecipeFilterSidebar({
           options={toolOptions ?? []}
           selected={filters.tools}
           onToggle={(value) => onFiltersChange({ ...filters, tools: toggleValue(filters.tools, value) })}
+        />
+
+        <CheckboxGroup
+          label="Sources"
+          options={sourceOptions ?? []}
+          selected={filters.sources}
+          onToggle={(value) => onFiltersChange({ ...filters, sources: toggleValue(filters.sources, value) })}
+        />
+
+        <CheckboxGroup
+          label="Source type"
+          options={sourceTypeOptions ?? []}
+          selected={filters.sourceTypes}
+          onToggle={(value) =>
+            onFiltersChange({ ...filters, sourceTypes: toggleValue(filters.sourceTypes, value) })
+          }
         />
 
         <RangeFilter
