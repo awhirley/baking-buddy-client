@@ -125,7 +125,7 @@ function ResultsCard({ bake } : { bake: BakeDetail }) {
       </CardHeader>
       <CardContent className="flex flex-col gap-4">
         <RatingsSummary ratings={bake.ratings} />
-        <BakeImageCarousel bakeId={bake.id} />
+        <BakeImageCarousel bakeId={bake.id} recipeId={bake.recipeId} />
       </CardContent>
     </Card>
   )

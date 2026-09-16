@@ -6,7 +6,7 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogT
 import { BakeStorageService } from "../../services/BakeStorageService";
 import { Input } from "#components/SharedComponents/ui/input";
 import { cn } from "cn";
-import { Camera } from "lucide-react";
+import { ImagePlus } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "#components/SharedComponents/ui/tooltip";
 
 interface BakeImageUploadTriggerProps {
@@ -52,7 +52,7 @@ export function BakeImageUploadTrigger({ bakeId }: BakeImageUploadTriggerProps) 
               className="self-start max-w-sm"
               size="icon"
               onClick={() => setOpen(true)}>
-                <Camera />
+                <ImagePlus />
             </Button>} />
           <TooltipContent className="flex flex-col gap-2">
             <p>Add a photo of your bake</p>

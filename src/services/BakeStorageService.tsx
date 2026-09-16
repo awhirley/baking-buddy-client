@@ -23,5 +23,9 @@ export const BakeStorageService = {
 
   async deleteBakeImage(bakeId: string, path: string) {
     await api.delete(`/bakes/${bakeId}/image`, { data: { path: path}});
+  },
+
+  async setImageAsRecipeDisplay(bakeImageId: string, recipeId: string) {
+    await api.patch(`/recipes/${recipeId}/image/${bakeImageId}`);
   }
 }

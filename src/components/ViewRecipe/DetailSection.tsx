@@ -26,6 +26,7 @@ import { UpdateTimesTrigger } from "#components/Triggers/UpdateTimesTrigger";
 import { Separator } from "#components/SharedComponents/ui/separator";
 import { UpdateChipsTrigger } from "#components/Triggers/UpdateChipsTrigger";
 import { UpdateDifficultyTrigger } from "#components/Triggers/UpdateDifficultyTrigger";
+import { RecipeDisplayImage } from "#components/SharedComponents/RecipeDisplayImage";
 
 interface RecipeDetailsCardProps {
   details: RecipeDetail;
@@ -83,7 +84,7 @@ export function RecipeDetailsCard({ details, editModeOn, setEditModeOn }: Recipe
           {bakes && (
             <button
               type="button"
-              onClick={() => navigate(`/bakes/${details.id}`)} // TODO this is wrong
+              onClick={() => navigate(`/bakes/${details.id}`)}
               className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground mt-1 w-fit"
             >
               <ChefHat className="h-3.5 w-3.5" />
@@ -124,11 +125,13 @@ export function RecipeDetailsCard({ details, editModeOn, setEditModeOn }: Recipe
               </DropdownMenuItem>
               <DropdownMenuItem
                 disabled={!mostRecentBake}
-                onClick={() => mostRecentBake && navigate(`/bakes/${mostRecentBake.id}`)}
+                onClick={() => mostRecentBake && navigate(`/bake/${mostRecentBake.id}`)}
               >
                 Go to most recent bake
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => navigate(`/recipes/${details.id}/bakes`)}>
+              <DropdownMenuItem 
+                disabled={sortedBakes.length === 0}
+                onClick={() => navigate(`/bakes/${details.id}`)}>
                 See all bakes
               </DropdownMenuItem>
               <DropdownMenuSeparator />
@@ -144,7 +147,7 @@ export function RecipeDetailsCard({ details, editModeOn, setEditModeOn }: Recipe
             recipeId={details.id}
             isOpen={deleteDialogIsOpen}
             setIsOpen={setDeleteDialogIsOpen}
-            navigateToHome={true}
+            navigateToRecipeList={true}
             renderButton={false}
           />
           <UpdateRecipeDetailsTrigger
@@ -207,6 +210,7 @@ export function RecipeDetailsCard({ details, editModeOn, setEditModeOn }: Recipe
             )}
           </div>
         </>}
+        <RecipeDisplayImage imageUrl={details.displayImage} recipeName={details.name} />
       </CardContent>
 }
     </Card>

@@ -13,15 +13,18 @@ import { formatAddedDate, formatDuration } from "./utils";
 import { bakeService } from "../../services/BakeService";
 import { useToast } from "../../contexts/ToastContext";
 import { LoadingButton } from "#components/SharedComponents/LoadingButton";
+import { RecipeDisplayImage } from "#components/SharedComponents/RecipeDisplayImage";
 
 const MAX_DIFFICULTY = 5;
 
 export function RecipeListItem({ recipe }: { recipe: RecipeDetail }) {
+  const navigate = useNavigate();
+
   return (
     <Card className="mb-4 outline-1 transition-shadow hover:shadow-md">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          {recipe.name}
+          <button onClick={() => navigate(`/recipe/${recipe.id}`)}>{recipe.name}</button>
           {recipe.favorite && (
             <Star
               className="h-4 w-4 fill-yellow-400 text-yellow-400"
@@ -34,65 +37,65 @@ export function RecipeListItem({ recipe }: { recipe: RecipeDetail }) {
           <ActionMenu recipeId={recipe.id} openBakeId={recipe.openBakeId}/>
         </CardAction>
       </CardHeader>
-      <CardContent className="flex flex-col gap-3">
-        <div className="flex flex-wrap items-center gap-x-2 text-xs text-muted-foreground">
-          {(recipe.recipeSource || recipe.recipeSourceType) && (
-            <>
-              <span>Source: {recipe.recipeSourceType} {recipe.recipeSource}</span>
-              <span aria-hidden="true">•</span>
-            </>
-          )}
-          <span>Added {formatAddedDate(recipe.createdAt)}</span>
-        </div>
-
-        {(recipe.prepTime != null || recipe.bakeTime != null) && (
-          <div className="flex flex-wrap items-center gap-x-4 text-xs text-muted-foreground">
-            <Clock className="h-3 w-3" />
-            {recipe.prepTime != null && (
-              <span className="flex items-center gap-1">
-                Prep: {formatDuration(recipe.prepTime)}
-              </span>
+      <CardContent className="flex flex-row gap-4">
+        <div className="flex flex-col gap-3 flex-1 min-w-0">
+          <div className="flex flex-wrap items-center gap-x-2 text-xs text-muted-foreground">
+            {(recipe.recipeSource || recipe.recipeSourceType) && (
+              <>
+                <span>Source: {recipe.recipeSourceType} {recipe.recipeSource}</span>
+                <span aria-hidden="true">•</span>
+              </>
             )}
-            {recipe.bakeTime != null && (
-              <span className="flex items-center gap-1">
-                Bake: {formatDuration(recipe.bakeTime)}
-              </span>
-            )}
+            <span>Added {formatAddedDate(recipe.createdAt)}</span>
           </div>
-        )}
 
-        {recipe.difficultyRating != null && (
-          <div className="flex items-center gap-1 text-xs text-muted-foreground">
-            <span>Difficulty:</span>
-            <div className="flex items-center gap-0.5">
-              {Array.from({ length: MAX_DIFFICULTY }).map((_, i) => (
-                <Sword
-                  key={i}
-                  className={
-                    i < recipe.difficultyRating!
-                      ? "h-3.5 w-3.5 fill-primary text-primary"
-                      : "h-3.5 w-3.5 text-muted-foreground/40"
-                  }
-                />
+          {(recipe.prepTime != null || recipe.bakeTime != null) && (
+            <div className="flex flex-wrap items-center gap-x-4 text-xs text-muted-foreground">
+              <Clock className="h-3 w-3" />
+              {recipe.prepTime != null && (
+                <span className="flex items-center gap-1">Prep: {formatDuration(recipe.prepTime)}</span>
+              )}
+              {recipe.bakeTime != null && (
+                <span className="flex items-center gap-1">Bake: {formatDuration(recipe.bakeTime)}</span>
+              )}
+            </div>
+          )}
+
+          {recipe.difficultyRating != null && (
+            <div className="flex items-center gap-1 text-xs text-muted-foreground">
+              <span>Difficulty:</span>
+              <div className="flex items-center gap-0.5">
+                {Array.from({ length: MAX_DIFFICULTY }).map((_, i) => (
+                  <Sword
+                    key={i}
+                    className={
+                      i < recipe.difficultyRating!
+                        ? "h-3.5 w-3.5 fill-primary text-primary"
+                        : "h-3.5 w-3.5 text-muted-foreground/40"
+                    }
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {(recipe.tags.length > 0 || recipe.tools.length > 0) && (
+            <div className="flex flex-wrap gap-2">
+              {recipe.tags.map((tag) => (
+                <Badge key={tag} variant="secondary">{tag}</Badge>
+              ))}
+              {recipe.tools.map((tool) => (
+                <Badge key={tool} variant="outline">{tool}</Badge>
               ))}
             </div>
-          </div>
-        )}
+          )}
+        </div>
 
-        {(recipe.tags.length > 0 || recipe.tools.length > 0) && (
-          <div className="flex flex-wrap gap-2">
-            {recipe.tags.map((tag) => (
-              <Badge key={tag} variant="secondary">
-                {tag}
-              </Badge>
-            ))}
-            {recipe.tools.map((tool) => (
-              <Badge key={tool} variant="outline">
-                {tool}
-              </Badge>
-            ))}
-          </div>
-        )}
+        <RecipeDisplayImage
+          imageUrl={recipe.displayImage}
+          recipeName={recipe.name}
+          maxHeightClassName="max-h-24"
+        />
       </CardContent>
     </Card>
   );

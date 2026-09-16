@@ -7,79 +7,88 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "#components/SharedComponents/ui/alert-dialog"
-import { AlertCircleIcon } from "lucide-react"
+import { AlertCircleIcon, NotebookPen } from "lucide-react"
 import {
   Alert,
   AlertDescription,
   AlertTitle,
 } from "#components/SharedComponents/ui/alert"
-import { recipeService } from '../../services/RecipeService';
 import { Button } from "#components/SharedComponents/ui/button"
-import { Trash2Icon } from "lucide-react"
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState, type Dispatch, type SetStateAction } from "react";
-import { useNavigate } from "react-router-dom";
 import { useToast } from "../../contexts/ToastContext";
 import { LoadingButton } from "#components/SharedComponents/LoadingButton";
+import { BakeStorageService } from "../../services/BakeStorageService";
+import { Tooltip, TooltipContent, TooltipTrigger } from "#components/SharedComponents/ui/tooltip"
 
-interface DeleteRecipeTriggerProps {
+interface SetImageAsRecipeDisplayTriggerProps {
   isOpen: boolean;
   setIsOpen: Dispatch<SetStateAction<boolean>>;
+  bakeImageId: string;
   recipeId: string;
-  navigateToRecipeList?: boolean;
-  renderButton?: boolean;
 }
 
-export function DeleteRecipeTrigger({ isOpen, setIsOpen, recipeId, navigateToRecipeList = false, renderButton = true }: DeleteRecipeTriggerProps) {
+export function SetImageAsRecipeDisplayTrigger({ isOpen, setIsOpen, bakeImageId, recipeId }: SetImageAsRecipeDisplayTriggerProps) {
   const queryClient = useQueryClient();
   const [showAlert, setShowAlert] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const navigate = useNavigate();
   const { addToast } = useToast();
 
-  const deleteRecipeMutation = useMutation({
-    mutationFn: (id: string) => recipeService.deleteRecipe(id),
+  const setImageMutation = useMutation({
+    mutationFn: () => BakeStorageService.setImageAsRecipeDisplay(bakeImageId, recipeId),
     onSuccess: () => {
-      addToast('Recipe was deleted successfully!', null, { type: 'default' });
-      queryClient.invalidateQueries({ queryKey: ['recipesList'] });
+      addToast('Image set as recipe display image', null, { type: 'default' });
+      queryClient.invalidateQueries({ queryKey: ['recipes', recipeId] });
       setIsOpen(false);
-      if (navigateToRecipeList) navigate("/recipes");
+      setIsLoading(false);
     },
     onError: () => {
       setShowAlert(true);
+      setIsLoading(false);
     }
   });
 
-  const handleDelete = () => {
+  const handleSetImage = () => {
     setIsLoading(true);
-    deleteRecipeMutation.mutate(recipeId);
+    setImageMutation.mutate();
   }
 
   return (
     <AlertDialog open={isOpen}>
-      <AlertDialogTrigger onClick={() => setIsOpen(true)} render={renderButton ? <Button variant="outline" size="icon"><Trash2Icon /></Button> : <></>} />
+      <AlertDialogTrigger render={
+        <Tooltip>
+          <TooltipTrigger
+            render={
+              <Button variant="secondary" onClick={() => setIsOpen(true)} size="icon"><NotebookPen /></Button>
+            }
+          />
+          <TooltipContent>
+            <p>Set image as recipe display photo</p>
+          </TooltipContent>
+        </Tooltip>
+      } />
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Delete recipe?</AlertDialogTitle>
-          { showAlert && <DeleteFailureAlert /> }
+          <AlertDialogTitle>Set image as recipe display?</AlertDialogTitle>
+          { showAlert && <SetFailureAlert /> }
           <AlertDialogDescription>
-            This will permanently delete all recipe details and history. This cannot be undone.
+            This image will become the display thumbnail for the recipe around the application.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <Button onClick={() => setIsOpen(false)} variant="outline">Cancel</Button>
-          <LoadingButton onClick={handleDelete} isLoading={isLoading} variant="default">Delete recipe</LoadingButton>
+          <LoadingButton onClick={handleSetImage} isLoading={isLoading} variant="default">Set</LoadingButton>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
   )
 }
 
-export function DeleteFailureAlert() {
+export function SetFailureAlert() {
   return (
     <Alert variant="destructive" className="max-w-md">
       <AlertCircleIcon />
-      <AlertTitle>Deletion failed</AlertTitle>
+      <AlertTitle>Failed to set image as display</AlertTitle>
       <AlertDescription>
         Please refresh and try again.
       </AlertDescription>
