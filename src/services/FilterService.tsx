@@ -9,5 +9,15 @@ export const filterService = {
   async listTools(): Promise<string[]> {
     const response = await api.get<string[]>("/tools");
     return response.data;
+  },
+
+  async listSourceTypes(): Promise<string[]> {
+    const response = await api.get<string[]>("/sourceTypes");
+    return response.data;
+  },
+
+  async listSources(): Promise<string[]> {
+    const response = await api.get<string[]>("/sources");
+    return response.data;
   }
 }
