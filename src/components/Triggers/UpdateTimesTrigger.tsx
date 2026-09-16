@@ -12,7 +12,7 @@ import { recipeService } from "../../services/RecipeService";
 import { clampMinutes, clampNonNegative, hourValueFromMinutes, minutesValueFromMinutes, TimeCounter, timeToTotalMinutes } from "#components/SharedComponents/TimeCounter";
 import { formatDuration } from "#components/RecipeList/utils";
 
-export function UpdateTimesTrigger({ time, timeType, recipeId }: { timeType: "PREP" | "BAKE", triggerType: "LINK" | "ICON", recipeId: string; time: number | null; }) {
+export function UpdateTimesTrigger({ time, timeType, recipeId, editModeOn }: { timeType: "PREP" | "BAKE", triggerType: "LINK" | "ICON", recipeId: string; time: number | null; editModeOn: boolean; }) {
   const [isOpen, setIsOpen] = useState(false);
   const queryClient = useQueryClient();
   const { addToast } = useToast();
@@ -60,27 +60,33 @@ export function UpdateTimesTrigger({ time, timeType, recipeId }: { timeType: "PR
     setIsOpen(open);
   };
 
+  console.log((hoursInput !== undefined || minutesInput !== undefined));
+  console.log((minutesInput));
+  console.log((hoursInput));
+
   return (
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
-      { (!hoursInput && !minutesInput) ? <div className="flex">
-        <Button onClick={() => handleOpenChange(true)} variant="link" className="px-0">
-          { timeType === "BAKE" ? 
-            <><Microwave/> Set bake time</> : 
-            <><Blender/> Set preparation time</>
-          }
-        </Button>
-      </div> :
-      <div className="flex flex-row items-center text-xs text-muted-foreground">
-        {timeType === "BAKE" ? "Bake time:" : "Prep time:"} {formatDuration(time ?? 0)}
-        <Button
-          onClick={() => handleOpenChange(true)}
-          variant="link"
-          className="h-4 w-4 p-0 pl-3"
-          size="icon"
-        >
-          <Pencil className="h-3 w-3" />
-        </Button>
-      </div>}
+      { time == null ? (
+        editModeOn && (
+          <div className="flex items-center text-xs text-muted-foreground">
+            <Button onClick={() => handleOpenChange(true)} variant="link" size="sm" className="h-auto p-0 gap-1 text-xs text-muted-foreground">
+              { timeType === "BAKE" ? 
+                <><Microwave className="h-3 w-3" /> Set bake time</> : 
+                <><Blender className="h-3 w-3" /> Set preparation time</>
+              }
+            </Button>
+          </div>
+        )
+      ) : (
+        <div className="flex flex-row items-center text-xs text-muted-foreground">
+          {timeType === "BAKE" ? "Bake time:" : "Prep time:"} {formatDuration(time)}
+          { editModeOn && (
+            <Button onClick={() => handleOpenChange(true)} variant="link" className="h-4 w-4 p-0 pl-3" size="icon">
+              <Pencil className="h-3 w-3" />
+            </Button>
+          )}
+        </div>
+      )}
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Set {timeType === "BAKE" ? "bake" : "preparatation"} time</DialogTitle>

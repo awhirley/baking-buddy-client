@@ -8,7 +8,7 @@ import { Badge } from '#components/SharedComponents/ui/badge';
 import { Button } from '#components/SharedComponents/ui/button';
 import { ButtonGroup } from "#components/SharedComponents/ui/button-group"
 import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from '#components/SharedComponents/ui/card';
-import { DeleteRecipeTrigger } from "#components/ActionDialogs/DeleteRecipeTrigger";
+import { DeleteRecipeTrigger } from "#components/Triggers/DeleteRecipeTrigger";
 import { formatAddedDate, formatDuration } from "./utils";
 import { bakeService } from "../../services/BakeService";
 import { useToast } from "../../contexts/ToastContext";

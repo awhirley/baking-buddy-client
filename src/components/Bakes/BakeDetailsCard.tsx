@@ -2,8 +2,8 @@ import { Link } from "react-router-dom";
 import { SquareArrowOutUpRight } from 'lucide-react';
 import { useQuery } from "@tanstack/react-query";
 
-import { CompleteBakeTrigger } from "#components/ActionDialogs/CompleteBakeTrigger";
-import { UpdateBakeRatingsTrigger } from "#components/ActionDialogs/UpdateBakeRatingsTrigger";
+import { CompleteBakeTrigger } from "#components/Triggers/CompleteBakeTrigger";
+import { UpdateBakeRatingsTrigger } from "#components/Triggers/UpdateBakeRatingsTrigger";
 import { NoteEditor } from "#components/SharedComponents/NoteEditor";
 import { formatAddedDate } from "#components/RecipeList/utils";
 import { Button } from "#components/SharedComponents/ui/button";
@@ -14,8 +14,8 @@ import { RatingsSummary } from "./RatingSummary";
 import { recipeService } from "../../services/RecipeService";
 import type { BakeDetail } from "../../types/BakeTypes";
 import { Badge } from "#components/SharedComponents/ui/badge";
-import { UpdateElevationTrigger } from "../ActionDialogs/UpdateElevationTrigger";
-import { BakeImageUploadTrigger } from "#components/ActionDialogs/BakeImageUploadTrigger";
+import { UpdateElevationTrigger } from "../Triggers/UpdateElevationTrigger";
+import { BakeImageUploadTrigger } from "#components/Triggers/BakeImageUploadTrigger";
 import { BakeImageCarousel } from "./BakeImageCarousel";
 
 export function BakeDetailsCard({ bake }: { bake: BakeDetail }) {

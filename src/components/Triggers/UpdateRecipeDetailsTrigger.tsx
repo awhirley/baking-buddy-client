@@ -10,7 +10,6 @@ import { Button } from "#components/SharedComponents/ui/button";
 import { Input } from "#components/SharedComponents/ui/input";
 import { Textarea } from "#components/SharedComponents/ui/textarea";
 import { Checkbox } from "#components/SharedComponents/ui/checkbox";
-import { Rating } from "#components/SharedComponents/ui/rating";
 
 import {
   DialogContent,
@@ -22,8 +21,6 @@ import {
 } from "#components/SharedComponents/ui/dialog";
 import type { UpdateRecipePayload } from "../../types/RecipeTypes";
 import { CreatableDropdown } from "#components/SharedComponents/CreatableDropdown";
-import { TagInput } from "#components/TagInput";
-import { Sword } from "lucide-react";
 
 interface UpdateRecipeDetailsTriggerProps {
   id: string;
@@ -31,8 +28,6 @@ interface UpdateRecipeDetailsTriggerProps {
   description: string;
   recipeSourceType: string | null | undefined;
   recipeSource: string | null | undefined;
-  tags: string[];
-  tools: string[];
   difficultyRating: number | null | undefined;
   favorite: boolean | undefined;
   bakeTime: number | null | undefined;
@@ -48,7 +43,6 @@ export function UpdateRecipeDetailsTrigger({
   setIsOpen: Dispatch<SetStateAction<boolean>>;
   recipe: UpdateRecipeDetailsTriggerProps, 
 }) {
-  // const [isOpen, setIsOpen] = useState(false);
   const queryClient = useQueryClient();
   const { addToast } = useToast();
 
@@ -66,6 +60,8 @@ export function UpdateRecipeDetailsTrigger({
         description: formState.description?.trim() || null,
         recipeSourceType: formState.recipeSourceType?.trim() || null,
         recipeSource: formState.recipeSource?.trim() || null,
+        tags: undefined,
+        tools: undefined,
         bakeTime: undefined,
         prepTime: undefined,
       };
@@ -103,6 +99,18 @@ export function UpdateRecipeDetailsTrigger({
         </DialogHeader>
 
         <div className="grid grid-cols-1 gap-4">
+          <Field>
+            <div className="flex items-center gap-2">
+              <Checkbox
+                id="favoriteInput"
+                checked={formState.favorite ?? false}
+                onCheckedChange={(checked) => updateField("favorite", checked === true)}
+              />
+              <FieldLabel htmlFor="favoriteInput">Set as favorite</FieldLabel>
+            </div>
+          </Field>
+
+
           <Field>
             <FieldLabel htmlFor="nameInput">Name</FieldLabel>
             <Input
@@ -142,39 +150,6 @@ export function UpdateRecipeDetailsTrigger({
                 onChange={(e) => updateField("recipeSource", e.target.value || undefined)}
                 placeholder="e.g. URL or book title"
               />
-            </Field>
-          </div>
-
-          <Field>
-            <FieldLabel htmlFor="tagsInput">Tags</FieldLabel>
-            <TagInput value={formState.tags} onValueChange={(value) => updateField("tags", value ?? undefined)} placeholder="Type a tag and press Enter" />
-          </Field>
-
-          <Field>
-            <FieldLabel htmlFor="toolsInput">Tools</FieldLabel>
-            <TagInput  value={formState.tools} onValueChange={(value) => updateField("tools", value ?? undefined)} placeholder="Type a tool and press Enter" />
-          </Field>
-
-          <div className="grid grid-cols-2 gap-4 items-end">
-            <Field>
-              <FieldLabel htmlFor="difficultyRating">Difficulty</FieldLabel>
-              <Rating
-                id="difficultyRating"
-                value={formState.difficultyRating ? Number(formState.difficultyRating) : undefined}
-                onValueChange={(value) => updateField("difficultyRating", value)}
-                icon={<Sword />}
-              />
-            </Field>
-
-            <Field>
-              <div className="flex items-center gap-2">
-                <Checkbox
-                  id="favoriteInput"
-                  checked={formState.favorite ?? false}
-                  onCheckedChange={(checked) => updateField("favorite", checked === true)}
-                />
-                <FieldLabel htmlFor="favoriteInput">Set as favorite</FieldLabel>
-              </div>
             </Field>
           </div>
         </div>

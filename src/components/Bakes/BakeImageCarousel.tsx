@@ -13,7 +13,7 @@ import type { BakeImage } from "../../types/BakeStorageTypes";
 import { cn } from "cn";
 import { X } from "lucide-react";
 import { Button } from "#components/SharedComponents/ui/button";
-import { DeleteImageTrigger } from "#components/ActionDialogs/DeleteImageTrigger";
+import { DeleteImageTrigger } from "#components/Triggers/DeleteImageTrigger";
 
 interface BakeImageCarouselProps {
   bakeId: string;

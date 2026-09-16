@@ -1,4 +1,4 @@
-import { DeleteRecipeTrigger } from "#components/ActionDialogs/DeleteRecipeTrigger";
+import { DeleteRecipeTrigger } from "#components/Triggers/DeleteRecipeTrigger";
 import { Badge } from "#components/SharedComponents/ui/badge";
 import { Button } from "#components/SharedComponents/ui/button";
 import { Card, CardAction, CardContent, CardHeader, CardTitle } from "#components/SharedComponents/ui/card";
@@ -6,7 +6,6 @@ import {
   ChefHat,
   MoreVertical,
   Plus,
-  Sword,
 } from "lucide-react";
 import { useState, type Dispatch, type SetStateAction } from "react";
 import type { RecipeDetail } from "../../types/RecipeTypes";
@@ -22,10 +21,11 @@ import {
   DropdownMenuTrigger,
 } from "#components/SharedComponents/ui/dropdown-menu";
 import { useNavigate } from "react-router-dom";
-import { UpdateRecipeDetailsTrigger } from "#components/ActionDialogs/UpdateRecipeDetailsTrigger";
-import { Rating } from "#components/SharedComponents/ui/rating";
-import { UpdateTimesTrigger } from "#components/ActionDialogs/UpdateTimesTrigger";
+import { UpdateRecipeDetailsTrigger } from "#components/Triggers/UpdateRecipeDetailsTrigger";
+import { UpdateTimesTrigger } from "#components/Triggers/UpdateTimesTrigger";
 import { Separator } from "#components/SharedComponents/ui/separator";
+import { UpdateChipsTrigger } from "#components/Triggers/UpdateChipsTrigger";
+import { UpdateDifficultyTrigger } from "#components/Triggers/UpdateDifficultyTrigger";
 
 interface RecipeDetailsCardProps {
   details: RecipeDetail;
@@ -63,6 +63,8 @@ export function RecipeDetailsCard({ details, editModeOn, setEditModeOn }: Recipe
   const sortedBakes = bakes?.slice().sort((a, b) => b.startDatetime.localeCompare(a.startDatetime)) ?? [];
   const mostRecentBake = sortedBakes[0];
   const openBake = sortedBakes.find((bake) => bake.endDatetime === null);
+
+  const hasLowerDetails = details.bakeTime || details.prepTime || details.difficultyRating || details.tools.length > 0 || details.tags.length > 0
 
   return (
     <Card>
@@ -153,46 +155,60 @@ export function RecipeDetailsCard({ details, editModeOn, setEditModeOn }: Recipe
         </CardAction>
       </CardHeader>
 
+      { (details.description || (hasLowerDetails || editModeOn)) && 
       <CardContent className="flex flex-col gap-6">
         <p className="text-sm">{details.description}</p>
 
-        <Separator />
+        { (hasLowerDetails || editModeOn) && <>
+          <Separator />
 
-        <div className="flex flex-col gap-2">
-          <div className="flex flex-wrap items-center gap-2">
-            <UpdateTimesTrigger time={details.prepTime} timeType="PREP" triggerType="ICON" recipeId={details.id} />
+          <div className="flex flex-col gap-2">
+            <div className="flex flex-wrap items-center gap-2">
+              <UpdateTimesTrigger time={details.prepTime} timeType="PREP" triggerType="ICON" recipeId={details.id} editModeOn={editModeOn}/>
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
+              <UpdateTimesTrigger time={details.bakeTime} timeType="BAKE" triggerType="ICON" recipeId={details.id} editModeOn={editModeOn}/>
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
+              {(details.tags.length > 0 || editModeOn) && (
+                <>
+                  <span className="text-xs text-muted-foreground">Tags:</span>
+                  {details.tags.map((tag) => (
+                    <Badge key={tag} variant="secondary">
+                      {tag}
+                    </Badge>
+                  ))}
+                  {editModeOn && (
+                    <UpdateChipsTrigger field="tags" recipeId={details.id} values={details.tags} />
+                  )}
+                </>
+              )}
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
+              {(details.tools.length > 0 || editModeOn) && (
+                <>
+                  <span className="text-xs text-muted-foreground">Tools:</span>
+                  {details.tools.map((tool) => (
+                    <Badge key={tool} variant="secondary">
+                      {tool}
+                    </Badge>
+                  ))}
+                  {editModeOn && (
+                    <UpdateChipsTrigger field="tools" recipeId={details.id} values={details.tools} />
+                  )}
+                </>
+              )}
+            </div>
+            {(details.difficultyRating || editModeOn) && (
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="text-xs text-muted-foreground">Difficulty rating:</span>
+                <UpdateDifficultyTrigger recipeId={details.id} difficultyRating={details.difficultyRating} readOnly={!editModeOn}/>
+              </div>
+            )}
           </div>
-          <div className="flex flex-wrap items-center gap-2">
-            <UpdateTimesTrigger time={details.bakeTime} timeType="BAKE" triggerType="ICON" recipeId={details.id} />
-          </div>
-          {details.tags.length > 0 && (
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="text-xs text-muted-foreground">Tags:</span>
-              {details.tags.map((tag) => (
-                <Badge key={tag} variant="secondary">
-                  {tag}
-                </Badge>
-              ))}
-            </div>
-          )}
-          {details.tools.length > 0 && (
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="text-xs text-muted-foreground">Tools:</span>
-              {details.tools.map((tool) => (
-                <Badge key={tool} variant="outline">
-                  {tool}
-                </Badge>
-              ))}
-            </div>
-          )}
-          {details.difficultyRating && (
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="text-xs text-muted-foreground">Difficulty rating:</span>
-              <Rating value={details.difficultyRating} max={5} icon={<Sword />} readOnly />
-            </div>
-          )}
-        </div>
+        </>}
       </CardContent>
+}
     </Card>
   );
 }
