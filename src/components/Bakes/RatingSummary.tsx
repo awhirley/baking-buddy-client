@@ -1,4 +1,4 @@
-import { Rating } from "#components/SharedComponents/ui/rating";
+import { RatingIcons } from "#components/SharedComponents/RatingIcons";
 import type { BakeRating } from "../../types/BakeTypes";
 import { RATING_FIELDS } from "../../types/RatingFields";
 
@@ -15,16 +15,11 @@ export function RatingsSummary({ ratings }: { ratings: BakeRating }) {
         const value = ratings?.[key];
         if (value != null) {
           return (
-            <div key={key} className="flex flex-col">
-              <span className="text-xs text-muted-foreground">{label}</span>
-              <span className="text-sm font-medium">{value != null ? `${value}/5` : "—"}</span>
-              <Rating
-                value={value != null ? value : 0}
-                max={5}
-                disabled
-                icon={icon}
-              />
+            <div className="flex items-center gap-1 text-xs text-muted-foreground">
+              <span>{label}:</span>
+              <RatingIcons icon={icon} max={5} rating={value != null ? value : 0} />
             </div>
+            
           );
         }
       })}
