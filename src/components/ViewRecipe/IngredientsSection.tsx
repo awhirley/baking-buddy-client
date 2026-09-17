@@ -13,7 +13,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "#components/SharedComponents/ui/dropdown-menu";
 import { Input } from "#components/SharedComponents/ui/input";
 import { Separator } from "#components/SharedComponents/ui/separator";
-import { Spinner } from "#components/SharedComponents/ui/spinner";
 import { Textarea } from "#components/SharedComponents/ui/textarea";
 
 import { useToast } from "../../contexts/ToastContext";
@@ -207,12 +206,16 @@ function IngredientRow({ ingredient, editModeOn }: { ingredient: Ingredient; edi
             <Button variant="ghost" size="sm" onClick={() => setIsEditingNote(false)} disabled={isSavingIngredient}>
               Cancel
             </Button>
-            <Button size="sm" onClick={() => updateIngredient({ amount: amountDraft, name: nameDraft, notes: noteDraft })} disabled={isSavingIngredient}>
+            <LoadingButton
+              size="sm"
+              isLoading={isSavingIngredient}
+              onClick={() => updateIngredient({ amount: amountDraft, name: nameDraft, notes: noteDraft })}
+            >
               <span className="flex items-center gap-2">
-                {isSavingIngredient ? <Spinner className="h-4 w-4" /> : <PencilSparklesIcon className="h-4 w-4" />}
+                <PencilSparklesIcon className="h-4 w-4" />
                 Save note
               </span>
-            </Button>
+            </LoadingButton>
           </div>
         </div>
       )}
