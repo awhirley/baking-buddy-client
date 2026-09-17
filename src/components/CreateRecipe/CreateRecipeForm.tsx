@@ -16,10 +16,10 @@ import { Separator } from "../SharedComponents/ui/separator";
 import { recipeService } from "../../services/RecipeService";
 import { useMutation } from "@tanstack/react-query";
 import type { CreateRecipePayload } from "../../types/RecipeTypes";
-import { Spinner } from "#components/SharedComponents/ui/spinner";
 import { useToast } from "../../contexts/ToastContext";
 import { CreatableDropdown } from "#components/SharedComponents/CreatableDropdown";
 import { clampMinutes, clampNonNegative, TimeCounter } from "#components/SharedComponents/TimeCounter";
+import { LoadingButton } from "#components/SharedComponents/LoadingButton";
 
 interface Ingredient {
   id: string;
@@ -359,9 +359,14 @@ export function RecipeForm() {
             <Button type="button" variant="secondary" onClick={() => navigate("/")} size="lg">
               Cancel
             </Button>
-            <Button style={{ width: '150px'}}type="button" onClick={handleCreate} size="lg" disabled={disableCreateButton}>
-              { isCreating ? <Spinner /> : "Create recipe" }
-            </Button>
+            <LoadingButton
+              size="lg"
+              disabled={disableCreateButton}
+              isLoading={isCreating}
+              onClick={handleCreate}
+            >
+              Create recipe
+            </LoadingButton>
           </div>
         </CardContent>
       </Card>

@@ -7,12 +7,12 @@ import { Badge } from "#components/SharedComponents/ui/badge";
 import { Button } from "#components/SharedComponents/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "#components/SharedComponents/ui/card";
 import { Separator } from "#components/SharedComponents/ui/separator";
-import { Spinner } from "#components/SharedComponents/ui/spinner";
 import { Textarea } from "#components/SharedComponents/ui/textarea";
 
 import { useToast } from "../../contexts/ToastContext";
 import type { BakeInstruction } from "../../types/BakeTypes";
 import { bakeService } from "../../services/BakeService";
+import { LoadingButton } from "#components/SharedComponents/LoadingButton";
 
 function instructionIsModified(instruction: BakeInstruction) {
   return instruction.initialDeltaValues.description !== instruction.updatedDeltaValues.updatedDescription;
@@ -158,16 +158,17 @@ function BakeInstructionRow({
               >
                 Cancel
               </Button>
-              <Button
+              <LoadingButton
                 size="sm"
+                disabled={descriptionDraft === effectiveDescription}
+                isLoading={isSavingInstruction}
                 onClick={() => editInstruction({ description: descriptionDraft })}
-                disabled={isSavingInstruction || descriptionDraft === effectiveDescription}
               >
                 <span className="flex items-center gap-2">
-                  {isSavingInstruction ? <Spinner className="h-4 w-4" /> : <Pencil className="h-4 w-4" />}
+                  <Pencil className="h-4 w-4" />
                   Save
                 </span>
-              </Button>
+              </LoadingButton>
             </>
           ) : (
             <>
@@ -184,7 +185,7 @@ function BakeInstructionRow({
               <Button
                 variant={isEditingNote ? "secondary" : "ghost"}
                 size="icon"
-                className="pl-2"
+                className="ml-2"
                 aria-label="Add note"
                 aria-pressed={isEditingNote}
                 disabled={isEditingSomething && !isEditingNote}
@@ -236,16 +237,16 @@ function BakeInstructionRow({
             <Button variant="ghost" size="sm" onClick={() => setIsEditingNote(false)} disabled={isSavingNote}>
               Cancel
             </Button>
-            <Button
+            <LoadingButton
               size="sm"
+              isLoading={isSavingNote}
               onClick={() => saveNote({ note: noteDraft?.trim() === "" ? null : noteDraft })}
-              disabled={isSavingNote}
             >
               <span className="flex items-center gap-2">
-                {isSavingNote ? <Spinner className="h-4 w-4" /> : <PencilSparklesIcon className="h-4 w-4" />}
+                <PencilSparklesIcon className="h-4 w-4" />
                 Save note
               </span>
-            </Button>
+            </LoadingButton>
           </div>
         </div>
       )}

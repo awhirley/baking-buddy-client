@@ -9,7 +9,6 @@ import { Button } from "#components/SharedComponents/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "#components/SharedComponents/ui/card";
 import { Input } from "#components/SharedComponents/ui/input";
 import { Separator } from "#components/SharedComponents/ui/separator";
-import { Spinner } from "#components/SharedComponents/ui/spinner";
 import { Textarea } from "#components/SharedComponents/ui/textarea";
 
 import { useToast } from "../../contexts/ToastContext";
@@ -185,7 +184,7 @@ function BakeIngredientRow({ bakeId, ingredient }: { bakeId: string; ingredient:
               )}
               <Button
                 variant={isEditingNote ? "secondary" : "ghost"}
-                className="pl-2"
+                className="ml-2"
                 size="icon"
                 aria-label="Add note"
                 aria-pressed={isEditingNote}
@@ -238,16 +237,16 @@ function BakeIngredientRow({ bakeId, ingredient }: { bakeId: string; ingredient:
             <Button variant="ghost" size="sm" onClick={() => setIsEditingNote(false)} disabled={isSavingNote}>
               Cancel
             </Button>
-            <Button
+            <LoadingButton
               size="sm"
+              isLoading={isSavingNote}
               onClick={() => saveNote({ note: noteDraft?.trim() === "" ? null : noteDraft })}
-              disabled={isSavingNote}
             >
               <span className="flex items-center gap-2">
-                {isSavingNote ? <Spinner className="h-4 w-4" /> : <PencilSparklesIcon className="h-4 w-4" />}
+                <PencilSparklesIcon className="h-4 w-4" />
                 Save note
               </span>
-            </Button>
+            </LoadingButton>
           </div>
         </div>
       )}

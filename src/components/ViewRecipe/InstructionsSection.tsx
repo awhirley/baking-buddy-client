@@ -11,7 +11,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "#components/SharedComp
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "#components/SharedComponents/ui/dialog";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "#components/SharedComponents/ui/dropdown-menu";
 import { Separator } from "#components/SharedComponents/ui/separator";
-import { Spinner } from "#components/SharedComponents/ui/spinner";
 import { Textarea } from "#components/SharedComponents/ui/textarea";
 
 import { useToast } from "../../contexts/ToastContext";
@@ -20,6 +19,7 @@ import { recipeService } from "../../services/RecipeService";
 import type { InstructionDeltaEntry } from "../../types/BakeTypes";
 import type { Instruction } from "../../types/RecipeTypes";
 import { BakesRelatedToDeltaDialog } from "./BakesRelatedToDeltaDialog";
+import { LoadingButton } from "#components/SharedComponents/LoadingButton";
 
 export function InstructionsSection({ instructions, editModeOn }: { instructions: Instruction[]; editModeOn: boolean }) {
   return (
@@ -144,16 +144,16 @@ function InstructionRow({
                 >
                   Cancel
                 </Button>
-                <Button
+                <LoadingButton
                   size="sm"
+                  isLoading={isSavingInstruction}
                   onClick={() => updateInstruction({ description: descriptionDraft, notes: savedNote })}
-                  disabled={isSavingInstruction}
                 >
                   <span className="flex items-center gap-2">
-                    {isSavingInstruction ? <Spinner className="h-4 w-4" /> : <Pencil className="h-4 w-4" />}
+                    <Pencil className="h-4 w-4" />
                     Save
                   </span>
-                </Button>
+                </LoadingButton>
               </>
             ) : (
               <>
@@ -209,12 +209,16 @@ function InstructionRow({
             <Button variant="ghost" size="sm" onClick={() => setIsEditingNote(false)} disabled={isSavingInstruction}>
               Cancel
             </Button>
-            <Button size="sm" onClick={() => updateInstruction({ description: descriptionDraft, notes: noteDraft })} disabled={isSavingInstruction}>
+            <LoadingButton
+              size="sm"
+              isLoading={isSavingInstruction}
+              onClick={() => updateInstruction({ description: descriptionDraft, notes: noteDraft })}
+            >
               <span className="flex items-center gap-2">
-                {isSavingInstruction ? <Spinner className="h-4 w-4" /> : <PencilSparklesIcon className="h-4 w-4" />}
+                <PencilSparklesIcon className="h-4 w-4" />
                 Save note
               </span>
-            </Button>
+            </LoadingButton>
           </div>
         </div>
       )}

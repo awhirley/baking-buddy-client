@@ -8,6 +8,7 @@ import { Input } from "#components/SharedComponents/ui/input";
 import { cn } from "cn";
 import { ImagePlus } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "#components/SharedComponents/ui/tooltip";
+import { LoadingButton } from "#components/SharedComponents/LoadingButton";
 
 interface BakeImageUploadTriggerProps {
   bakeId: string;
@@ -97,12 +98,13 @@ export function BakeImageUploadTrigger({ bakeId }: BakeImageUploadTriggerProps) 
             <Button variant="ghost" onClick={() => resetAndClose(true)}>
               Cancel
             </Button>
-            <Button
+            <LoadingButton
+              disabled={!file}
+              isLoading={uploadMutation.isPending}
               onClick={() => uploadMutation.mutate()}
-              disabled={!file || uploadMutation.isPending}
             >
-              {uploadMutation.isPending ? "Uploading..." : "Upload"}
-            </Button>
+              Upload
+            </LoadingButton>
           </div>
         </DialogFooter>
       </DialogContent>
