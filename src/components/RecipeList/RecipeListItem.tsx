@@ -14,8 +14,7 @@ import { bakeService } from "../../services/BakeService";
 import { useToast } from "../../contexts/ToastContext";
 import { LoadingButton } from "#components/SharedComponents/LoadingButton";
 import { RecipeDisplayImage } from "#components/SharedComponents/RecipeDisplayImage";
-
-const MAX_DIFFICULTY = 5;
+import { RatingIcons } from "#components/SharedComponents/RatingIcons";
 
 export function RecipeListItem({ recipe }: { recipe: RecipeDetail }) {
   const navigate = useNavigate();
@@ -64,18 +63,7 @@ export function RecipeListItem({ recipe }: { recipe: RecipeDetail }) {
           {recipe.difficultyRating != null && (
             <div className="flex items-center gap-1 text-xs text-muted-foreground">
               <span>Difficulty:</span>
-              <div className="flex items-center gap-0.5">
-                {Array.from({ length: MAX_DIFFICULTY }).map((_, i) => (
-                  <Sword
-                    key={i}
-                    className={
-                      i < recipe.difficultyRating!
-                        ? "h-3.5 w-3.5 fill-primary text-primary"
-                        : "h-3.5 w-3.5 text-muted-foreground/40"
-                    }
-                  />
-                ))}
-              </div>
+              <RatingIcons icon={Sword} max={5} rating={recipe.difficultyRating} />
             </div>
           )}
 
