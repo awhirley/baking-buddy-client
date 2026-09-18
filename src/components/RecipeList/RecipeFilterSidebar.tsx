@@ -13,6 +13,7 @@ import {
 import { Slider } from "#components/ui/slider";
 import { filterService } from "../../services/FilterService";
 import { ScrollArea } from "#components/ui/scroll-area";
+import { Skeleton } from "#components/SharedComponents/ui/skeleton";
 
 interface RecipeFilterSidebarProps {
   filters: RecipeFilters;
@@ -27,22 +28,22 @@ export function RecipeFilterSidebar({
   bounds,
   activeFilterCount,
 }: RecipeFilterSidebarProps) {
-  const { data: tagOptions } = useQuery({
+  const { data: tagOptions, isLoading: isLoadingTags } = useQuery({
     queryKey: ["recipeTags"],
     queryFn: () => filterService.listTags(),
   });
 
-  const { data: toolOptions } = useQuery({
+  const { data: toolOptions, isLoading: isLoadingTools } = useQuery({
     queryKey: ["recipeTools"],
     queryFn: () => filterService.listTools(),
   });
 
-  const { data: sourceOptions } = useQuery({
+  const { data: sourceOptions, isLoading: isLoadingSources } = useQuery({
     queryKey: ["recipeSources"],
     queryFn: () => filterService.listSources(),
   });
 
-  const { data: sourceTypeOptions } = useQuery({
+  const { data: sourceTypeOptions, isLoading: isLoadingSourceTypes } = useQuery({
     queryKey: ["recipeSourceTypes"],
     queryFn: () => filterService.listSourceTypes(),
   });
@@ -92,6 +93,7 @@ export function RecipeFilterSidebar({
           label="Tags"
           options={tagOptions ?? []}
           selected={filters.tags}
+          isLoading={isLoadingTags}
           onToggle={(value) => onFiltersChange({ ...filters, tags: toggleValue(filters.tags, value) })}
         />
 
@@ -99,6 +101,7 @@ export function RecipeFilterSidebar({
           label="Tools"
           options={toolOptions ?? []}
           selected={filters.tools}
+          isLoading={isLoadingTools}
           onToggle={(value) => onFiltersChange({ ...filters, tools: toggleValue(filters.tools, value) })}
         />
 
@@ -106,6 +109,7 @@ export function RecipeFilterSidebar({
           label="Sources"
           options={sourceOptions ?? []}
           selected={filters.sources}
+          isLoading={isLoadingSources}
           onToggle={(value) => onFiltersChange({ ...filters, sources: toggleValue(filters.sources, value) })}
         />
 
@@ -113,6 +117,7 @@ export function RecipeFilterSidebar({
           label="Source type"
           options={sourceTypeOptions ?? []}
           selected={filters.sourceTypes}
+          isLoading={isLoadingSourceTypes}
           onToggle={(value) =>
             onFiltersChange({ ...filters, sourceTypes: toggleValue(filters.sourceTypes, value) })
           }
@@ -155,31 +160,41 @@ function CheckboxGroup({
   options,
   selected,
   onToggle,
+  isLoading,
 }: {
   label: string;
   options: string[];
   selected: string[];
   onToggle: (value: string) => void;
+  isLoading?: boolean;
 }) {
-  if (options.length === 0) return null;
+  if (!isLoading && options.length === 0) return null;
 
   return (
     <div>
       <Label className="text-xs text-muted-foreground">{label}</Label>
-      <ScrollArea className="mt-2 flex max-h-40 flex-col gap-2 overflow-y-auto">
-        {options.map((option) => (
-          <div key={option} className="flex items-center gap-2">
-            <Checkbox
-              id={`${label}-${option}`}
-              checked={selected.includes(option)}
-              onCheckedChange={() => onToggle(option)}
-            />
-            <Label htmlFor={`${label}-${option}`} className="text-sm font-normal">
-              {option}
-            </Label>
-          </div>
-        ))}
-      </ScrollArea>
+      {isLoading ? (
+        <div className="mt-2 flex flex-col gap-2.5">
+          <Skeleton className="h-4 w-3/4" />
+          <Skeleton className="h-4 w-1/2" />
+          <Skeleton className="h-4 w-2/3" />
+        </div>
+      ) : (
+        <ScrollArea className="mt-2 flex max-h-40 flex-col gap-2 overflow-y-auto">
+          {options.map((option) => (
+            <div key={option} className="flex items-center gap-2">
+              <Checkbox
+                id={`${label}-${option}`}
+                checked={selected.includes(option)}
+                onCheckedChange={() => onToggle(option)}
+              />
+              <Label htmlFor={`${label}-${option}`} className="text-sm font-normal">
+                {option}
+              </Label>
+            </div>
+          ))}
+        </ScrollArea>
+      )}
     </div>
   );
 }
