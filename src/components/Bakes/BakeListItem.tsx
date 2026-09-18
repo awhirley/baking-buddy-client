@@ -24,6 +24,7 @@ import {
 } from "#components/SharedComponents/ui/alert-dialog";
 import { Trash2, Mountain } from "lucide-react";
 import { RatingsSummary } from "./RatingSummary";
+import { BakeDisplayImages } from "./BakeDisplayImages";
 
 export function BakeListItem({ bake }: { bake: BakeDetail }) {
   const isInProgress = !bake.endDatetime;
@@ -52,23 +53,27 @@ export function BakeListItem({ bake }: { bake: BakeDetail }) {
           <BakeActionMenu bake={bake} />
         </CardAction>
       </CardHeader>
-      <CardContent className="flex flex-col gap-3">
-        <div className="flex flex-wrap items-center gap-x-4 text-xs text-muted-foreground">
-          {bake.elevation != null && (
-            <span className="flex items-center gap-1">
-              <Mountain className="h-3 w-3" />
-              {bake.elevation}ft elevation
-            </span>
+      <CardContent className="flex flex-row gap-4">
+        <div className="flex flex-col gap-3 flex-1 min-w-0">
+          <div className="flex flex-wrap items-center gap-x-4 text-xs text-muted-foreground">
+            {bake.elevation != null && (
+              <span className="flex items-center gap-1">
+                <Mountain className="h-3 w-3" />
+                {bake.elevation}ft elevation
+              </span>
+            )}
+          </div>
+
+          {!isInProgress && bake.ratings && (
+            <div className="border-t pt-3">
+              <RatingsSummary ratings={bake.ratings} />
+            </div>
           )}
+
+          {bake.notes && <p className="text-sm text-muted-foreground italic line-clamp-2">{bake.notes}</p>}
         </div>
 
-        {!isInProgress && bake.ratings && (
-          <div className="border-t pt-3">
-            <RatingsSummary ratings={bake.ratings} />
-          </div>
-        )}
-
-        {bake.notes && <p className="text-sm text-muted-foreground italic line-clamp-2">{bake.notes}</p>}
+        <BakeDisplayImages bakeId={bake.id} maxHeightClassName="max-h-24" />
       </CardContent>
     </Card>
   );
