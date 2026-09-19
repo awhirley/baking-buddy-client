@@ -56,7 +56,7 @@ export function Recipe() {
 
           <NoteCard recipeId={data.details.id} notes={data.details.notes} />
 
-          <IngredientsSection ingredients={data.ingredients} editModeOn={editModeOn} />
+          <IngredientsSection recipeId={data.details.id} ingredients={data.ingredients} editModeOn={editModeOn} />
 
           <InstructionsSection instructions={data.instructions} editModeOn={editModeOn} />
         </div>

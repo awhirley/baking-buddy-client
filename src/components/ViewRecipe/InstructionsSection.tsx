@@ -1,5 +1,5 @@
-import { History as HistoryIcon, MoreVertical, Pencil, PencilSparklesIcon, StickyNote } from "lucide-react";
-import { useState } from "react";
+import { History as HistoryIcon, MoreVertical, MoveDown, MoveUp, Pencil, PencilSparklesIcon, Plus, StickyNote, Trash2 } from "lucide-react";
+import { Fragment, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -20,19 +20,66 @@ import type { InstructionDeltaEntry } from "../../types/BakeTypes";
 import type { Instruction } from "../../types/RecipeTypes";
 import { BakesRelatedToDeltaDialog } from "./BakesRelatedToDeltaDialog";
 import { LoadingButton } from "#components/SharedComponents/LoadingButton";
+import { DeleteInstructionOrIngredientDialog } from "#components/Triggers/DeleteInstructionOrIngredientDialog";
 
 export function InstructionsSection({ instructions, editModeOn }: { instructions: Instruction[]; editModeOn: boolean }) {
+  const { id } = useParams();
+
+  // null = append at the end
+  const [insertIndex, setInsertIndex] = useState<number | null>(null);
+  const position = Math.min(insertIndex ?? instructions.length, instructions.length);
+
+  // don't carry a stale insert position across edit-mode toggles
+  if (!editModeOn) setInsertIndex(null);
+
+  const previousInstructionId = position > 0 ? instructions[position - 1].id : null;
+  const nextInstructionId = position < instructions.length ? instructions[position].id : null;
+
+  const moveUp = () => setInsertIndex(Math.max(position - 1, 0));
+  const moveDown = () => setInsertIndex(Math.min(position + 1, instructions.length));
+
+  const items = instructions.map((instruction, index) => ({
+    key: instruction.id,
+    node: (
+      <InstructionRow
+        instruction={instruction}
+        // steps after the insertion point shift down by one while adding
+        stepNumber={editModeOn && index >= position ? index + 2 : index + 1}
+        editModeOn={editModeOn}
+      />
+    ),
+  }));
+
+  if (editModeOn && id) {
+    items.splice(position, 0, {
+      key: "add-instruction-row", // stable key so state survives moving
+      node: (
+        <AddInstructionRow
+          recipeId={id}
+          previousInstructionId={previousInstructionId}
+          nextInstructionId={nextInstructionId}
+          stepNumber={position + 1}
+          canMoveUp={position > 0}
+          canMoveDown={position < instructions.length}
+          onMoveUp={moveUp}
+          onMoveDown={moveDown}
+          onClose={() => setInsertIndex(null)}
+        />
+      ),
+    });
+  }
+
   return (
     <Card>
       <CardHeader>
         <CardTitle>Instructions</CardTitle>
       </CardHeader>
       <CardContent className="flex flex-col gap-1">
-        {instructions.map((instruction, index) => (
-          <div key={instruction.id}>
-            <InstructionRow instruction={instruction} stepNumber={index + 1} editModeOn={editModeOn} />
-            {index < instructions.length - 1 && <Separator />}
-          </div>
+        {items.map((item, i) => (
+          <Fragment key={item.key}>
+            {item.node}
+            {i < items.length - 1 && <Separator />}
+          </Fragment>
         ))}
       </CardContent>
     </Card>
@@ -60,6 +107,8 @@ function InstructionRow({
 
   const [isViewingHistory, setIsViewingHistory] = useState(false);
 
+  const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
+
   const { addToast } = useToast();
 
   const { mutate: updateInstruction, isPending: isSavingInstruction } = useMutation({
@@ -74,6 +123,18 @@ function InstructionRow({
     },
     onError: () => {
       addToast("Failed to update instruction", "Please try again.", { type: "destructive", duration: 6000 });
+    },
+  });
+
+  const { mutate: deleteInstruction, isPending: isDeletingInstruction } = useMutation({
+    mutationFn: () => recipeService.deleteInstruction(instruction.id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["recipe", id] });
+      addToast("Instruction deleted", null, { type: "default" });
+      setIsConfirmingDelete(false);
+    },
+    onError: () => {
+      addToast("Failed to delete instruction", "Please try again.", { type: "destructive", duration: 6000 });
     },
   });
 
@@ -186,6 +247,15 @@ function InstructionRow({
                 >
                   <HistoryIcon className="h-4 w-4" />
                 </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  aria-label="Delete instruction"
+                  disabled={isEditingSomething}
+                  onClick={() => setIsConfirmingDelete(true)}
+                >
+                  <Trash2 className="h-4 w-4 text-destructive" />
+                </Button>
               </>
             )}
           </div>
@@ -224,6 +294,108 @@ function InstructionRow({
       )}
 
       {isViewingHistory && <InstructionHistoryPreview instructionId={instruction.id} />}
+
+      <DeleteInstructionOrIngredientDialog
+        isOpen={isConfirmingDelete}
+        onOpenChange={setIsConfirmingDelete}
+        title="Delete instruction?"
+        description={`Step ${stepNumber} will be permanently removed from this recipe. The steps after it will be renumbered.`}
+        isDeleting={isDeletingInstruction}
+        onConfirm={() => deleteInstruction()}
+      />
+    </div>
+  );
+}
+
+function AddInstructionRow({
+  recipeId,
+  previousInstructionId,
+  nextInstructionId,
+  stepNumber,
+  canMoveUp,
+  canMoveDown,
+  onMoveUp,
+  onMoveDown,
+  onClose,
+}: {
+  recipeId: string;
+  previousInstructionId: string | null;
+  nextInstructionId: string | null;
+  stepNumber: number;
+  canMoveUp: boolean;
+  canMoveDown: boolean;
+  onMoveUp: () => void;
+  onMoveDown: () => void;
+  onClose: () => void;
+}) {
+  const queryClient = useQueryClient();
+  const { addToast } = useToast();
+
+  const [isAdding, setIsAdding] = useState(false);
+  const [descriptionDraft, setDescriptionDraft] = useState("");
+
+  const canSubmit = descriptionDraft.trim() !== "";
+
+  function closeForm() {
+    setDescriptionDraft("");
+    setIsAdding(false);
+    onClose(); // reset insert position to the end
+  }
+
+  const { mutate: createInstruction, isPending: isCreating } = useMutation({
+    mutationFn: () =>
+      recipeService.createInstruction(recipeId, {
+        description: descriptionDraft.trim(),
+        previousInstructionId,
+        nextInstructionId,
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["recipe", recipeId] });
+      addToast("Instruction added", null, { type: "default" });
+      closeForm();
+    },
+    onError: () => {
+      addToast("Failed to add instruction", "Please try again.", { type: "destructive", duration: 6000 });
+    },
+  });
+
+  if (!isAdding) {
+    return (
+      <Button variant="ghost" size="sm" className="self-start" onClick={() => setIsAdding(true)}>
+        <Plus className="h-4 w-4" />
+        Add step
+      </Button>
+    );
+  }
+
+  return (
+    <div className="flex flex-col gap-2 py-2">
+      <div className="flex items-start gap-2">
+        <div className="flex">
+          <Button size="icon" variant="ghost" aria-label="Move up" disabled={!canMoveUp} onClick={onMoveUp}>
+            <MoveUp />
+          </Button>
+          <Button size="icon" variant="ghost" aria-label="Move down" disabled={!canMoveDown} onClick={onMoveDown}>
+            <MoveDown />
+          </Button>
+        </div>
+        <span className="font-medium text-muted-foreground pt-2">{stepNumber}.</span>
+        <Textarea
+          autoFocus
+          value={descriptionDraft}
+          onChange={(event) => setDescriptionDraft(event.target.value)}
+          className="flex-1 border p-2"
+          placeholder="Instruction step..."
+        />
+      </div>
+      <div className="flex gap-2 self-end">
+        <Button variant="ghost" size="sm" onClick={closeForm} disabled={isCreating}>
+          Cancel
+        </Button>
+        <LoadingButton size="sm" isLoading={isCreating} onClick={() => createInstruction()} disabled={isCreating || !canSubmit}>
+          Add step
+        </LoadingButton>
+      </div>
     </div>
   );
 }
