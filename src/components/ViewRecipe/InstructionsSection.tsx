@@ -1,5 +1,5 @@
 import { History as HistoryIcon, MoreVertical, MoveDown, MoveUp, Pencil, PencilSparklesIcon, Plus, StickyNote, Trash2 } from "lucide-react";
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -30,9 +30,7 @@ export function InstructionsSection({ instructions, editModeOn }: { instructions
   const position = Math.min(insertIndex ?? instructions.length, instructions.length);
 
   // don't carry a stale insert position across edit-mode toggles
-  useEffect(() => {
-    if (!editModeOn) setInsertIndex(null);
-  }, [editModeOn]);
+  if (!editModeOn) setInsertIndex(null);
 
   const previousInstructionId = position > 0 ? instructions[position - 1].id : null;
   const nextInstructionId = position < instructions.length ? instructions[position].id : null;
