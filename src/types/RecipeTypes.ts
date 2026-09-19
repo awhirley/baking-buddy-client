@@ -57,7 +57,7 @@ export interface RecipeDetail {
   displayImage: string | null;
 }
 
-export interface CreateIngredientPayload {
+export interface CreateInitialIngredientPayload {
   amount: string;
   name: string;
 }
@@ -82,7 +82,7 @@ export interface CreateRecipePayload {
   recipeSource: string | null;
   tags: string[] | null;
   tools: string[] | null;
-  ingredients: CreateIngredientPayload[];
+  ingredients: CreateInitialIngredientPayload[];
   instructions: string[];
   bakeTime: number | null;
   prepTime: number | null;

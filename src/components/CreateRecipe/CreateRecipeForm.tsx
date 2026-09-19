@@ -123,12 +123,8 @@ export function RecipeForm() {
       recipeSource: source ?? null,
       tags: [],
       tools: [],
-      // Assumes CreateRecipePayload.prepTime / bakeTime are stored as total minutes.
-      // Update these field names/shape if your payload type differs.
       prepTime: prepHours === null && prepMinutes === null ? null : (prepHours ?? 0) * 60 + (prepMinutes ?? 0),
       bakeTime: bakeHours === null && bakeMinutes === null ? null : (bakeHours ?? 0) * 60 + (bakeMinutes ?? 0),
-      // Safe to assume non-null here: the create button is disabled
-      // whenever any ingredient/instruction field is still null.
       ingredients: ingredients.map(({ amount, name }) => ({
         amount: amount ?? "",
         name: name ?? "",
