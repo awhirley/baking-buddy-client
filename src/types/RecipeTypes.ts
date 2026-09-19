@@ -26,6 +26,19 @@ export interface Instruction {
   createdAt: string;
 }
 
+export interface CreateIngredientPayload {
+  amount: string,
+  name: string,
+  previousIngredientId: string | null,
+  nextIngredientId: string | null,
+}
+
+export interface CreateInstructionPayload {
+  description: string,
+  previousInstructionId: string | null,
+  nextInstructionId: string | null,
+}
+
 export interface RecipeDetail {
   id: string;
   name: string;
@@ -119,5 +132,22 @@ export function updatedRecipePayloadtoApiPayload(payload: UpdateRecipePayload) {
     ...presentOrOmit("difficulty_rating", payload.difficultyRating),
     ...presentOrOmit("bake_time", payload.bakeTime),
     ...presentOrOmit("prep_time", payload.prepTime),
+  };
+}
+
+export function createInstructionPayloadtoApiPayload(payload: CreateInstructionPayload) {
+  return {
+    description: payload.description,
+    previous_instruction_id: payload.previousInstructionId,
+    next_instruction_id: payload.nextInstructionId
+  };
+}
+
+export function createIngredientPayloadtoApiPayload(payload: CreateIngredientPayload) {
+  return {
+    name: payload.name,
+    amount: payload.amount,
+    previous_ingredient_id: payload.previousIngredientId,
+    next_ingredient_id: payload.nextIngredientId
   };
 }

@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { createRecipePayloadtoApiPayload, type CreateRecipePayload, type UpdateIngredientPayload, type UpdateInstructionPayload, type Recipe, type RecipeDetail, type UpdateRecipePayload, updatedRecipePayloadtoApiPayload } from '../types/RecipeTypes';
+import { createRecipePayloadtoApiPayload, type CreateRecipePayload, type UpdateIngredientPayload, type UpdateInstructionPayload, type Recipe, type RecipeDetail, type UpdateRecipePayload, updatedRecipePayloadtoApiPayload, type CreateIngredientPayload, type CreateInstructionPayload, createIngredientPayloadtoApiPayload, createInstructionPayloadtoApiPayload, type Ingredient, type Instruction } from '../types/RecipeTypes';
 import { toCamelCase } from './utils';
 
 const recipeServiceApi = `${import.meta.env.VITE_API_URL}/api`;
@@ -58,4 +58,23 @@ export const recipeService = {
       const response = await api.patch<Recipe>(`/instructions/${id}`, args);
       return response.data;
     },
+
+    async createIngredient(recipeId: string, args: CreateIngredientPayload): Promise<Ingredient> {
+      const response = await api.post<Ingredient>(`/recipes/${recipeId}/ingredients`, createIngredientPayloadtoApiPayload(args));
+      return response.data;
+    },
+
+    async createInstruction(recipeId: string, args: CreateInstructionPayload): Promise<Instruction> {
+      const response = await api.post<Instruction>(`/recipes/${recipeId}/instructions`, createInstructionPayloadtoApiPayload(args));
+      return response.data;
+    },
+
+    async deleteIngredient(id: string): Promise<void> {
+      await api.delete(`/ingredients/${id}`);
+    },
+
+    async deleteInstruction(id: string): Promise<void> {
+      await api.delete(`/instructions/${id}`);
+    },
+
 }

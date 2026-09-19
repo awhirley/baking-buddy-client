@@ -1,5 +1,5 @@
-import { History as HistoryIcon, MoreVertical, Pencil, PencilSparklesIcon, StickyNote } from "lucide-react";
-import { useState } from "react";
+import { History as HistoryIcon, MoreVertical, MoveDown, MoveUp, Pencil, PencilSparklesIcon, Plus, StickyNote, Trash2 } from "lucide-react";
+import { Fragment, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -21,19 +21,53 @@ import { recipeService } from "../../services/RecipeService";
 import type { IngredientDeltaEntry } from "../../types/BakeTypes";
 import type { Ingredient } from "../../types/RecipeTypes";
 import { BakesRelatedToDeltaDialog } from "./BakesRelatedToDeltaDialog";
+import { DeleteInstructionOrIngredientDialog } from "#components/Triggers/DeleteInstructionOrIngredientDialog";
 
-export function IngredientsSection({ ingredients, editModeOn }: { ingredients: Ingredient[]; editModeOn: boolean }) {
+export function IngredientsSection({ recipeId, ingredients, editModeOn }: { recipeId: string; ingredients: Ingredient[]; editModeOn: boolean }) {
+  // null = append at the end
+  const [insertIndex, setInsertIndex] = useState<number | null>(null);
+  const position = Math.min(insertIndex ?? ingredients.length, ingredients.length);
+
+  const previousIngredientId = position > 0 ? ingredients[position - 1].id : null;
+  const nextIngredientId = position < ingredients.length ? ingredients[position].id : null;
+
+  const moveUp = () => setInsertIndex(Math.max(position - 1, 0));
+  const moveDown = () => setInsertIndex(Math.min(position + 1, ingredients.length));
+
+  const items = ingredients.map((ingredient) => ({
+    key: ingredient.id,
+    node: <IngredientRow ingredient={ingredient} editModeOn={editModeOn} />,
+  }));
+
+  if (editModeOn) {
+    items.splice(position, 0, {
+      key: "add-ingredient-row", // stable key so state survives moving
+      node: (
+        <AddIngredientRow
+          recipeId={recipeId}
+          previousIngredientId={previousIngredientId}
+          nextIngredientId={nextIngredientId}
+          canMoveUp={position > 0}
+          canMoveDown={position < ingredients.length}
+          onMoveUp={moveUp}
+          onMoveDown={moveDown}
+          onClose={() => setInsertIndex(null)}
+        />
+      ),
+    });
+  }
+
   return (
     <Card>
       <CardHeader>
         <CardTitle>Ingredients</CardTitle>
       </CardHeader>
       <CardContent className="flex flex-col gap-1">
-        {ingredients.map((ingredient, index) => (
-          <div key={ingredient.id}>
-            <IngredientRow ingredient={ingredient} editModeOn={editModeOn} />
-            {index < ingredients.length - 1 && <Separator />}
-          </div>
+        {items.map((item, i) => (
+          <Fragment key={item.key}>
+            {item.node}
+            {i < items.length - 1 && <Separator />}
+          </Fragment>
         ))}
       </CardContent>
     </Card>
@@ -54,6 +88,8 @@ function IngredientRow({ ingredient, editModeOn }: { ingredient: Ingredient; edi
 
   const [isViewingHistory, setIsViewingHistory] = useState(false);
 
+  const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
+
   const { addToast } = useToast();
 
   const { mutate: updateIngredient, isPending: isSavingIngredient } = useMutation({
@@ -68,6 +104,18 @@ function IngredientRow({ ingredient, editModeOn }: { ingredient: Ingredient; edi
     },
     onError: () => {
       addToast("Failed to update ingredient", "Please try again.", { type: "destructive", duration: 6000 });
+    },
+  });
+
+  const { mutate: deleteIngredient, isPending: isDeletingIngredient } = useMutation({
+    mutationFn: () => recipeService.deleteIngredient(ingredient.id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["recipe", id] });
+      addToast("Ingredient deleted", null, { type: "default" });
+      setIsConfirmingDelete(false);
+    },
+    onError: () => {
+      addToast("Failed to delete ingredient", "Please try again.", { type: "destructive", duration: 6000 });
     },
   });
 
@@ -183,6 +231,15 @@ function IngredientRow({ ingredient, editModeOn }: { ingredient: Ingredient; edi
                 >
                   <HistoryIcon className="h-4 w-4" />
                 </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  aria-label="Delete ingredient"
+                  disabled={isEditingSomething}
+                  onClick={() => setIsConfirmingDelete(true)}
+                >
+                  <Trash2 className="h-4 w-4 text-destructive" />
+                </Button>
               </>
             )}
           </div>
@@ -221,6 +278,118 @@ function IngredientRow({ ingredient, editModeOn }: { ingredient: Ingredient; edi
       )}
 
       {isViewingHistory && <IngredientHistoryPreview ingredientId={ingredient.id} />}
+
+      <DeleteInstructionOrIngredientDialog
+        isOpen={isConfirmingDelete}
+        onOpenChange={setIsConfirmingDelete}
+        title="Delete ingredient?"
+        description={`"${ingredient.amount} ${ingredient.name}" will be permanently removed from this recipe.`}
+        isDeleting={isDeletingIngredient}
+        onConfirm={() => deleteIngredient()}
+      />
+    </div>
+  );
+}
+
+function AddIngredientRow({
+  recipeId,
+  previousIngredientId,
+  nextIngredientId,
+  canMoveUp,
+  canMoveDown,
+  onMoveUp,
+  onMoveDown,
+  onClose,
+}: {
+  recipeId: string;
+  previousIngredientId: string | null;
+  nextIngredientId: string | null;
+  canMoveUp: boolean;
+  canMoveDown: boolean;
+  onMoveUp: () => void;
+  onMoveDown: () => void;
+  onClose: () => void;
+}) {
+  const queryClient = useQueryClient();
+  const { addToast } = useToast();
+
+  const [isAdding, setIsAdding] = useState(false);
+  const [amountDraft, setAmountDraft] = useState("");
+  const [nameDraft, setNameDraft] = useState("");
+
+  const canSubmit = nameDraft.trim() !== "";
+
+  function closeForm() {
+    setAmountDraft("");
+    setNameDraft("");
+    setIsAdding(false);
+    onClose(); // reset insert position to the end
+  }
+
+  const { mutate: createIngredient, isPending: isCreating } = useMutation({
+    mutationFn: () =>
+      recipeService.createIngredient(recipeId, {
+        name: nameDraft.trim(),
+        amount: amountDraft.trim(),
+        previousIngredientId,
+        nextIngredientId,
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["recipe", recipeId] });
+      addToast("Ingredient added", null, { type: "default" });
+      closeForm();
+    },
+    onError: () => {
+      addToast("Failed to add ingredient", "Please try again.", { type: "destructive", duration: 6000 });
+    },
+  });
+
+  function handleKeyDown(event: React.KeyboardEvent) {
+    if (event.key === "Enter" && canSubmit && !isCreating) {
+      createIngredient();
+    }
+  }
+
+  if (!isAdding) {
+    return (
+      <Button variant="ghost" size="sm" className="self-start" onClick={() => setIsAdding(true)}>
+        <Plus className="h-4 w-4" />
+        Add ingredient
+      </Button>
+    );
+  }
+
+  return (
+    <div className="flex flex-col gap-2 py-2">
+      <div className="flex items-center gap-2">
+        <div>
+          <Button size="icon" variant="ghost" aria-label="Move up" disabled={!canMoveUp} onClick={onMoveUp}><MoveUp /></Button>
+          <Button size="icon" variant="ghost" aria-label="Move down" disabled={!canMoveDown} onClick={onMoveDown}><MoveDown /></Button>
+        </div>
+        <Input
+          autoFocus
+          value={amountDraft}
+          onChange={(event) => setAmountDraft(event.target.value)}
+          onKeyDown={handleKeyDown}
+          className="w-24"
+          placeholder="Amount"
+        />
+        <Input
+          value={nameDraft}
+          onChange={(event) => setNameDraft(event.target.value)}
+          onKeyDown={handleKeyDown}
+          className="flex-1"
+          placeholder="Ingredient name"
+        />
+      </div>
+      <div className="flex gap-2 self-end">
+        <Button variant="ghost" size="sm" onClick={closeForm} disabled={isCreating}>
+          Cancel
+        </Button>
+        <LoadingButton size="sm" isLoading={isCreating} onClick={() => createIngredient()} disabled={isCreating || !canSubmit}>
+          Add ingredient
+        </LoadingButton>
+      </div>
     </div>
   );
 }

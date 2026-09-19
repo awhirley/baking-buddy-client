@@ -60,10 +60,6 @@ export function UpdateTimesTrigger({ time, timeType, recipeId, editModeOn }: { t
     setIsOpen(open);
   };
 
-  console.log((hoursInput !== undefined || minutesInput !== undefined));
-  console.log((minutesInput));
-  console.log((hoursInput));
-
   return (
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       { time == null ? (
